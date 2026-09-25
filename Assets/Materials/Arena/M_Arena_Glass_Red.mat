@@ -8,42 +8,29 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: M_Arena_Glass_Red
-  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
-  m_Parent: {fileID: 0}
-  m_ModifiedProperties:
-  m_ValidKeywords:
-  - _ALPHAPREMULTIPLY_ON
+  m_Shader: {fileID: 4800000, guid: 7e51cceaf15a5d4aaa8ccc80ae189b91, type: 3}
+  m_Parent: {fileID: 2100000, guid: 04539caca6d75623b1e28a29224ac2db, type: 2}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
   m_InvalidKeywords: []
-  m_LightmapFlags: 1
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 1
-  m_CustomRenderQueue: 3000
+  m_LightmapFlags: 2
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
   stringTagMap:
     RenderType: Transparent
   disabledShaderPasses: []
-  m_LockedProperties:
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _BumpScale: 1
-    - _Cutoff: 0.5
-    - _DetailNormalMapScale: 1
-    - _DstBlend: 10
-    - _GlossMapScale: 1
-    - _Glossiness: 0.82
-    - _GlossyReflections: 1
-    - _Metallic: 0
-    - _Mode: 3
-    - _OcclusionStrength: 1
-    - _Parallax: 0.02
-    - _SmoothnessTextureChannel: 0
-    - _SpecularHighlights: 1
-    - _SrcBlend: 1
-    - _UVSec: 0
-    - _ZWrite: 0
+    - _SecondaryThreshold: 0.6
+    - _Transmission: 0.3
     m_Colors:
-    - _Color: {r: 0.58, g: 0.14, b: 0.145, a: 0.36}
-    - _EmissionColor: {r: 0.14, g: 0.02, b: 0.02, a: 1}
+    - _Color: {r: 0.52, g: 0.08, b: 0.08, a: 1}
+    - _ColorAccent: {r: 0.2, g: 0.3, b: 0.55, a: 1}
+    - _ColorSecondary: {r: 0.36, g: 0.06, b: 0.14, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1

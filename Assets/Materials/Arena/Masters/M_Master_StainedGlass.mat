@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: M_Master_StainedGlass
+  m_Shader: {fileID: 4800000, guid: 7e51cceaf15a5d4aaa8ccc80ae189b91, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 2
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap:
+    RenderType: Transparent
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 01562dae733657c7b4a51cf82cc50f19, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap:
+        m_Texture: {fileID: 2800000, guid: fd22c69e9c415f8f8bb409c24035319c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RoughnessMap:
+        m_Texture: {fileID: 2800000, guid: 54834a00685550fe9f6b83e26a22c929, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 2800000, guid: 5adfbab3964059498e5bfcf3426b35e5, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 2800000, guid: 60feeb2c3e5554b58fe7d9af09e03bce, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MacroMap:
+        m_Texture: {fileID: 2800000, guid: 7e1095d12ee35e04a6a4ef3ec680e544, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AccentThreshold: 0.9
+    - _BlendSharpness: 8
+    - _BumpScale: 1
+    - _GlassOpacity: 0.42
+    - _GrimeDarkening: 0.35
+    - _MacroScale: 5
+    - _SecondaryThreshold: 0.55
+    - _TileSize: 1.2
+    - _Transmission: 0.35
+    m_Colors:
+    - _Color: {r: 0.2, g: 0.32, b: 0.7, a: 1}
+    - _ColorAccent: {r: 0.85, g: 0.55, b: 0.18, a: 1}
+    - _ColorSecondary: {r: 0.3, g: 0.18, b: 0.55, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

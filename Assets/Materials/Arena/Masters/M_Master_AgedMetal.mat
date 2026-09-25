@@ -1,0 +1,101 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: M_Master_AgedMetal
+  m_Shader: {fileID: 4800000, guid: 3372eee1ed395380b508c9e2c28285b8, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 2
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 89e4629b758358fb999164042a12c6dc, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap:
+        m_Texture: {fileID: 2800000, guid: 83adc61d372d5a0fb433c8083d470bba, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RoughnessMap:
+        m_Texture: {fileID: 2800000, guid: 6a072e3c2ebe577da0e44d892aad0ef9, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 2800000, guid: 5170932e445c536da0f9fdc6eb27cedf, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 2800000, guid: 7785179effb551058be7355743c65c44, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MacroMap:
+        m_Texture: {fileID: 2800000, guid: 7e1095d12ee35e04a6a4ef3ec680e544, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DustMap:
+        m_Texture: {fileID: 2800000, guid: 3c726e30c4c75c7d917d4b9fcfefce31, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DustBumpMap:
+        m_Texture: {fileID: 2800000, guid: 5f0c9af6d9be5e8bbf8cd95933583e5c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _BlendSharpness: 6
+    - _BumpScale: 1
+    - _DustAmount: 0.15
+    - _DustCavityBias: 0.6
+    - _DustSharpness: 4
+    - _DustTileSize: 1.2
+    - _EmissionFlow: 0
+    - _EmissionFlowSpeed: 0.4
+    - _EmissionUV: 0
+    - _GrimeHeight: 1.5
+    - _GrimeStrength: 0
+    - _MacroAlbedo: 0.08
+    - _MacroRoughness: 0.05
+    - _MacroScale: 9
+    - _Metallic: 1
+    - _ObjectSpace: 1
+    - _ObjectVariation: 0.08
+    - _OcclusionStrength: 1
+    - _RitualPulse: 0
+    - _RoughnessMax: 1
+    - _RoughnessMin: 0.12
+    - _StreakStrength: 0
+    - _TileSize: 0.6
+    - _Translucency: 0
+    - _TranslucencyWrap: 0.5
+    - _UVMapping: 0
+    - _UseTranslucency: 0
+    - _VariationTintStrength: 0
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _DustCenter: {r: 0, g: 0, b: 0, a: 0}
+    - _DustColor: {r: 1, g: 1, b: 1, a: 1}
+    - _DustRadius: {r: 0, g: 0, b: 1, a: 0}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _TranslucencyColor: {r: 1, g: 0.55, b: 0.25, a: 1}
+    - _VariationTint: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
