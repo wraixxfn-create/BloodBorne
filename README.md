@@ -1,1 +1,105 @@
-# BloodBorne
+# Vespershade
+
+An **original** third-person dark fantasy action RPG foundation built in Unity.
+
+The project draws its tone from gothic horror, oppressive fantasy and cosmic
+mystery — but every name, system, placeholder asset and design decision here
+is original. It contains **no** characters, monsters, environments, weapons,
+architecture, animations, UI, names, lore, music, dialogue, textures or models
+from Bloodborne, Dark Souls, Elden Ring or any other existing game.
+
+This repository is intentionally *only* the technical foundation: a clean,
+scalable base that later prompts will build gameplay on.
+
+---
+
+## Requirements
+
+- **Unity 2022.3 LTS** (authored against 2022.3.20f1; any 2022.3.x works)
+- Internet connection on first open (Unity resolves packages from the manifest)
+- Render pipeline: **Built-in**, linear color space
+- Input: **Both** (new Input System enabled via `activeInputHandler: 2`)
+
+## Opening & playing
+
+1. In Unity Hub: **Add > Add project from disk**, select this repository root.
+2. Open it with Unity 2022.3 LTS and let the initial import finish.
+3. Open `Assets/Scenes/Main/Main.unity` (already registered in Build Settings).
+4. Press **Play**.
+
+What you should see: a dark, fogged plane under cold moonlight. A capsule
+placeholder character spawns, the cursor locks, and you can:
+
+| Input | Action |
+| --- | --- |
+| `WASD` / left stick | Move (camera relative) |
+| Mouse / right stick | Orbit camera |
+| `Left Shift` / L3 | Sprint |
+| `Space` / A | Jump |
+| `Esc` / Start | Pause (freezes time, unlocks cursor) |
+| `E`, `Q`-area keys, mouse buttons, triggers | Reserved gameplay actions (Interact, Dodge, Light/Heavy Attack) — wired in the input layer, awaiting gameplay |
+
+The camera pulls itself in when the (future) environment blocks it, and the
+screen is graded with a vignette / desaturated / film-grain post pass.
+
+## Project structure
+
+```
+Assets/
+  Art/Shaders/        Foundation fullscreen grade shader
+  Audio/              Reserved for original audio
+  Materials/          Placeholder materials (ground, player)
+  Models/             Reserved for original models
+  Animations/         Reserved for original animation content
+  Prefabs/            Player.prefab, MainCameraRig.prefab
+  Scenes/Main/        Main.unity - the playable test scene
+  Scripts/
+    Core/             GameManager, SceneFlowManager, GameBootstrap, SingletonBehaviour
+    Data/             GameSettingsSO, SceneFlowSO
+    Events/           GameEventChannelSO, GameEventListener
+    Input/            CoreInput (code-defined Input System action maps)
+    Player/           PlayerController (CharacterController based)
+    Camera/           ThirdPersonCameraRig (orbit/follow + collision)
+    Rendering/        PostProcessController (OnRenderImage grade)
+  VFX/                Reserved for original effects
+  UI/                 Reserved for original UI
+  Resources/          Reserved for Resources.Load content
+  ScriptableObjects/  GameSettings.asset, SceneFlow.asset
+```
+
+## How it is put together
+
+- **ScriptableObject architecture** — tuning data lives in assets
+  (`GameSettings.asset`), scene tables in `SceneFlow.asset`; event channels
+  (`GameEventChannelSO`) decouple systems. Behaviours consume data, they don't
+  own it.
+- **Prefabs workflow** — the player and the camera rig are prefabs; the scene
+  spawns/references them instead of holding loose GameObjects, so later
+  prompts iterate on the prefab, not the scene.
+- **Input** — one `CoreInput` component owns a code-defined Input System map
+  (`Move, Look, Sprint, Jump, Dodge, Interact, LightAttack, HeavyAttack,
+  Pause`) with keyboard+mouse and gamepad bindings.
+- **Scene management** — `SceneFlowManager` loads scenes asynchronously with
+  progress + events, ready for a future loading screen.
+- **Lighting foundation** — single cold directional key light, flat dim
+  ambient, exponential fog, no skybox (void backdrop) in `Main.unity`.
+- **Post-processing foundation** — dependency free single pass
+  (vignette, saturation/contrast/tint, animated grain) so the base look works
+  with zero package dependencies.
+
+See [Docs/FOUNDATION.md](Docs/FOUNDATION.md) for the full architecture guide
+and the extension points planned for the next prompts.
+
+## Verification
+
+This project was authored and verified without a Unity editor in the loop.
+Tooling in `Tools/` performs the structural checks:
+
+```bash
+python3 Tools/generate_unity_guids.py   # deterministic GUIDs + .meta files (idempotent)
+python3 Tools/validate_unity_project.py # YAML integrity, GUID refs, scene/prefab/asset wiring
+python3 Tools/csharp_smoke_check.py     # delimiter balance + cross-file API symbols
+```
+
+All three pass. On first open, Unity will re-serialize a few files (normal)
+and download the packages listed in `Packages/manifest.json`.
