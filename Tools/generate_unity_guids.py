@@ -171,6 +171,8 @@ def ensure_metas() -> None:
     created = 0
     for dirpath, dirnames, filenames in os.walk(ASSETS):
         for name in dirnames + filenames:
+            if name.endswith(".meta"):
+                continue
             full = os.path.join(dirpath, name)
             rel = os.path.relpath(full, ROOT).replace(os.sep, "/")
             meta_path = full + ".meta"
