@@ -56,6 +56,7 @@ CLASS_NAMES = {
     143: "CharacterController",
     157: "LightmapSettings",
     196: "NavMeshSettings",
+    215: "ReflectionProbe",
     1001: "PrefabInstance",
     1045: "EditorBuildSettings",
 }
@@ -407,6 +408,8 @@ def main() -> int:
         for name in filenames:
             if name.endswith(".meta"):
                 continue
+            if name.lower().endswith((".png", ".jpg", ".jpeg", ".tga", ".exr", ".psd", ".wav", ".ogg", ".mp3", ".fbx")):
+                continue  # binary payloads can contain arbitrary byte sequences
             full = os.path.join(dirpath, name)
             try:
                 with open(full, "r", encoding="utf-8", errors="ignore") as fh:

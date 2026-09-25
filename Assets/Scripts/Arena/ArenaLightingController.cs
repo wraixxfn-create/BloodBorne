@@ -32,11 +32,14 @@ namespace Vespershade.Arena
         public float shaftBreathing = 0.08f;
 
         [Header("Ritual Pulse")]
-        [Tooltip("Emissive renderer materials for the ritual ring; pulse scale drives emission intensity via shader.")]
+        [Tooltip("Ritual renderers (Vespershade/Environment/Lit). The pulse drives the shader's _RitualPulse multiplier on top of each material's own emission.")]
         public Renderer[] ritualEmissiveRenderers;
 
         public float ritualPulseSpeed = 0.35f;
         public float ritualPulseStrength = 0.5f;
+
+        private static readonly int RitualPulseId = Shader.PropertyToID("_RitualPulse");
+        private MaterialPropertyBlock ritualBlock;
 
         private float[] candleBaseIntensities;
         private float[] shaftBaseIntensities;
@@ -69,7 +72,8 @@ namespace Vespershade.Arena
                 var ritual = new System.Collections.Generic.List<Renderer>();
                 foreach (var r in allR)
                 {
-                    if (r.gameObject.name.Contains("Ritual") || r.gameObject.name.Contains("Marking"))
+                    if (r.gameObject.name.Contains("Ritual") || r.gameObject.name.Contains("Marking")
+                        || r.gameObject.name.StartsWith("Platform_Tier") || r.gameObject.name.StartsWith("Stairs_Curved"))
                         ritual.Add(r);
                 }
                 if (ritual.Count > 0) ritualEmissiveRenderers = ritual.ToArray();
@@ -120,20 +124,23 @@ namespace Vespershade.Arena
                 }
             }
 
-            // Ritual emissive pulse: modulate emission color multiplier
+            // Ritual emissive pulse. Each material keeps its own authored emission
+            // colour (Vespershade/Environment/Lit multiplies it by 1 + _RitualPulse),
+            // so the sigil, glyph plates and dais floor pulse together while keeping
+            // their individual intensities. One shared MaterialPropertyBlock, no
+            // material instancing, no per-frame allocations.
             if (ritualEmissiveRenderers != null)
             {
                 float pulse = Mathf.Sin(t * ritualPulseSpeed + seed) * 0.5f + 0.5f;
-                float emissionScale = 1f + pulse * ritualPulseStrength;
-                Color baseEmission = new Color(0.22f, 0.48f, 0.52f, 1f) * emissionScale;
+                float value = pulse * ritualPulseStrength;
+                if (ritualBlock == null) ritualBlock = new MaterialPropertyBlock();
                 for (int i = 0; i < ritualEmissiveRenderers.Length; i++)
                 {
-                    if (ritualEmissiveRenderers[i] == null) continue;
-                    // MaterialPropertyBlock avoids instancing materials for the subtle pulse
-                    var block = new MaterialPropertyBlock();
-                    ritualEmissiveRenderers[i].GetPropertyBlock(block);
-                    block.SetColor("_EmissionColor", baseEmission);
-                    ritualEmissiveRenderers[i].SetPropertyBlock(block);
+                    var r = ritualEmissiveRenderers[i];
+                    if (r == null) continue;
+                    r.GetPropertyBlock(ritualBlock);
+                    ritualBlock.SetFloat(RitualPulseId, value);
+                    r.SetPropertyBlock(ritualBlock);
                 }
             }
         }

@@ -151,6 +151,14 @@ Modules live at `Assets/Prefabs/Arena/Modules/`. The master composition is `Asse
 
 ## 5. Material List
 
+> **Superseded (2026-09-25, material pass):** the arena now uses a textured PBR
+> library of 9 master materials and 25 Material Variants on custom
+> `Vespershade/Environment/*` shaders (triplanar, macro variation, dust, grime,
+> ritual emission). The asset names and GUIDs below are unchanged. Their values
+> now come from the variants. Full reference: **[ARENA_Materials.md](ARENA_Materials.md)**.
+> The table records the original colour-only palette, which the textured
+> albedos still follow.
+
 All materials use **Built-in Standard** (`Shader: Standard`, fileID 46). No textures in the foundation — colour, metallic, smoothness and emission alone establish read without texture memory. Textures can be projected later without changing prefab layout.
 
 | Material Asset | GUID (deterministic) | Base `_Color` (sRGB) | Metallic | Smoothness `_Glossiness` | Transparency / Emission | Use |
@@ -287,6 +295,7 @@ The arena was dimensioned around **Vespershade’s** movement values:
 
 ## 11. Change Log
 
+- **2026-09-25** — PBR material & texture pass: 9 masters + 25 variants, 10 texture sets, 2 custom shaders, reflection probe; primitive assembly Quad→Cube, collider, wall-gap, window and marking fixes (see ARENA_Materials.md §5).
 - **2026-09-25** — Initial design, modular kit authoring, 15 materials, 13 module prefabs + 244-object master, 3 arena scripts, scene integrated into `Main.unity`. All GUIDs deterministic via `generate_unity_guids.py`. Validation + C# smoke pass.
 
 ---
