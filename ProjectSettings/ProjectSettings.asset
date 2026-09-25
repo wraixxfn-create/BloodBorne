@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!129 &1
+PlayerSettings:
+  serializedVersion: 26
+  productGUID: 9f3c51d8-4b62-4a7e-8f02-c1d6a45b7e21
+  companyName: Vespershade Project
+  productName: Vespershade
+  defaultCursor: {fileID: 0}
+  cursorHotspot: {x: 0, y: 0}
+  defaultScreenWidth: 1920
+  defaultScreenHeight: 1080
+  defaultScreenWidthWeb: 1280
+  defaultScreenHeightWeb: 720
+  runInBackground: 1
+  resizableWindow: 0
+  fullscreenMode: 1
+  colorSpace: 1
+  activeInputHandler: 2
+  apiCompatibilityLevel: 6
