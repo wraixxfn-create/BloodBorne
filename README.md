@@ -58,6 +58,7 @@ Assets/
   Audio/              Reserved for original audio
   Materials/          Player placeholders + original arena lighting materials
   Models/Arena/       Reusable modular stonework and two tiny VFX meshes
+  Models/Characters/  Procedural layered protagonist wardrobe (base + 2 LODs)
   Animations/         Reserved for original animation content
   Prefabs/Arena/      Both chambers + shared Arena_LightingRig.prefab
   Prefabs/            Player.prefab, MainCameraRig.prefab
@@ -100,6 +101,14 @@ Assets/
   (vignette, saturation/contrast/tint, animated grain). Arena camera instances
   override the grade gently so shadowed figures remain visible.
 
+The player capsule carries the **Veilbound Wayfarer**, an original
+procedurally generated figure whose gothic wardrobe is built as real layered
+geometry (every garment is a cloth solid with lining and bound edges, with an
+asymmetric closure, half-cape, baldric and buckled boots). It streams through
+a three-level `LODGroup`. See
+[Docs/CHARACTER_WARDROBE.md](Docs/CHARACTER_WARDROBE.md) for the layer map,
+regeneration commands and the offline multi-angle preview tool.
+
 See [Docs/FOUNDATION.md](Docs/FOUNDATION.md) for core architecture and
 [Docs/ARENA_Lighting.md](Docs/ARENA_Lighting.md) for lighting controls.
 
@@ -115,6 +124,8 @@ python3 Tools/audit_serialized_types.py # object-reference type checks (needs Py
 python3 Tools/test_serialized_types.py  # offline auditor regression tests (needs PyYAML)
 python3 Tools/csharp_smoke_check.py     # delimiter balance + API symbols
 python3 Tools/verify_arena_lighting.py  # zones, budgets, heights, scene wiring (needs PyYAML)
+python3 Tools/create_original_protagonist.py  # regenerate the protagonist mesh + LODs
+python3 Tools/render_character_previews.py    # offline multi-angle wardrobe renders
 ```
 
 All checks pass in the authoring environment. There is no Unity editor here,
