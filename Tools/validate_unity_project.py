@@ -263,14 +263,14 @@ FIELD_SKIP_TYPES = {"class", "struct", "enum", "interface", "void", "delegate"}
 ATTR_CHUNK = re.compile(r"^\[[^\]]*\]\s*")
 
 
-def extract_serialized_fields(cs_path: str):
+def extract_serialized_fields(cs_path: str, include_types=False):
     try:
         with open(cs_path, "r", encoding="utf-8") as fh:
             text = fh.read()
     except OSError:
         return None
 
-    fields = set()
+    fields = {}
     pending_serialize = False
     for raw in text.splitlines():
         line = raw.strip()
@@ -323,9 +323,9 @@ def extract_serialized_fields(cs_path: str):
             and type_name.split(" ")[0] not in FIELD_SKIP_TYPES
         )
         if is_field and (serialize_attr or access == "public"):
-            fields.add(m.group("name"))
+            fields[m.group("name")] = type_name
 
-    return fields
+    return fields if include_types else set(fields)
 
 
 # --------------------------------------------------------------------------

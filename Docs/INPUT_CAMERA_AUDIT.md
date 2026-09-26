@@ -1,5 +1,13 @@
 # Input / camera repair audit
 
+## Follow-up investigation (2026-09-26)
+
+See [INVALID_CAST_INVESTIGATION.md](INVALID_CAST_INVESTIGATION.md) for the new
+whole-project type audit. It found and repaired six bootstrap GameObject fields
+that referenced prefab asset handles instead of prefab root GameObjects. This is
+a concrete data defect but **not a runtime-verified cause of the exception**.
+Unity remains unavailable; no Play Mode success is claimed.
+
 ## Status and evidence limits
 
 - **Camera:** independently verified source defects repaired in the existing rig;

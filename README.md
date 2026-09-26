@@ -111,6 +111,8 @@ Tooling in `Tools/` performs the structural checks:
 ```bash
 python3 Tools/generate_unity_guids.py  # deterministic GUIDs + .meta files
 python3 Tools/validate_unity_project.py # YAML integrity + references (needs PyYAML)
+python3 Tools/audit_serialized_types.py # object-reference type checks (needs PyYAML)
+python3 Tools/test_serialized_types.py  # offline auditor regression tests (needs PyYAML)
 python3 Tools/csharp_smoke_check.py     # delimiter balance + API symbols
 python3 Tools/verify_arena_lighting.py  # zones, budgets, heights, scene wiring (needs PyYAML)
 ```
@@ -128,3 +130,8 @@ Runner > PlayMode > Run All**. These tests use virtual Input System devices.
 They have **not been executed in the authoring environment** (no Unity Editor).
 The reported `InvalidCastException` remains unconfirmed/unresolved; static
 checks are not evidence of an exception-free Unity Console.
+
+The follow-up [InvalidCast investigation](Docs/INVALID_CAST_INVESTIGATION.md)
+found and repaired bootstrap prefab-reference IDs in all three scenes and added
+a serialized-reference type audit. This repair has **not** been tested in Unity;
+the reported exception's root cause remains unverified.
