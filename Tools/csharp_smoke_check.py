@@ -12,7 +12,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SCRIPTS = os.path.join(ROOT, "Assets", "Scripts")
+SCRIPTS = os.path.join(ROOT, "Assets")  # Include regression tests as well as runtime scripts.
 
 ERRORS = []
 
@@ -171,7 +171,7 @@ def main() -> int:
             ERRORS.append(f"expected symbol /{pattern}/ (in {where}) not found")
 
     # Every GameSettingsSO field consumed by code must exist on the class.
-    consumed = set(re.findall(r"settings\.(\w+)", joined))
+    consumed = set(re.findall(r"(?<![\w.])settings\.(\w+)", joined))
     gs_members = members_of(files["Assets/Scripts/Data/GameSettingsSO.cs"], "GameSettingsSO")
     if gs_members is None:
         ERRORS.append("could not locate GameSettingsSO class body")

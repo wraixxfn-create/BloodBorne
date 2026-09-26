@@ -49,7 +49,17 @@ Scene load
 
 ### Input (`Scripts/Input`)
 
-`CoreInput` builds one `InputActionMap` ("Gameplay") in code:
+`CoreInput` builds one `InputActionMap` ("Gameplay") in code. The project uses
+**Input System only** (`activeInputHandler: 1`), not the legacy Input Manager.
+There is intentionally no `PlayerInput` component or `.inputactions` asset;
+adding another owner would duplicate this existing architecture.
+
+`Move` and `Look` are `Value` / `Vector2` actions, constructed with the named
+`expectedControlLayout` argument and read with `ReadValue<Vector2>()`.
+Buttons use `IsPressed()` / `WasPressedThisFrame()`, never `ReadValue<bool>()`.
+The map follows the owner's enable/disable/dispose lifecycle.
+
+Bindings:
 
 | Action | Keyboard/Mouse | Gamepad |
 | --- | --- | --- |
@@ -59,8 +69,9 @@ Scene load
 | Jump | Space | South |
 | Dodge | Left Ctrl | East |
 | Interact | E | West |
-| Light Attack | LMB | Right trigger |
+| Light Attack (`Attack` alias) | LMB | Right trigger |
 | Heavy Attack | RMB | Left trigger |
+| LockOn (reserved) | Middle mouse | R3 |
 | Pause | Esc | Start |
 
 Migration path: if designer rebinding is needed, move the map into a
@@ -86,10 +97,18 @@ machine (Locomotion / Airborne / Dodge / Combat) driven by the same input.
 `ThirdPersonCameraRig` sits on the camera GameObject itself and moves it in
 `LateUpdate`:
 
-- yaw/pitch orbit driven by `Look`,
-- frame-rate independent exponential smoothing (pivot + distance),
-- sphere-cast collision against the **Environment** layer pulls the camera in,
-- all values come from `GameSettings.asset` with hard-coded fallbacks.
+- persistent yaw/pitch driven by `Look`; rebinding the same target does not reset the orbit,
+- mouse pixels use sensitivity without delta time; the right stick uses degrees/second,
+- the active control's device identifies mouse versus stick (never value magnitude),
+- configurable invert-Y and pitch limits clamped inside ±89 degrees,
+- exponential smoothing for pivot, yaw, pitch and outward distance recovery,
+- near-plane-aware sphere casts against **Environment**; immediate inward collision
+  correction, including overlap handling and obstruction checks along pivot lag,
+- pause/cursor-release gating; click the focused Game view to restore capture,
+- tuning comes from `GameSettings.asset`, with defaults when no asset is assigned.
+
+See [INPUT_CAMERA_AUDIT.md](INPUT_CAMERA_AUDIT.md) for test coverage and the
+unresolved exception status. No dodge/attack/lock-on gameplay is implemented.
 
 ### Rendering (`Scripts/Rendering` + `Art/Shaders`)
 

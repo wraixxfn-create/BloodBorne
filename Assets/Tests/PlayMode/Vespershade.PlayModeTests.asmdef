@@ -1,0 +1,6 @@
+{
+  "name": "Vespershade.PlayModeTests",
+  "rootNamespace": "Vespershade.Tests",
+  "references": ["Vespershade.Runtime", "Unity.InputSystem"],
+  "optionalUnityReferences": ["TestAssemblies"]
+}
