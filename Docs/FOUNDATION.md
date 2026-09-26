@@ -25,8 +25,10 @@ Scene load
   └─ Start (order independent):
        GameManager        -> locks cursor, owns pause state
        SceneFlowManager   -> reads SceneFlow.asset
-       GameBootstrap      -> instantiates Player.prefab at SpawnPoint,
-                             calls ThirdPersonCameraRig.SetTarget(player.CameraFocus)
+       GameBootstrap      -> locates the player (or instantiates Player.prefab at
+                             SpawnPoint), locates the scene's ThirdPersonCameraRig
+                             (or creates one from cameraRigPrefab), then calls
+                             ThirdPersonCameraRig.SetTarget(player.CameraFocus) once
   └─ Per frame:
        CoreInput          -> polls Input System actions
        PlayerController   -> camera-relative CharacterController movement
@@ -43,7 +45,7 @@ Scene load
 | `SingletonBehaviour<T>` | Base for persistent managers (DontDestroyOnLoad, duplicate guard). |
 | `GameManager` | Pause state (`SetPaused`, `PauseChanged`), cursor policy, `Settings` access. |
 | `SceneFlowManager` | Async scene loads (`LoadScene`, `ReloadCurrentScene`, `LoadProgress`, `SceneLoadStarted/Finished`). |
-| `GameBootstrap` | Spawns the player prefab at `SpawnPoint` and wires the camera. Extend here when more scene assembly is needed. |
+| `GameBootstrap` | Locates or spawns the player prefab at `SpawnPoint` and makes sure exactly one `ThirdPersonCameraRig` follows it (`cameraRigPrefab` is the fallback used only when the scene has no rig). Locates before creating, so initialization can never produce two players or two cameras. Extend here when more scene assembly is needed. |
 
 ### Input (`Scripts/Input`)
 
@@ -137,7 +139,16 @@ settings, atmosphere impostors, culling masks and performance budget.
 - New scene-assembly steps go into `GameBootstrap` or a new manager derived
   from `SingletonBehaviour<T>`.
 - Cross-system signals go through `GameEventChannelSO` assets, not direct
-  `FindObjectOfType` lookups.
+  lookups. One-time scene assembly is the exception: `GameBootstrap` locates the
+  player and the camera rig before it creates anything, so it never duplicates
+  what the scene already contains.
+- Prefab references always use the prefab asset handle: `m_SourcePrefab:
+  {fileID: 100100000, guid: <prefab guid>, type: 3}` in a `PrefabInstance`, and
+  `{fileID: 100100000, guid: <prefab guid>, type: 3}` for a prefab assigned to a
+  component field. An id that only exists *inside* the prefab (its root
+  GameObject, a child, a component) does not resolve for those fields — Unity
+  then reports `Missing Prefab with guid: <guid>` and the instance is lost.
+  `Tools/validate_unity_project.py` rejects that form.
 - Keep placeholder visuals as primitives until real original art exists.
 
 ## Tooling (`Tools/`)

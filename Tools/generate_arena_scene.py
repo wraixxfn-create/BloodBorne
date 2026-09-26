@@ -336,13 +336,15 @@ MonoBehaviour:
   m_Script: {{fileID: 11500000, guid: {GUID_GameBootstrap}, type: 3}}
   m_Name:
   m_EditorClassIdentifier:
-  playerPrefab: {{fileID: 710000, guid: {GUID_Player}, type: 3}}
+  playerPrefab: {{fileID: 100100000, guid: {GUID_Player}, type: 3}}
   spawnPoint: {{fileID: 30001}}
   spawnPlayerOnStart: 1
+  cameraRigPrefab: {{fileID: 100100000, guid: {GUID_MainCameraRig}, type: 3}}
+  createCameraRigWhenMissing: 1
 --- !u!1001 &50000
 PrefabInstance:
   m_ObjectHideFlags: 0
-  serializedVersion: 3
+  serializedVersion: 2
   m_Modification:
     serializedVersion: 3
     m_TransformParent: {{fileID: 0}}
@@ -367,11 +369,11 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {{fileID: 720000, guid: {GUID_MainCameraRig}, type: 3}}
+  m_SourcePrefab: {{fileID: 100100000, guid: {GUID_MainCameraRig}, type: 3}}
 --- !u!1001 &60000
 PrefabInstance:
   m_ObjectHideFlags: 0
-  serializedVersion: 3
+  serializedVersion: 2
   m_Modification:
     serializedVersion: 3
     m_TransformParent: {{fileID: 0}}
@@ -380,11 +382,11 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {{fileID: 1000, guid: {GUID_Arena_MeshKit}, type: 3}}
+  m_SourcePrefab: {{fileID: 100100000, guid: {GUID_Arena_MeshKit}, type: 3}}
 --- !u!1001 &70000
 PrefabInstance:
   m_ObjectHideFlags: 0
-  serializedVersion: 3
+  serializedVersion: 2
   m_Modification:
     serializedVersion: 3
     m_TransformParent: {{fileID: 0}}
@@ -393,7 +395,7 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {{fileID: 1000, guid: {GUID_LightingRig}, type: 3}}
+  m_SourcePrefab: {{fileID: 100100000, guid: {GUID_LightingRig}, type: 3}}
 """
 
 with open(OUT_SCENE, 'w', encoding='utf-8') as f:

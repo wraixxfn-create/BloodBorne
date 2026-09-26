@@ -175,7 +175,7 @@ if f"guid: {rig_guid}" not in scene:
 --- !u!1001 &70000
 PrefabInstance:
   m_ObjectHideFlags: 0
-  serializedVersion: 3
+  serializedVersion: 2
   m_Modification:
     serializedVersion: 3
     m_TransformParent: {{fileID: 0}}
@@ -188,7 +188,7 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {{fileID: 1000, guid: {rig_guid}, type: 3}}
+  m_SourcePrefab: {{fileID: 100100000, guid: {rig_guid}, type: 3}}
 """
 if scene != scene_path.read_text(encoding="utf-8"):
     scene_path.write_text(scene, encoding="utf-8")

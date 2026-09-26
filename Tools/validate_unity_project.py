@@ -35,6 +35,13 @@ BUILTIN_GUIDS = {
     "0000000000000000f000000000000000",  # built-in shaders/materials
 }
 
+# A .prefab asset is addressed through the prefab asset handle Unity creates at
+# import time. PrefabInstance.m_SourcePrefab must use this id (plus the prefab's
+# GUID); pointing it at an object id that only exists inside the prefab file
+# leaves the instance unresolved and makes Unity log
+# "Missing Prefab with guid: <guid>".
+PREFAB_ASSET_HANDLE = 100100000
+
 CLASS_NAMES = {
     1: "GameObject",
     4: "Transform",
@@ -342,7 +349,10 @@ def main() -> int:
         docs = check_unity_file(os.path.join(ROOT, rel), metas, guid_to_path, script_fields)
         all_docs[rel] = docs
 
-    # Prefab root referenced by PrefabInstance must exist in the source prefab.
+    # Prefab instances must reference the prefab asset itself: the prefab asset
+    # handle (fileID 100100000) plus the prefab GUID. Referencing an object id
+    # that only exists inside the prefab file (the root GameObject, a component,
+    # ...) does not resolve at load time and Unity reports the prefab as missing.
     for rel, docs in all_docs.items():
         for class_id, file_id, data in docs:
             if class_id != 1001:
@@ -351,13 +361,21 @@ def main() -> int:
             if not isinstance(source, dict):
                 error(f"{rel}: PrefabInstance &{file_id} lacks m_SourcePrefab")
                 continue
+            version = data.get("serializedVersion")
+            if version not in (None, 2):
+                warning(f"{rel}: PrefabInstance &{file_id} has serializedVersion {version}; Unity writes 2")
             guid = str(source.get("guid", "")).lower()
             source_rel = guid_to_path.get(guid)
             if source_rel is None:
                 continue  # already reported
-            source_ids = {fid for _, fid, _ in all_docs.get(source_rel, [])}
-            if source.get("fileID") not in source_ids:
-                error(f"{rel}: PrefabInstance &{file_id} references unknown root &{source.get('fileID')} in {source_rel}")
+            if not source_rel.endswith(".prefab"):
+                error(f"{rel}: PrefabInstance &{file_id} points at {source_rel}, which is not a prefab asset")
+                continue
+            if source.get("fileID") != PREFAB_ASSET_HANDLE:
+                error(
+                    f"{rel}: PrefabInstance &{file_id} m_SourcePrefab must use the prefab asset handle "
+                    f"(fileID {PREFAB_ASSET_HANDLE}) but references &{source.get('fileID')} in {source_rel}"
+                )
 
     # EditorBuildSettings consistency.
     ebs_path = os.path.join(ROOT, "ProjectSettings", "EditorBuildSettings.asset")
