@@ -549,7 +549,7 @@ def build_hem_strap(mesh, sign, label):
         point = (point[0], y, point[2])
         path.append(point)
         normals.append(kk.vnorm((math.cos(u), 0.0, math.sin(u))))
-    kk.strap(mesh, f"Coat/HemStrap_{label}", path, normals, "Leather", 0.030, 0.008)
+    kk.strap(mesh, f"Coat/HemStrap_{label}", path, normals, "Leather", 0.024, 0.007)
     mid = 3
     end, normal = path[mid], normals[mid]
     side = kk.vnorm(kk.vcross(kk.vsub(path[mid + 1], path[mid - 1]), normal))

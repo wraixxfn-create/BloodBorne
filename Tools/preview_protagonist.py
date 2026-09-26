@@ -186,6 +186,15 @@ def render(verts, faces, face_mat, mat_lookup, size, ss, eye, target, fov_deg=32
 
     # Cull triangles fully behind the camera; keep the rest.
     keep = (sz[faces] > 0.02) if not ortho else np.ones(len(faces), dtype=bool)
+    # QA guard: drop extremely long thin triangles (a sweep whose samples
+    # double back). They are authoring noise, not part of the silhouette.
+    edges = np.stack([np.linalg.norm(tri[:, 0, :2] - tri[:, 1, :2], axis=1),
+                      np.linalg.norm(tri[:, 1, :2] - tri[:, 2, :2], axis=1),
+                      np.linalg.norm(tri[:, 2, :2] - tri[:, 0, :2], axis=1)], axis=1)
+    edge_max = edges.max(axis=1)
+    longest = edges.max(axis=1)
+    shortest = np.maximum(edges.min(axis=1), 1e-6)
+    keep &= ~((longest > 90.0) & (longest / shortest > 40.0))
     order = np.argsort(-tri[:, :, 2].mean(axis=1))
 
     for f in order:
