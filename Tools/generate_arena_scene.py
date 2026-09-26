@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate Unity scene file for the meshkit arena.
+Generate the playable MeshKit arena scene with the shared lighting rig.
 Creates Assets/Scenes/Arena/Arena_RitualChamber_MeshKit.unity
 """
 
@@ -16,6 +16,7 @@ def guid_for(rel):
 GUID_MainCameraRig = guid_for("Assets/Prefabs/Camera/MainCameraRig.prefab")
 GUID_Player = guid_for("Assets/Prefabs/Player/Player.prefab")
 GUID_Arena_MeshKit = guid_for("Assets/Prefabs/Arena/Arena_RitualChamber_MeshKit.prefab")
+GUID_LightingRig = guid_for("Assets/Prefabs/Arena/Arena_LightingRig.prefab")
 GUID_GameSettings = guid_for("Assets/ScriptableObjects/GameSettings.asset")
 GUID_SceneFlow = guid_for("Assets/ScriptableObjects/SceneFlow.asset")
 GUID_GameManager = guid_for("Assets/Scripts/Core/GameManager.cs")
@@ -40,14 +41,14 @@ RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 9
   m_Fog: 1
-  m_FogColor: {{r: 0.028, g: 0.032, b: 0.048, a: 1}}
-  m_FogMode: 3
-  m_FogDensity: 0.015
+  m_FogColor: {{r: 0.027, g: 0.033, b: 0.05, a: 1}}
+  m_FogMode: 2
+  m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {{r: 0.11, g: 0.115, b: 0.17, a: 1}}
-  m_AmbientEquatorColor: {{r: 0.105, g: 0.115, b: 0.135, a: 1}}
-  m_AmbientGroundColor: {{r: 0.042, g: 0.038, b: 0.032, a: 1}}
+  m_AmbientSkyColor: {{r: 0.10, g: 0.112, b: 0.15, a: 1}}
+  m_AmbientEquatorColor: {{r: 0.08, g: 0.095, b: 0.13, a: 1}}
+  m_AmbientGroundColor: {{r: 0.045, g: 0.05, b: 0.068, a: 1}}
   m_AmbientIntensity: 1
   m_AmbientMode: 3
   m_SubtractiveShadowColor: {{r: 0.42, g: 0.478, b: 0.627, a: 1}}
@@ -60,7 +61,7 @@ RenderSettings:
   m_DefaultReflectionMode: 0
   m_DefaultReflectionResolution: 128
   m_ReflectionBounces: 1
-  m_ReflectionIntensity: 1
+  m_ReflectionIntensity: 0.35
   m_CustomReflection: {{fileID: 0}}
   m_Sun: {{fileID: 0}}
   m_IndirectSpecularColor: {{r: 0, g: 0, b: 0, a: 1}}
@@ -148,79 +149,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {{fileID: 0}}
---- !u!1 &10000
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {{fileID: 0}}
-  m_PrefabInstance: {{fileID: 0}}
-  m_PrefabAsset: {{fileID: 0}}
-  serializedVersion: 6
-  m_Component:
-  - component: {{fileID: 10001}}
-  - component: {{fileID: 10002}}
-  m_Layer: 0
-  m_Name: Directional Light
-  m_TagString: Untagged
-  m_Icon: {{fileID: 0}}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &10001
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {{fileID: 0}}
-  m_PrefabInstance: {{fileID: 0}}
-  m_PrefabAsset: {{fileID: 0}}
-  m_GameObject: {{fileID: 10000}}
-  serializedVersion: 2
-  m_LocalRotation: {{x: 0.4460149, y: -0.2295753, z: 0.1195093, w: 0.8567867}}
-  m_LocalPosition: {{x: 0, y: 10, z: 0}}
-  m_LocalScale: {{x: 1, y: 1, z: 1}}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {{fileID: 0}}
-  m_LocalEulerAnglesHint: {{x: 55, y: -30, z: 0}}
---- !u!108 &10002
-Light:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {{fileID: 0}}
-  m_PrefabInstance: {{fileID: 0}}
-  m_PrefabAsset: {{fileID: 0}}
-  m_GameObject: {{fileID: 10000}}
-  m_Enabled: 1
-  serializedVersion: 10
-  m_Type: 1
-  m_Shape: 0
-  m_Color: {{r: 0.68, g: 0.74, b: 0.88, a: 1}}
-  m_Intensity: 1.35
-  m_Range: 10
-  m_SpotAngle: 30
-  m_InnerSpotAngle: 21.80208
-  m_CookieSize: 10
-  m_Shadows:
-    m_Type: 2
-    m_Resolution: -1
-    m_CustomResolution: -1
-    m_Strength: 1
-    m_Bias: 0.05
-    m_NormalBias: 0.4
-    m_NearPlane: 0.2
-  m_Cookie: {{fileID: 0}}
-  m_DrawHalo: 0
-  m_Flare: {{fileID: 0}}
-  m_RenderMode: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingLayerMask: 1
-  m_Lightmapping: 1
-  m_LightShadowCasterMode: 0
-  m_AreaSize: {{x: 1, y: 1}}
-  m_BounceIntensity: 1
-  m_ColorTemperature: 6570
-  m_UseColorTemperature: 0
-  m_ShadowRadius: 0
-  m_ShadowAngle: 0
 --- !u!1 &20000
 GameObject:
   m_ObjectHideFlags: 0
@@ -418,7 +346,23 @@ PrefabInstance:
   m_Modification:
     serializedVersion: 3
     m_TransformParent: {{fileID: 0}}
-    m_Modifications: []
+    m_Modifications:
+    - target: {{fileID: 720005, guid: {GUID_MainCameraRig}, type: 3}}
+      propertyPath: vignetteIntensity
+      value: 0.3
+      objectReference: {{fileID: 0}}
+    - target: {{fileID: 720005, guid: {GUID_MainCameraRig}, type: 3}}
+      propertyPath: vignetteRadius
+      value: 0.62
+      objectReference: {{fileID: 0}}
+    - target: {{fileID: 720005, guid: {GUID_MainCameraRig}, type: 3}}
+      propertyPath: contrast
+      value: 1.02
+      objectReference: {{fileID: 0}}
+    - target: {{fileID: 720005, guid: {GUID_MainCameraRig}, type: 3}}
+      propertyPath: grainIntensity
+      value: 0.025
+      objectReference: {{fileID: 0}}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -437,6 +381,19 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {{fileID: 1000, guid: {GUID_Arena_MeshKit}, type: 3}}
+--- !u!1001 &70000
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 3
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {{fileID: 0}}
+    m_Modifications: []
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {{fileID: 1000, guid: {GUID_LightingRig}, type: 3}}
 """
 
 with open(OUT_SCENE, 'w', encoding='utf-8') as f:

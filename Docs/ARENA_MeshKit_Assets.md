@@ -1,13 +1,18 @@
-# Hollow Sanctum — Modular Mesh Kit (Bloodborne-inspired Original Arena)
+# Hollow Sanctum — Modular Mesh Kit (original gothic arena)
+
+> **Lighting update (2026-09-25):** The playable scene now instances a separate
+> five-zone `Arena_LightingRig`. Light counts, fog heights and exposure below
+> reflect the final pass; see [ARENA_Lighting.md](ARENA_Lighting.md) for tuning.
+> No boss or combat has been added.
 
 **Date:** 2026-09-25  
 **Unity Version:** 2022.3 LTS Built-in  
 **Root Folders:**
-- Meshes: `Assets/Models/Arena/` (87 OBJs)
+- Meshes: `Assets/Models/Arena/` (87 modular OBJs + 2 lighting VFX OBJs)
 - Prefabs: `Assets/Prefabs/Arena/MeshKit/` (87 prefabs, 13 categories)
 - Master Assembly: `Assets/Prefabs/Arena/Arena_RitualChamber_MeshKit.prefab` (321 children)
 - Scene: `Assets/Scenes/Arena/Arena_RitualChamber_MeshKit.unity`
-- Materials: `Assets/Materials/Arena/` (20 mats)
+- Materials: `Assets/Materials/Arena/` (20 kit mats + 9 lighting VFX mats)
 
 ---
 
@@ -161,7 +166,7 @@ All forms are **original** — no Bloodborne, Dark Souls, Elden Ring assets, nam
 - `SM_Arena_Deco_Banner_Tattered_100x300x002` — banner 1×3×0.02, Wood_Rotted placeholder (use Banner_Cloth mat for final)
 - `SM_Arena_Deco_Iron_Bracket_030x020x040` — bracket 0.3×0.2×0.4, Metal_Chain
 - `SM_Arena_Deco_Candelabra_Wall_020x060x020` — candelabra 0.2×0.6×0.2, 2 mats
-- `SM_Arena_Deco_Fog_Volume_1000x002x1000` — fog plane 10×0.02×10, Fog_Plane mat, alpha 0.11
+- `SM_Arena_Deco_Fog_Volume_1000x002x1000` — fog plane 10×0.02×10, scaled to 6.5 m and placed at y=0.54; master uses feathered `M_Arena_GroundMist` (alpha 0.07), not a hard-edged slab
 - `SM_Arena_Deco_Moss_Patch_100x005x100` — moss 1×0.05×1, StonePillar (use Moss mat for final)
 
 ### LODs (4)
@@ -175,7 +180,7 @@ All forms are **original** — no Bloodborne, Dark Souls, Elden Ring assets, nam
 ## 4. Topology & Optimization
 
 - **Clean Topology:** Boxes use 24 verts (hard edges) with per-face normals, proper UVs. Cylinders use 12-32 segments, caps as fans. No ngons — all quads triangulated by Unity.
-- **Polygon Density:** Floor/wall/debris 12 tris, pillar full 48 tris, platform cylinder 128 tris, chain segment 288 tris, candle cluster 244 tris, brazier large 192 tris. Total master arena ~180 mesh renderers, ~30-40 draw calls after static batching (many share 3 materials: StoneWall, StonePillar, StoneFloor).
+- **Polygon Density:** Floor/wall/debris 12 tris, pillar full 48 tris, platform cylinder 128 tris, chain segment 288 tris, candle cluster 244 tris, brazier large 192 tris. The kit master has ~180 mesh renderers; many share StoneWall, StonePillar and StoneFloor. Profile actual draw calls in Unity with the separate lighting rig.
 - **Reusable Meshes:** Shaft, base, capital are separate but also combined in full pillar. Floor tile 4×4 reused 30+ times. Wall 4×16 reused 8 times. Candle cluster reused 20 times.
 - **Pivots:** All at base center (0,0,0 bottom). Verified in OBJ: bottom vertices at y=0, top at y=height, x/z centered.
 - **Scale:** 1 unit = 1 meter. All dimensions from filenames: e.g., 400 = 4.00 m, 050 = 0.50 m.
@@ -208,7 +213,7 @@ All use Built-in Standard shader (fileID 46). No textures — color, metallic, s
 | Candle_Wax | 0.84,0.80,0.71 | 0 | 0.15 | none | wax |
 | Candle_Flame | 0.95,0.72,0.22 | 0 | 0.60 | 1.35,0.62,0.12 | flame emissive |
 | RitualMarking | 0.22,0.235,0.25 | 0.02 | 0.12 | 0.22,0.48,0.52 | decals, rune, circle |
-| Fog_Plane | 0.18,0.195,0.22 a0.11 | 0 | 0.02 | none | fog volumes, transparent |
+| Fog_Plane | 0.18,0.195,0.22 a0.075 | 0 | 0.02 | none | modular prefab / primitive chamber mist; master MeshKit uses `M_Arena_GroundMist` a0.07 |
 | Brazier_Metal | 0.19,0.165,0.11 | 0.68 | 0.32 | none | braziers, holders, chalice |
 | Banner_Cloth | 0.62,0.18,0.16 | 0 | 0.12 | none | tattered banners |
 | Moss | 0.15,0.25,0.12 | 0 | 0.05 | none | moss patches |
@@ -230,14 +235,14 @@ Each mesh has a prefab under `MeshKit/<Category>/`:
 
 - Root (1000) with Transform (1001) + ArenaBounds (1002) + ArenaFogController (1003) + ArenaLightingController (1004)
 - 321 children (Transforms 2001-5201) placed via polar coordinates
-- Includes: 2 platform cylinders + rim + ritual center, 30 floor tiles, 16 wedges, 8 ritual plates, 8 solid walls + 8 window walls + bases + cornices + gargoyles, 8 pillars (4 full + 4 damaged) + rubble, 5 arches, 16 window frames + glass, 6 stairs, 8 statues (4 upright + pedestals + 4 fallen), 24 chains (hanging + swags + anchors), 13 wood, 20 candle clusters + 20 point lights + 8 sconces, 6 ritual props, 18 debris, 3 doors, 32 deco (brackets, cornices, banners, candelabras, fog volumes, moss), 28 lights (20 candle point + 8 moon shaft spots)
+- Includes: 2 platform cylinders + rim + ritual center, floor tiles / wedges / eight raised ritual plates, 16 walls (8 window), 8 pillars, 5 arches, stairs, 8 statues, chains, wood, 20 candle clusters, ritual props, debris, doors and periphery decoration. It still serializes 20 candle point + 8 window spot **components**, but only 10 + 4 are enabled. Candle flames and stained glass remain visible at disabled practicals.
 - Total: 1353 GameObject entries (including m_GameObject refs), 322 Transforms, ~180 renderers, 28 lights
 
 **Scene:** `Arena_RitualChamber_MeshKit.unity`
 
-- RenderSettings: fog 0.028,0.032,0.048 density 0.015 exponential, ambient 0.11,0.115,0.17, no skybox
-- Directional Light: color 0.68,0.74,0.88 intensity 1.35 rot 55,-30,0 soft shadows
-- Ground (disabled placeholder 12×1×12)
+- RenderSettings: exponential fog 0.027/0.033/0.05, density 0.01, flat cold ambient 0.10/0.112/0.15, no skybox
+- PrefabInstance of `Arena_LightingRig` (five zones; 0.86-intensity moon key, only soft shadow caster, character-only neutral fill) — **no scene-level directional**
+- Ground (disabled placeholder 12×1×12); MeshKit outer floor top is **y=0.5**
 - SpawnPoint at (0,0.8,-14) facing north
 - GameCore with GameManager, SceneFlowManager, GameBootstrap (spawns Player.prefab)
 - PrefabInstance for MainCameraRig and Arena_RitualChamber_MeshKit at (0,0,0)
@@ -261,7 +266,7 @@ Each mesh has a prefab under `MeshKit/<Category>/`:
 1. Open `Assets/Scenes/Arena/Arena_RitualChamber_MeshKit.unity`
 2. Press Play — capsule spawns at south broad stair, camera orbits, fog drifts, candles flicker, ritual pulses.
 3. To modify:
-   - Drag `Arena_RitualChamber_MeshKit.prefab` into any scene at (0,0,0)
+   - Drag **both** `Arena_RitualChamber_MeshKit.prefab` and `Arena_LightingRig.prefab` into any scene at (0,0,0), then copy the arena scene's RenderSettings and camera grade overrides
    - Expand root, select any child, adjust Transform — pivot base center ensures rotation around Y stays on floor
    - Replace mesh by swapping MeshFilter mesh guid or swapping prefab child with another MeshKit prefab (e.g., replace `Wall_Solid` with `Wall_Window`)
    - For grid snapping: set Unity snap to 4 m (Edit > Snap Settings > Move 4, 0.5, 4) and rotate 22.5° increments
@@ -273,7 +278,7 @@ Each mesh has a prefab under `MeshKit/<Category>/`:
    - Add pillars at 45° increments, radius 17.5
    - Add platform cylinders at center
    - Scatter statues, chains, wood, candles, debris in periphery (r>12)
-   - Add fog volumes at 0.06-0.09 y, alpha 0.11, no shadows
+   - Add feathered mist at the **floor top + 0.04 m** (y=0.54 here), in the outer ring; do not cover the combat disc
 
 ---
 
@@ -281,10 +286,10 @@ Each mesh has a prefab under `MeshKit/<Category>/`:
 
 - Verts: ~8k for master (average 25 verts per mesh × 321)
 - Tris: ~4k (average 12 tris per mesh, plus cylinders)
-- Draw calls: ~30-40 after static batching (15 materials shared)
-- Lights: 20 point (no shadows) + 8 spot (soft shadows) + 1 directional (soft)
-- No textures, no lightmaps, forward rendering, expected >60 fps on 2022.3 Built-in
-- Future: mark all Environment layer objects static, merge wall segments by material, bake lightmaps, add occlusion culling
+- Measure draw calls and transparent overdraw in Unity after importing the lighting meshes; no frame-time estimate is asserted from generated YAML.
+- **Active** lights: MeshKit 10 candle point + 4 window spots (all shadowless) + rig 15 (one soft shadow key) = **29**, not 44. The other physical candles remain emissive.
+- No textures for lighting, no lightmaps; translucent veils and motes use low-cost unlit shaders. Frame-rate targets need in-editor profiling on target hardware, not estimates from this sandbox.
+- Future optimization: mark fixed Environment objects static, merge wall segments by material, bake lightmaps, add occlusion culling.
 
 ---
 

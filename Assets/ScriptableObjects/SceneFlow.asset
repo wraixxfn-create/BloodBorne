@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 214dfcc41fd0557eaf687074ef9e90c8, type: 3}
   m_Name: SceneFlow
   m_EditorClassIdentifier:
-  bootSceneName: Main
+  bootSceneName: Arena_RitualChamber_MeshKit
   sceneNames:
+  - Arena_RitualChamber_MeshKit
+  - Arena_RitualChamber
   - Main

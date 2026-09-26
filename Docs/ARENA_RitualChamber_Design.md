@@ -3,10 +3,15 @@
 
 **Author:** Arena Team — Vespershade Project  
 **Date:** 2026-09-25  
-**Unity Scene:** `Assets/Scenes/Arena/Arena_RitualChamber.unity` (+ embedded in `Main.unity`)  
+**Unity Scene:** `Assets/Scenes/Arena/Arena_RitualChamber.unity` (primitive variant; the MeshKit scene is build scene 0)
 **Master Prefab:** `Assets/Prefabs/Arena/Arena_RitualChamber.prefab`  
 **Modules:** `Assets/Prefabs/Arena/Modules/*`  
 **Materials:** `Assets/Materials/Arena/*`
+
+> This document records the **initial environment layout and artistic concept**.
+> The final lighting implementation, zone values, floor heights and light
+> budgets are in [ARENA_Lighting.md](ARENA_Lighting.md); the chamber is not
+> embedded in `Main.unity`. No boss or combat systems have been added.
 
 ---
 
@@ -105,15 +110,15 @@ All values are in **Unity meters** (1 unit = 1 m). Tuned for a character with `w
 | **Stained-glass shards** | Clusters 4.2 × 7.2 m, individual shards 0.9–1.7 m | Three palettes (blue / red / amber) at 0.34–0.38 alpha. ~30% of each window is empty (broken). |
 | **Ruined statues** | Pedestal 1.2 × 0.5 × 1.2, figure ~1.6 m tall | 4 upright (cardinals) + 4 fallen (diagonals) len 1.8 m. No collider on these — visual only, to keep floor frictionless. |
 | **Chains** | Links 0.4 m tall, total drop 2.2–3.0 m; swags 5.2 m long | Hangs from pillar capitals (y≈7.2) and window heads (y≈9.8). No collision. |
-| **Candles** | Wax 0.09–0.10 m diam, 0.18–0.25 m tall; flame sphere 0.06–0.08; point light range 4.5–6 m | 20+ lights, intensity 0.8–1.1, kept dim to protect contrast. |
+| **Candles** | Wax 0.09–0.10 m diam, 0.18–0.25 m tall; flame sphere 0.06–0.08; point light range 4.5–6 m | 8/16 physical candle lights active, 0.5–0.51 intensity and no shadows (primitive version). |
 | **Rotted scaffold / beams** | 3.2 × 0.28 × 0.28 m (+ 1.1 m brace) | 6 pieces leaned against walls at y≈0–1.2. Visual only. |
 | **Ritual markings** | Primary ring r=7 m: 8 decals 2.2 × 0.65 m + centre 3.2 m disc | Emissive cyan (see materials). Pupils at 0.02–0.04 m above floor to avoid z-fighting. |
-| **Fog volumes** | Large planes 9–14 m, thickness 0.02 m at y=0.06–0.09; high mist 18–20 m box at y=2–8 m | Transparent material alpha 0.11; driven by `ArenaFogController`. |
+| **Fog volumes** | Large planes 9–14 m, thickness 0.02 m at y=0.06–0.09; high mist 18–20 m box at y=2–8 m | Transparent fog material alpha 0.075; driven by `ArenaFogController`. |
 | **Spawn / boss anchors** | Player (0, 0.8, **-14**), Boss (0, 0.6, 0), Camera pivot 1.5 m above player | Spawn faces north (yaw 0) toward dais. |
 | **Camera clearance** | Minimum wall distance 19 m from centre → **≥ 7 m** from edge of combat disc to wall | Guarantees `cameraDistance 4.5` never clips wall when circling at r=12. |
 | **Nav/AI** | Playable disc 38 m is fully walkable; dais steps are traversable | Boss AI can use straight-line to centre from any point without wall avoidance inside r=12. |
 
-**Performance budget guide:** ~244 GameObjects in master prefab, ~180 draw-calling meshes (many share 3 materials) + 20 point lights + 8 spots. With Built-in forward rendering, the arena is within the base scene cost (no real-time GI, no baked lightmap yet). Future optimization: merge wall segments by material and mark static.
+**Performance budget guide:** ~244 GameObjects in master prefab, ~180 draw-calling meshes (many share 3 materials) + 8 active candle points + 4 shadowless spots, plus the shared 15-light rig. With Built-in forward rendering, the arena is within the base scene cost (no real-time GI, no baked lightmap yet). Future optimization: merge wall segments by material and mark static.
 
 ---
 
@@ -138,7 +143,7 @@ Modules live at `Assets/Prefabs/Arena/Modules/`. The master composition is `Asse
 | **MOD-11** | `Arena_Module_CandleCluster` | Lighting | Cylinder brazier 0.45×0.06×0.45 + 3× Cylinder wax + 3× Sphere flame + (light) | `M_Arena_Brazier_Metal`, `M_Arena_Candle_Wax`, `M_Arena_Candle_Flame` | 0.45×0.5×0.45 | — | 20+ in arena; intensity kept low (see §6) |
 | **MOD-12** | `Arena_Module_WoodenBeam` | Damaged structure | Cube beam 3.2×0.28×0.28 + brace 0.28×1.2×0.22 + nail plate 0.24 | `M_Arena_Wood_Rotted`, `M_Arena_Metal_Chain` | 3.2×0.3×0.3 | — | 6× leaned against walls; marks dark corners |
 | **MOD-13** | `Arena_Module_RitualDecal` | Gameplay / Supernatural | Cube 2.2×0.015×0.65 + rune 0.5×0.01×0.5 | `M_Arena_RitualMarking` (emissive) | 2.2×0.015×0.65 | — | 8× at r=7 + centre disc 3.2 m |
-| **MOD-00** | `Arena_RitualChamber` (Master) | Assembly | **244 children** composing floor, dais, 16 walls, 8 pillars, 8 windows with glass, 8 statues, ~22 chain rigs, 20+ candle lights, 6 beams, 10 ritual marks, 8 fog volumes | All above | Aggregate ∅42 × h16 | Walls + pillars + floor/dais have BoxColliders on **Environment** layer | Single prefab drop in `Main.unity`; all tuning via `ArenaBounds` / `ArenaFogController` / `ArenaLightingController` |
+| **MOD-00** | `Arena_RitualChamber` (Master) | Assembly | **244 children** composing floor, dais, 16 walls, 8 pillars, 8 windows with glass, 8 statues, chains, candle models, ritual marks and mist | All above | Aggregate ∅42 × h16 | Walls + pillars + floor/dais have BoxColliders on **Environment** layer | Primitive arena scene uses this environment **plus** `Arena_LightingRig`; tuning via `ArenaBounds`, fog and lighting controllers |
 
 **Design rules for modularity:**
 
@@ -168,7 +173,7 @@ All materials use **Built-in Standard** (`Shader: Standard`, fileID 46). No text
 | `M_Arena_Candle_Wax` | `f8ca8b5…` | 0.84, 0.80, 0.71 | 0 | 0.15 | Opaque | Candle bodies — warm off-white, receives point light |
 | `M_Arena_Candle_Flame` | `914c56d…` | 0.95, 0.72, 0.22 + **Emission 1.35, 0.62, 0.12** | 0 | 0.60 | **Emissive** (`_EMISSION`) | Flame spheres — emissive so they glow even without bloom |
 | `M_Arena_RitualMarking` | `9699c3a…` | 0.22, 0.235, 0.25 + **Emission 0.22, 0.48, 0.52** | 0.02 | 0.12 | Opaque + emission | Decals on floor — the only gameplay-critical emission (telegraphs AoE) |
-| `M_Arena_Fog_Plane` | `aead929…` | 0.18, 0.195, 0.22 **a 0.11** | 0 | 0.02 | **Transparent** (Queue 3000, ZWrite Off, no specular) | Ground mist & high volumes |
+| `M_Arena_Fog_Plane` | `aead929…` | 0.18, 0.195, 0.22 **a 0.075** | 0 | 0.02 | **Transparent** (Queue 3000, ZWrite Off, no specular) | Ground mist & high volumes |
 | `M_Arena_Brazier_Metal` | `8ff56e3…` | 0.19, 0.165, 0.11 | **0.68** | 0.32 | Opaque | Candle holders / braziers — tarnished bronze |
 
 **Material philosophy:**
@@ -176,40 +181,25 @@ All materials use **Built-in Standard** (`Shader: Standard`, fileID 46). No text
 - **Stone palette is narrow** (0.13–0.19) so candles (0.84) and ritual cyan (emission) *pop* without extra saturation.
 - **Metal is dark** (0.08–0.19) — chains should be read as line, not surface.
 - **Glass is saturated but dim** — alpha 0.34–0.38 + low emission stops windows from blooming and stealing contrast from the combat disc.
-- **Fog is cheapest transparency** — 0.11 alpha, no specular, ZWrite Off. It never casts or receives shadow, so it cannot muddy depth.
+- **Fog is cheapest transparency** — 0.075 alpha, no specular, ZWrite Off. It never casts or receives shadow, so it cannot muddy depth.
 
 ---
 
-## 6. Lighting Concept
+## 6. Final Lighting (supersedes the initial lighting sketch)
 
-### 6.1 Three-Layer Approach (all original, no baked lightmaps yet)
+The shared `Arena_LightingRig.prefab` is now instanced in **both** playable
+arena scenes. Its five zones provide an entrance landmark, steady central
+combat readability, controlled corners and glass, an elevated-platform fill,
+and a very restrained ritual accent. One cold key casts soft shadows; other
+lights are shadowless. Only 8/16 physical candles and 4/8 window spots are
+active in this primitive version. It shares the rig with the MeshKit version,
+with a -0.5 m offset for this version's y=0 floor. The steady Player/Enemy-only
+fill preserves subject separation; fog is exponential 0.01 and glass shafts
+are transparent mesh impostors, not volumetric post-processing.
 
-**Layer 1 — Cold Moon Key (readability anchor)**
-
-- **One directional light:** colour **(0.68, 0.74, 0.88)**, intensity **1.35**, rotation **(55°, -30°, 0)** (higher than the foundation’s 50° — longer shadows across the dais steps). Soft shadows (`m_Type: 2`).
-- Purpose: top-down, slightly angled to throw 0.6 m dais steps into a readable shadow line without blacking out faces. The angle is chosen so the pillar shadows fall *diagonally across the floor toward the centre*, not straight toward the camera — this adds depth in third-person without occluding the boss silhouette.
-- Complements **RenderSettings:** fog `0.028, 0.032, 0.048` at density **0.015** exponential, ambient sky `0.11, 0.115, 0.17` (flat/gradient, not skybox) at intensity 1.0. The scene has **no skybox** — the void beyond windows is near-black, making windows read as light sources.
-
-**Layer 2 — Warm Candle Field (human scale, orientation)**
-
-- **20 point lights** (range 4.5–6 m, intensity 0.8–1.1, colour 1.0, 0.70, 0.30) placed in the 3 candle families (§3). **Shadows off** for point lights — performance and to avoid stippled floor shadows that confuse telegraphs.
-- Flicker via `ArenaLightingController`: two sine frequencies (`6.5 Hz` + `15.4 Hz`) with per-light phase offset `i * 0.73`, amplitude **0.12**. The irregular sum reads as flame, not a clean pulse.
-- **Cooking the balance:** Candles are intentionally **dim**. At 1.1 intensity and 6 m range, a candle illuminates only its 1.5 m island. The combat disc (r<12) gets < 0.15 lux from candles — so boss VFX and ritual emission remain the brightest warm things in the centre, preserving priority.
-- Warm vs. cold is a compass: south entry = 4 wall-cluster candles (warmest), north = 0 candles (coldest moon shaft). Players orient without a minimap.
-
-**Layer 3 — Ritual Emissive & Moon Shafts (supernatural, barely there)**
-
-- **Ritual decals** use `M_Arena_RitualMarking` at emission **(0.22, 0.48, 0.52)** pulsed by `ArenaLightingController` at **0.35 Hz**, strength **0.5**, via `MaterialPropertyBlock` (no material instancing). The pulse is slow enough to not trigger epilepsy concerns, but fast enough to be noticed peripherally — it also serves future gameplay as an AoE telegraph (pulse speeds up under boss charge).
-- **Moon shafts:** **8 spot lights** (type Spot, colour 0.78, 0.84, 1.0, intensity 1.4, range 22, spotAngle 38°, shadows *Soft*) placed 10 m high just inside each window, pointing inward and slightly down (yaw `270 - angle`). They are *shafts*, not fill: intensity is breathed ±8% at 0.25 Hz, and they intersect fog volumes to create visible beams without volumetric post. They never hit the dais directly — the boss on the dais is rim-lit, not washed out.
-- **Post grade:** `VespershadePostGrade` ( vignette 0.45, radius 0.58, saturation 0.90, contrast 1.06, grain 0.05 ) desaturates slightly and pulls corners darker, forcing the eye centre-ward.
-
-**Guidance for future boss VFX:** Keep boss emissive/ + particle colour in the **cyan–amber complement** (opposite to candle warm) so silhouette remains distinct from environment warmth.
-
-### 6.2 Fog & Volumetrics
-
-- `Fog: Exponential`, density **0.015** + extra **0.006** breathed via `ArenaFogController` (driftSpeed 0.12, breathingSpeed 0.22, driftAmplitude 0.6 m). The 4 large fog planes drift in a slow figure-eight (sin/cos offset per plane) at **0.04 m** vertical bob.
-- The **high mist volume** (20×3×20 box at y=2.2, and 18×2×18 at y=8) is a transparent mesh, not particle system — cheap and camera-friendly (no overdraw burst when the camera clips a wall). Its alpha 0.11 ensures the far wall is always visible, even at the arena edge, so players can judge distance.
-- **Dark corners** (fog at r=17, y=0.12, size 6×0.8×6, four instances at 35/125/215/305°) are slightly denser because they sit between pillars where air would stagnate. They create natural “fog traps” the designer can use to hint at danger.
+**Do not use the earlier 1.35 key / 8 shadowed shafts / 0.015+0.006 fog targets.**
+See [ARENA_Lighting.md](ARENA_Lighting.md) for the actual numbers, authoring
+instructions, shader limitations and in-editor visual QA checklist.
 
 ---
 
@@ -231,10 +221,10 @@ The arena was dimensioned around **Vespershade’s** movement values:
 | **Floor contrast** | Outer floor (darker stone, 0.135) vs. dais (ritual stone + emission) vs. ritual ring (cyan at r=7) — three discernible tones at grazing view angle. Future boss AoE can recolour the ring via `ArenaLightingController` without changing geometry. |
 | **Height language** | Anything > 1 m above floor is *not* traversable except the two 0.3 m dais steps. Scaffold beams are fragmented and at y≈0–1.2 but appear collapsed — the player learns “if it’s tilted wood, it’s not a ramp”. |
 | **Silhouette preservation** | Statues are palest stone (0.19) vs. wall (0.18) — only slightly brighter, selling erosion while keeping the boss (future, presumably darker or more saturated) as the *sole high-contrast figure* in the disc. |
-| **Fog discipline** | Ground fog **alpha 0.11**, height 0.06–0.09 m, never taller than shin. High mist **alpha same**, but 20 m wide and 3 m thick — from the typical camera height (1.6 m, distance 4.5 m, pitch 15°) the mist is viewed edge-on and reads as atmosphere, not as a wall. |
+| **Fog discipline** | Ground fog **alpha 0.075**, height 0.06–0.09 m, never taller than shin. High mist **alpha same**, but 20 m wide and 3 m thick — from the typical camera height (1.6 m, distance 4.5 m, pitch 15°) the mist is viewed edge-on and reads as atmosphere, not as a wall. |
 | **Camera** | `ThirdPersonCameraRig` collides against **Environment** layer (walls + pillar shafts). Tested: at combat disc edge (r=12) with camera behind player (worst case toward wall), distance 4.5 m still clears the wall by 2+ m. SphereCast radius 0.25 + padding 0.05 pulls in gracefully. Corners between wall segments are bridged by the continuous floor, so no camera pop. |
 | **Lighting for telegraphs** | Ritual decals sit *below* knee height; boss wind-ups can flash them (via `ArenaLightingController.ritualPulseStrength`) without competing with candle flicker (which is at ~0.5–1.0 m height). Light layers are altitude-separated. |
-| **Audio/stationarity** | `ArenaFogController` and `ArenaLightingController` auto-discover their scene refs (by name `FogPlane`, `Mist`, `Candle`, `MoonShaft`, `Ritual`) — artists can rearrange the hierarchy without breaking wiring. |
+| **Audio/stationarity** | `ArenaFogController` and `ArenaLightingController` use explicitly serialized refs, with independent by-name fallback for older prefabs — artists can rearrange the hierarchy without breaking wiring. |
 
 ### 7.3 Boss-Specific Provisions (without building the boss)
 
@@ -256,11 +246,11 @@ The arena was dimensioned around **Vespershade’s** movement values:
 
 ## 8. Implementation Notes
 
-- **Prefab drop:** Drag `Assets/Prefabs/Arena/Arena_RitualChamber.prefab` into any scene at (0,0,0). It is self-contained (lights, fog logic, bounds). The player prefab (`Player.prefab`) spawn at `SpawnPoint` (0, 0.8, -14) via `GameBootstrap`.
+- **Prefab drop:** Drag `Arena_RitualChamber.prefab` **and** `Arena_LightingRig.prefab` into a scene; offset the rig y=-0.5 for this primitive floor, and copy fog/ambient and camera overrides from its arena scene. `GameBootstrap` spawns `Player.prefab` at (0, 0.8, -14).
 - **Layers:** Floor, dais, walls, pillar shafts = **Environment (10)** — camera collides. Statues, chains, candles, beams, glass, decals, fog = **Default (0)** — no collision, camera passes through.
 - **Collision thickness:** Walls/pillars use BoxCollider sized to mesh; walls are 1.1 m thick so a sprinting player (6.6 m/s) cannot tunnel through in one frame. CharacterController skinWidth 0.08 gives margin.
 - **NavMesh:** Bake with agentRadius 0.5, agentHeight 2 — clear disc bakes as one polygon; wall ring is excluded. Dais steps need off-mesh links if AI must path onto dais, but boss can be placed directly on Tier 2.
-- **Performance:** No texture, no lightmap, forward rendering, 28 distinct materials (many shared). Draw calls ~30–40 after static batching. Point lights are forward-add, shadows off except moon directional + 8 spots (soft). Expected >60 fps on 2022.3 Built-in.
+- **Performance:** Texture-free lighting, no lightmaps; 27 enabled lights in the primitive scene, only the rig moon key casts shadows. Verify actual forward-pass cost and frame rate in Unity on target hardware.
 
 ---
 
@@ -287,7 +277,7 @@ The arena was dimensioned around **Vespershade’s** movement values:
 
 ## 11. Change Log
 
-- **2026-09-25** — Initial design, modular kit authoring, 15 materials, 13 module prefabs + 244-object master, 3 arena scripts, scene integrated into `Main.unity`. All GUIDs deterministic via `generate_unity_guids.py`. Validation + C# smoke pass.
+- **2026-09-25** — Initial concept, modular kit and separate primitive arena scene (not embedded in `Main.unity`). Lighting later replaced with the shared five-zone rig; see [ARENA_Lighting.md](ARENA_Lighting.md). GUIDs deterministic via `generate_unity_guids.py`.
 
 ---
 
