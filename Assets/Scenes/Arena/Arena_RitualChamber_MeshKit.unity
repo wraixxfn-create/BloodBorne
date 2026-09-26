@@ -310,10 +310,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4690275808ca54b99276ac67e341d86c, type: 3}
   m_Name:
   m_EditorClassIdentifier:
-  playerPrefab: {fileID: 100100000, guid: 54a32c6a27315c3282a29e8d7c9e67a2, type: 3}
+  playerPrefab: {fileID: 710000, guid: 54a32c6a27315c3282a29e8d7c9e67a2, type: 3}
   spawnPoint: {fileID: 30001}
   spawnPlayerOnStart: 1
-  cameraRigPrefab: {fileID: 100100000, guid: 0783c648532c5980a1c4967b67aa285c, type: 3}
+  cameraRigPrefab: {fileID: 720000, guid: 0783c648532c5980a1c4967b67aa285c, type: 3}
   createCameraRigWhenMissing: 1
 --- !u!1001 &50000
 PrefabInstance:

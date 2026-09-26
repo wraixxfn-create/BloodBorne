@@ -97,6 +97,10 @@ namespace Vespershade.Tests
             {
                 Assert.That(action.type, Is.EqualTo(InputActionType.Button));
                 Assert.That(action.expectedControlType, Is.EqualTo("Button"));
+                Assert.That(action.controls.Count, Is.GreaterThan(0), action.name);
+                foreach (var control in action.controls)
+                    Assert.That(control.valueType, Is.EqualTo(typeof(float)), action.name + ": " + control.path);
+                Assert.That(action.ReadValue<float>(), Is.EqualTo(0f), action.name);
             }
             Assert.That(input.Attack, Is.SameAs(input.LightAttack));
             input.enabled = false;

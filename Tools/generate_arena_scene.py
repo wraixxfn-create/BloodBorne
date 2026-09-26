@@ -336,10 +336,10 @@ MonoBehaviour:
   m_Script: {{fileID: 11500000, guid: {GUID_GameBootstrap}, type: 3}}
   m_Name:
   m_EditorClassIdentifier:
-  playerPrefab: {{fileID: 100100000, guid: {GUID_Player}, type: 3}}
+  playerPrefab: {{fileID: 710000, guid: {GUID_Player}, type: 3}}
   spawnPoint: {{fileID: 30001}}
   spawnPlayerOnStart: 1
-  cameraRigPrefab: {{fileID: 100100000, guid: {GUID_MainCameraRig}, type: 3}}
+  cameraRigPrefab: {{fileID: 720000, guid: {GUID_MainCameraRig}, type: 3}}
   createCameraRigWhenMissing: 1
 --- !u!1001 &50000
 PrefabInstance:
