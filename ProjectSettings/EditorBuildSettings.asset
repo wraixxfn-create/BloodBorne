@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Arena/Arena_RitualChamber_MeshKit.unity
+    guid: 458eeb9eee185faca431d2d9f56fd78e
+  - enabled: 1
+    path: Assets/Scenes/Arena/Arena_RitualChamber.unity
+    guid: 29e6cfec3dde59ffa8e7f3bb46537d2c
+  - enabled: 1
     path: Assets/Scenes/Main/Main.unity
     guid: f194142469475f6b8fb0293c620edc50
   m_configObjects: {}

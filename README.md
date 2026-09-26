@@ -24,11 +24,12 @@ scalable base that later prompts will build gameplay on.
 
 1. In Unity Hub: **Add > Add project from disk**, select this repository root.
 2. Open it with Unity 2022.3 LTS and let the initial import finish.
-3. Open `Assets/Scenes/Main/Main.unity` (already registered in Build Settings).
-4. Press **Play**.
+3. Open **`Assets/Scenes/Arena/Arena_RitualChamber_MeshKit.unity`** (build scene 0).
+4. Press **Play**. The boss chamber has five lighting zones: a cold moon key,
+   warm doorway/candle practicals, dim stained-glass spill, restrained cyan
+   ritual accents, ground mist and sparse motes. **There is no boss or combat yet.**
 
-What you should see: a dark, fogged plane under cold moonlight. A capsule
-placeholder character spawns, the cursor locks, and you can:
+A capsule placeholder spawns at the south doorway, the cursor locks, and you can:
 
 | Input | Action |
 | --- | --- |
@@ -39,20 +40,24 @@ placeholder character spawns, the cursor locks, and you can:
 | `Esc` / Start | Pause (freezes time, unlocks cursor) |
 | `E`, `Q`-area keys, mouse buttons, triggers | Reserved gameplay actions (Interact, Dodge, Light/Heavy Attack) — wired in the input layer, awaiting gameplay |
 
-The camera pulls itself in when the (future) environment blocks it, and the
-screen is graded with a vignette / desaturated / film-grain post pass.
+The camera pulls itself in when the environment blocks it. The two arena scene
+instances use a softer vignette/grain grade for visibility. For the earlier
+primitive chamber open `Assets/Scenes/Arena/Arena_RitualChamber.unity`; for the
+original fogged-plane movement sandbox open `Assets/Scenes/Main/Main.unity`.
 
 ## Project structure
 
 ```
 Assets/
-  Art/Shaders/        Foundation fullscreen grade shader
+  Art/Shaders/        Fullscreen grade + arena haze/glass/particle shaders
   Audio/              Reserved for original audio
-  Materials/          Placeholder materials (ground, player)
-  Models/             Reserved for original models
+  Materials/          Player placeholders + original arena lighting materials
+  Models/Arena/       Reusable modular stonework and two tiny VFX meshes
   Animations/         Reserved for original animation content
+  Prefabs/Arena/      Both chambers + shared Arena_LightingRig.prefab
   Prefabs/            Player.prefab, MainCameraRig.prefab
-  Scenes/Main/        Main.unity - the playable test scene
+  Scenes/Arena/       Playable boss room (MeshKit first in Build Settings)
+  Scenes/Main/        Main.unity - separate movement sandbox
   Scripts/
     Core/             GameManager, SceneFlowManager, GameBootstrap, SingletonBehaviour
     Data/             GameSettingsSO, SceneFlowSO
@@ -81,14 +86,17 @@ Assets/
   Pause`) with keyboard+mouse and gamepad bindings.
 - **Scene management** — `SceneFlowManager` loads scenes asynchronously with
   progress + events, ready for a future loading screen.
-- **Lighting foundation** — single cold directional key light, flat dim
-  ambient, exponential fog, no skybox (void backdrop) in `Main.unity`.
-- **Post-processing foundation** — dependency free single pass
-  (vignette, saturation/contrast/tint, animated grain) so the base look works
-  with zero package dependencies.
+- **Boss-room lighting** — reusable five-zone lighting rig: one controlled
+  soft-shadow moon key, steady Player/Enemy-only silhouette fill, dim local
+  spots and candles, patterned glass pools, low mist and bounded dust. Built-in
+  render pipeline; no volume package, boss or combat component. See
+  [Docs/ARENA_Lighting.md](Docs/ARENA_Lighting.md) for zone map and QA notes.
+- **Post-processing foundation** — dependency-free single pass
+  (vignette, saturation/contrast/tint, animated grain). Arena camera instances
+  override the grade gently so shadowed figures remain visible.
 
-See [Docs/FOUNDATION.md](Docs/FOUNDATION.md) for the full architecture guide
-and the extension points planned for the next prompts.
+See [Docs/FOUNDATION.md](Docs/FOUNDATION.md) for core architecture and
+[Docs/ARENA_Lighting.md](Docs/ARENA_Lighting.md) for lighting controls.
 
 ## Verification
 
@@ -96,10 +104,12 @@ This project was authored and verified without a Unity editor in the loop.
 Tooling in `Tools/` performs the structural checks:
 
 ```bash
-python3 Tools/generate_unity_guids.py   # deterministic GUIDs + .meta files (idempotent)
-python3 Tools/validate_unity_project.py # YAML integrity, GUID refs, scene/prefab/asset wiring
-python3 Tools/csharp_smoke_check.py     # delimiter balance + cross-file API symbols
+python3 Tools/generate_unity_guids.py  # deterministic GUIDs + .meta files
+python3 Tools/validate_unity_project.py # YAML integrity + references (needs PyYAML)
+python3 Tools/csharp_smoke_check.py     # delimiter balance + API symbols
+python3 Tools/verify_arena_lighting.py  # zones, budgets, heights, scene wiring (needs PyYAML)
 ```
 
-All three pass. On first open, Unity will re-serialize a few files (normal)
-and download the packages listed in `Packages/manifest.json`.
+All checks pass in the authoring environment. There is no Unity editor here,
+so visual/play-mode QA should be done on first open. Unity may re-serialize a
+few files and download the packages in `Packages/manifest.json`.

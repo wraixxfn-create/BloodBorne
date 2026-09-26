@@ -1,6 +1,6 @@
 # Arena Mesh Kit — Modular 3D Assets
 
-This folder contains 87 original OBJ meshes for the Hollow Sanctum boss arena.
+This folder contains 87 original modular OBJs for the Hollow Sanctum arena, plus two non-colliding lighting VFX meshes (a light veil and stained-glass floor pool): 89 OBJs total.
 
 ## Categories
 - Floor: 400x400, 200x200, 100x100, Wedge 22.5° r15-19, Edge, Ritual Plate, Ritual Center
@@ -32,7 +32,8 @@ This folder contains 87 original OBJ meshes for the Hollow Sanctum boss arena.
 ## Usage
 - Prefabs in `Assets/Prefabs/Arena/MeshKit/` reference these meshes with correct materials and colliders
 - Master assembly: `Assets/Prefabs/Arena/Arena_RitualChamber_MeshKit.prefab` (321 children)
-- Scene: `Assets/Scenes/Arena/Arena_RitualChamber_MeshKit.unity`
+- Scene: `Assets/Scenes/Arena/Arena_RitualChamber_MeshKit.unity` (instances both the environment and `Arena_LightingRig.prefab`)
+- Lighting-only meshes: `SM_Arena_LightVeil_450.obj` and `SM_Arena_GlassPool_500.obj`
 
 ## Grid
 - Base grid 4 m, snap 4 m move, 22.5° rotate for circular
@@ -40,8 +41,8 @@ This folder contains 87 original OBJ meshes for the Hollow Sanctum boss arena.
 - Platform Tier1 14 m dia, Tier2 10 m dia, steps 0.3 m
 
 ## Optimization
-- Total master ~8k verts, ~4k tris, ~30-40 draw calls after batching
-- Point lights no shadows, spot + directional soft shadows only
+- Modular master geometry ~8k verts, ~4k tris (kit-only estimate); profile actual draw calls and transparent overdraw in Unity with the separate lighting rig.
+- In the final arena lighting pass, only the separate rig's moon directional casts soft shadows; all spot and point lights are shadowless. See `Docs/ARENA_Lighting.md`.
 - Mark Environment layer static for batching, add LODGroup for distant pillars/walls/statues
 
 All meshes original, no external assets.

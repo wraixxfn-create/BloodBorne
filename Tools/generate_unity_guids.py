@@ -85,9 +85,9 @@ def meta_for_file(relpath: str, guid: str) -> str:
             "  defaultReferences: []\n"
             "  executionOrder: 0\n"
             "  icon: {instanceID: 0}\n"
-            "  userData: \n"
-            "  assetBundleName: \n"
-            "  assetBundleVariant: \n"
+            "  userData:\n"
+            "  assetBundleName:\n"
+            "  assetBundleVariant:\n"
         )
     if ext == ".shader":
         return (
@@ -97,9 +97,9 @@ def meta_for_file(relpath: str, guid: str) -> str:
             "  externalObjects: {}\n"
             "  defaultTextures: []\n"
             "  nonModifiableTextures: []\n"
-            "  userData: \n"
-            "  assetBundleName: \n"
-            "  assetBundleVariant: \n"
+            "  userData:\n"
+            "  assetBundleName:\n"
+            "  assetBundleVariant:\n"
         )
     if ext == ".txt":
         return (
@@ -107,9 +107,9 @@ def meta_for_file(relpath: str, guid: str) -> str:
             f"guid: {guid}\n"
             "TextScriptImporter:\n"
             "  externalObjects: {}\n"
-            "  userData: \n"
-            "  assetBundleName: \n"
-            "  assetBundleVariant: \n"
+            "  userData:\n"
+            "  assetBundleName:\n"
+            "  assetBundleVariant:\n"
         )
     if ext == ".mat":
         return (
@@ -118,9 +118,9 @@ def meta_for_file(relpath: str, guid: str) -> str:
             "NativeFormatImporter:\n"
             "  externalObjects: {}\n"
             "  mainObjectFileID: 2100000\n"
-            "  userData: \n"
-            "  assetBundleName: \n"
-            "  assetBundleVariant: \n"
+            "  userData:\n"
+            "  assetBundleName:\n"
+            "  assetBundleVariant:\n"
         )
     if ext == ".asset":
         return (
@@ -129,9 +129,9 @@ def meta_for_file(relpath: str, guid: str) -> str:
             "NativeFormatImporter:\n"
             "  externalObjects: {}\n"
             "  mainObjectFileID: 11400000\n"
-            "  userData: \n"
-            "  assetBundleName: \n"
-            "  assetBundleVariant: \n"
+            "  userData:\n"
+            "  assetBundleName:\n"
+            "  assetBundleVariant:\n"
         )
     if ext == ".prefab":
         return (
@@ -139,18 +139,18 @@ def meta_for_file(relpath: str, guid: str) -> str:
             f"guid: {guid}\n"
             "PrefabImporter:\n"
             "  externalObjects: {}\n"
-            "  userData: \n"
-            "  assetBundleName: \n"
-            "  assetBundleVariant: \n"
+            "  userData:\n"
+            "  assetBundleName:\n"
+            "  assetBundleVariant:\n"
         )
     return (
         "fileFormatVersion: 2\n"
         f"guid: {guid}\n"
         "DefaultImporter:\n"
         "  externalObjects: {}\n"
-        "  userData: \n"
-        "  assetBundleName: \n"
-        "  assetBundleVariant: \n"
+        "  userData:\n"
+        "  assetBundleName:\n"
+        "  assetBundleVariant:\n"
     )
 
 
@@ -161,9 +161,9 @@ def meta_for_folder(guid: str) -> str:
         "folderAsset: yes\n"
         "DefaultImporter:\n"
         "  externalObjects: {}\n"
-        "  userData: \n"
-        "  assetBundleName: \n"
-        "  assetBundleVariant: \n"
+        "  userData:\n"
+        "  assetBundleName:\n"
+        "  assetBundleVariant:\n"
     )
 
 

@@ -71,109 +71,13 @@ class PrefabBuilder:
         return nid
 
     def add_root(self):
-        # Root GameObject with 4 components: Transform, ArenaBounds, ArenaFogController, ArenaLightingController
-        yaml = f"""--- !u!1 &1000
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {{fileID: 0}}
-  m_PrefabInstance: {{fileID: 0}}
-  m_PrefabAsset: {{fileID: 0}}
-  serializedVersion: 6
-  m_Component:
-  - component: {{fileID: 1001}}
-  - component: {{fileID: 1002}}
-  - component: {{fileID: 1003}}
-  - component: {{fileID: 1004}}
-  m_Layer: 0
-  m_Name: Arena_RitualChamber_MeshKit
-  m_TagString: Untagged
-  m_Icon: {{fileID: 0}}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1001
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {{fileID: 0}}
-  m_PrefabInstance: {{fileID: 0}}
-  m_PrefabAsset: {{fileID: 0}}
-  m_GameObject: {{fileID: 1000}}
-  serializedVersion: 2
-  m_LocalRotation: {{x: 0, y: 0, z: 0, w: 1}}
-  m_LocalPosition: {{x: 0, y: 0, z: 0}}
-  m_LocalScale: {{x: 1, y: 1, z: 1}}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-"""
-        # children will be filled later, placeholder
-        yaml += "  - {fileID: 0}\n"  # will replace
-        yaml += """  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1002
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: """+GUID_ArenaBounds+""", type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playableRadius: 19
-  clearCombatRadius: 12
-  centralPlatformRadius: 5
-  wallHeight: 16
-  arenaCenter: {fileID: 0}
---- !u!114 &1003
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: """+GUID_ArenaFog+""", type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fogPlanes: []
-  driftAmplitude: 0.6
-  opacityBreathing: 0.15
-  baseFogDensity: 0.015
-  extraFogDensity: 0.006
-  driftSpeed: 0.12
-  breathingSpeed: 0.22
---- !u!114 &1004
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: """+GUID_ArenaLighting+""", type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moonLight: {fileID: 0}
-  candleLights: []
-  candleFlickerAmplitude: 0.12
-  candleFlickerSpeed: 6.5
-  moonShafts: []
-  shaftBreathing: 0.08
-  ritualEmissiveRenderers: []
-  ritualPulseSpeed: 0.35
-  ritualPulseStrength: 0.5
-"""
-        self.objects.append(yaml)
-        # Ensure next IDs start after root to avoid collision
+        # build_file writes the root after all IDs / child references are known.
+        self.objects.append("")  # preserve the existing child fileIDs
         self.next_id = 2000
-        # We'll keep root children list to fill later
-        # For now, we need to manage root transform children fileIDs dynamically, so we will not write children yet, we'll generate final root with actual children list after all objects added.
-        # Instead, we will store root yaml separately and rewrite at end.
-        self.root_yaml_template = yaml  # but we will rebuild at end
+        self.fog_ids = []
+        self.candle_ids = []
+        self.shaft_ids = []
+        self.ritual_ids = []
 
     def add_mesh_object(self, name, model_file, position, rotation_euler, scale, has_collider, layer, collider_size=None, is_static=False):
         """
@@ -243,6 +147,13 @@ MonoBehaviour:
         for mname in mats:
             mg = MAT_GUIDS.get(mname, MAT_GUIDS["M_Arena_StoneWall"])
             mat_guids.append(mg)
+        # The MeshKit's original fog slabs were opaque-edged and under the floor.
+        # A separate unlit, feathered mist material now keeps them in the periphery.
+        if name.startswith("Fog_Volume_"):
+            mat_guids = [guid_for("Assets/Materials/Arena/M_Arena_GroundMist.mat")]
+        casts_shadows = not name.startswith(("Fog_Volume_", "Window_Glass_",
+                                               "Candle_Cluster_", "Ritual_Plate_",
+                                               "Ritual_Rune_", "Ritual_Center_"))
 
         # Determine collider size if not provided: try parse from filename
         if has_collider and collider_size is None:
@@ -311,8 +222,8 @@ MeshRenderer:
   m_PrefabAsset: {{fileID: 0}}
   m_GameObject: {{fileID: {go_id}}}
   m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
+  m_CastShadows: {1 if casts_shadows else 0}
+  m_ReceiveShadows: {1 if casts_shadows else 0}
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
   m_MotionVectors: 1
@@ -366,9 +277,14 @@ BoxCollider:
 """
         self.objects.append(yaml)
         self.root_children.append(tr_id)
+        if name.startswith("Fog_Volume_"):
+            self.fog_ids.append(tr_id)
+        elif name.startswith(("Ritual_Plate_", "Ritual_Rune_", "Ritual_Center_")):
+            self.ritual_ids.append(mr_id)
         return go_id
 
-    def add_light(self, name, position, rotation_euler, light_type, color, intensity, range_val, spot_angle=38):
+    def add_light(self, name, position, rotation_euler, light_type, color, intensity,
+                  range_val, spot_angle=38, enabled=True):
         go_id = self.alloc_id()
         tr_id = go_id+1
         light_id = go_id+2
@@ -428,7 +344,7 @@ Light:
   m_PrefabInstance: {{fileID: 0}}
   m_PrefabAsset: {{fileID: 0}}
   m_GameObject: {{fileID: {go_id}}}
-  m_Enabled: 1
+  m_Enabled: {1 if enabled else 0}
   serializedVersion: 10
   m_Type: {light_type}
   m_Shape: 0
@@ -439,22 +355,22 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: {1 if light_type!=2 else 0}
+    m_Type: 0
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
-    m_Bias: 0.05
-    m_NormalBias: 0.4
+    m_Bias: 0.04
+    m_NormalBias: 0.25
     m_NearPlane: 0.2
   m_Cookie: {{fileID: 0}}
   m_DrawHalo: 0
   m_Flare: {{fileID: 0}}
-  m_RenderMode: 0
+  m_RenderMode: 2
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 1
+  m_Lightmapping: 4
   m_LightShadowCasterMode: 0
   m_AreaSize: {{x: 1, y: 1}}
   m_BounceIntensity: 1
@@ -465,8 +381,16 @@ Light:
 """
         self.objects.append(yaml)
         self.root_children.append(tr_id)
+        if enabled:
+            if name.startswith("Candle_Light_"):
+                self.candle_ids.append(light_id)
+            elif name.startswith("MoonShaft_"):
+                self.shaft_ids.append(light_id)
 
     def build_file(self):
+        def refs(ids):
+            return "".join(f"  - {{fileID: {fid}}}\n" for fid in ids)
+
         # Build root with children list
         children_yaml = ""
         for cid in self.root_children:
@@ -537,13 +461,14 @@ MonoBehaviour:
   m_Script: {{fileID: 11500000, guid: {GUID_ArenaFog}, type: 3}}
   m_Name: 
   m_EditorClassIdentifier: 
-  fogPlanes: []
-  driftAmplitude: 0.6
-  opacityBreathing: 0.15
-  baseFogDensity: 0.015
-  extraFogDensity: 0.006
-  driftSpeed: 0.12
-  breathingSpeed: 0.22
+  fogPlanes:
+{refs(self.fog_ids)}  driftAmplitude: 0.25
+  opacityBreathing: 0.1
+  baseFogDensity: 0.01
+  extraFogDensity: 0.0015
+  fogColor: {{r: 0.027, g: 0.033, b: 0.05, a: 1}}
+  driftSpeed: 0.11
+  breathingSpeed: 0.19
 --- !u!114 &1004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -556,37 +481,16 @@ MonoBehaviour:
   m_Script: {{fileID: 11500000, guid: {GUID_ArenaLighting}, type: 3}}
   m_Name: 
   m_EditorClassIdentifier: 
-  moonLight: {{fileID: 0}}
-  candleLights: []
-  candleFlickerAmplitude: 0.12
-  candleFlickerSpeed: 6.5
-  moonShafts: []
-  shaftBreathing: 0.08
-  ritualEmissiveRenderers: []
-  ritualPulseSpeed: 0.35
-  ritualPulseStrength: 0.5
+  candleLights:
+{refs(self.candle_ids)}  candleFlickerAmplitude: 0.12
+  candleFlickerSpeed: 5.2
+  moonShafts:
+{refs(self.shaft_ids)}  shaftBreathing: 0.035
+  ritualEmissiveRenderers:
+{refs(self.ritual_ids)}  ritualPulseSpeed: 0.32
+  ritualPulseStrength: 0.14
 """
-        # Combine
-        full = root_yaml + "".join(self.objects[1:])  # first object in self.objects is root template we will replace
-        # Actually self.objects[0] is old root, we replace with new root_yaml
-        # So we need to use root_yaml + rest of objects (excluding first)
-        # self.objects list contains root as first element, plus all added objects
-        # So final = root_yaml + concat(self.objects[1:])
-        final = root_yaml
-        for obj_yaml in self.objects[1:]:
-            final += obj_yaml
-        # Actually self.objects[0] is root, we have root_yaml now, so we need objects from index 1 onward which are the added meshes
-        # But we stored all added objects after root, so self.objects[1:] is correct
-        # However we appended root as first object, then each add_mesh_object appended its yaml. So we need to include all after first.
-        # We already have root_yaml, so we need to write final file as root_yaml + all subsequent objects
-        # Let's reconstruct: we have self.objects list where first is old root, rest are added. So we want root_yaml + "".join(self.objects[1:])
-        # But we already have final = root_yaml, then we need to add rest
-        # The loop above for final is incomplete because self.objects[1:] already contains all added objects, but we did final = root_yaml + "".join(self.objects[1:]) would be enough.
-        # Let's just do that
-        final_content = root_yaml
-        for yaml in self.objects[1:]:
-            final_content += yaml
-        return final_content
+        return root_yaml + "".join(self.objects[1:])
 
 def main():
     builder = PrefabBuilder()
@@ -629,7 +533,7 @@ def main():
         r=7.0
         x = math.cos(rad)*r
         z = math.sin(rad)*r
-        builder.add_mesh_object(f"Ritual_Plate_{i}", "SM_Arena_Floor_Ritual_Plate_220x065.obj", (x,0.02,z), (0, -ang, 0), (1,1,1), False, 0)
+        builder.add_mesh_object(f"Ritual_Plate_{i}", "SM_Arena_Floor_Ritual_Plate_220x065.obj", (x,0.515,z), (0, -ang, 0), (1,1,1), False, 0)
 
     # --- WALLS ---
     # 16 walls around radius 19
@@ -783,9 +687,10 @@ def main():
         x = math.cos(ang_rad)*r
         z = math.sin(ang_rad)*r
         rot_y = random.uniform(0,360)
-        builder.add_mesh_object(f"Candle_Cluster_{i}", "SM_Arena_Candle_Cluster_3x_045.obj", (x,0,z), (0, rot_y, 0), (1,1,1), False, 0)
+        builder.add_mesh_object(f"Candle_Cluster_{i}", "SM_Arena_Candle_Cluster_3x_045.obj", (x,0.5,z), (0, rot_y, 0), (1,1,1), False, 0)
         # Add point light for each cluster
-        builder.add_light(f"Candle_Light_{i}", (x,0.5,z), (0,0,0), 2, (1.0,0.70,0.30), 0.9, 5.5)
+        builder.add_light(f"Candle_Light_{i}", (x,1.0,z), (0,0,0), 2,
+                          (1.0,0.62,0.33), 0.53, 4.6, enabled=(i % 2 == 0))
 
     # Wall sconces 8
     for i in range(8):
@@ -798,12 +703,12 @@ def main():
         builder.add_mesh_object(f"Candle_Sconce_{i}", "SM_Arena_Candle_Wall_Sconce_020x030x015.obj", (x,2.5,z), (0, rot_y, 0), (1,1,1), False, 0)
 
     # --- RITUAL PROPS ---
-    builder.add_mesh_object("Ritual_Brazier_Large", "SM_Arena_Ritual_Brazier_Large_080x060x080.obj", (0,0,10), (0,0,0), (1,1,1), False, 0)
-    builder.add_mesh_object("Ritual_Altar_Slab", "SM_Arena_Ritual_Altar_Slab_200x080x100.obj", (0,0,12), (0,180,0), (1,1,1), True, 10, collider_size=(2,0.8,1))
-    builder.add_mesh_object("Ritual_Chalice", "SM_Arena_Ritual_Chalice_020x030x020.obj", (0.3,0.8,12), (0,0,0), (1,1,1), False, 0)
-    builder.add_mesh_object("Ritual_Incense", "SM_Arena_Ritual_Incense_Burner_025x035x025.obj", (-0.3,0.8,12), (0,0,0), (1,1,1), False, 0)
-    builder.add_mesh_object("Ritual_Rune_1", "SM_Arena_Ritual_Rune_050x001x050.obj", (2,0.02,2), (0,45,0), (1,1,1), False, 0)
-    builder.add_mesh_object("Ritual_Rune_2", "SM_Arena_Ritual_Rune_050x001x050.obj", (-2,0.02,-2), (0,-30,0), (1,1,1), False, 0)
+    builder.add_mesh_object("Ritual_Brazier_Large", "SM_Arena_Ritual_Brazier_Large_080x060x080.obj", (0,0.5,10), (0,0,0), (1,1,1), False, 0)
+    builder.add_mesh_object("Ritual_Altar_Slab", "SM_Arena_Ritual_Altar_Slab_200x080x100.obj", (0,0.5,12), (0,180,0), (1,1,1), True, 10, collider_size=(2,0.8,1))
+    builder.add_mesh_object("Ritual_Chalice", "SM_Arena_Ritual_Chalice_020x030x020.obj", (0.3,1.3,12), (0,0,0), (1,1,1), False, 0)
+    builder.add_mesh_object("Ritual_Incense", "SM_Arena_Ritual_Incense_Burner_025x035x025.obj", (-0.3,1.3,12), (0,0,0), (1,1,1), False, 0)
+    builder.add_mesh_object("Ritual_Rune_1", "SM_Arena_Ritual_Rune_050x001x050.obj", (2,0.615,2), (0,45,0), (1,1,1), False, 0)
+    builder.add_mesh_object("Ritual_Rune_2", "SM_Arena_Ritual_Rune_050x001x050.obj", (-2,0.615,-2), (0,-30,0), (1,1,1), False, 0)
 
     # --- DEBRIS ---
     for i in range(8):
@@ -845,10 +750,10 @@ def main():
     for i in range(4):
         ang_deg = 35 + i*90
         ang_rad = math.radians(ang_deg)
-        r = 12
+        r = 15  # edge haze, outside the 12m combat disc
         x = math.cos(ang_rad)*r
         z = math.sin(ang_rad)*r
-        builder.add_mesh_object(f"Fog_Volume_{i}", "SM_Arena_Deco_Fog_Volume_1000x002x1000.obj", (x,0.06,z), (0,0,0), (1,1,1), False, 0)
+        builder.add_mesh_object(f"Fog_Volume_{i}", "SM_Arena_Deco_Fog_Volume_1000x002x1000.obj", (x,0.54,z), (0,0,0), (0.65,1,0.65), False, 0)
 
     # Moss patches
     for i in range(8):
@@ -869,16 +774,12 @@ def main():
         # Spot pointing inward and down
         # Yaw = 270 - ang? As per design doc
         yaw = 270 - ang_deg
-        builder.add_light(f"MoonShaft_{i}", (x,10,z), (50, yaw, 0), 0, (0.78,0.84,1.0), 1.4, 22, 38)
+        builder.add_light(f"MoonShaft_{i}", (x,10,z), (50, yaw, 0), 0,
+                          (0.63,0.74,0.92), 0.52, 20, 42,
+                          enabled=(i in (1, 2, 4, 7)))
 
-    # Build file
+    # Explicit light/renderer references are authored in the root component.
     final_yaml = builder.build_file()
-    # Need to reconstruct correctly: our builder.build_file currently uses self.objects[1:] but we also have root children. Let's regenerate properly
-    # Actually build_file method already builds root + objects[1:], but we stored root separately. Let's just write final_yaml as returned
-    # But we implemented build_file to return final_content that includes root + objects[1:]
-    # However we also have self.objects[0] as old root, we want to ignore it. Our build_file already does that.
-    # So final_yaml is already correct? Wait we called builder.add_root() which adds old root to objects list. Then build_file creates new root_yaml and appends objects[1:]. So final_yaml is correct.
-    # Let's write
     with open(OUT_PREFAB, 'w', encoding='utf-8') as f:
         f.write(final_yaml)
     print(f"Wrote master prefab {OUT_PREFAB} with {len(builder.root_children)} children, {len(builder.objects)} objects total")

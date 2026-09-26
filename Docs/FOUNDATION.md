@@ -1,7 +1,9 @@
 # Vespershade — Foundation Architecture
 
-This document describes the technical foundation, its conventions, and the
-extension points later prompts are expected to use.
+This document describes the original technical foundation and its conventions.
+The default build scene is now the lit MeshKit boss chamber. `Main.unity` remains
+a separate movement sandbox; the playable room lighting, masks and zones are
+documented in [ARENA_Lighting.md](ARENA_Lighting.md). There is no boss or combat.
 
 ## Guiding principles
 
@@ -118,9 +120,13 @@ Create channels via **Assets > Create > Vespershade > Events**.
 | 11 | Interactable | reserved |
 | 12 | Trigger | reserved |
 
-`Main.unity` lighting: directional key light (cold, 50°/-30°, soft shadows,
-intensity 1.1), flat ambient `(0.12, 0.12, 0.16)`, exponential fog
-(density 0.02), solid near-black camera background, no skybox.
+`Main.unity` is the original placeholder-plane test scene (cold directional,
+flat ambient, exponential fog, near-black background). In **both** chamber
+scenes the shared `Arena_LightingRig` replaces the scene directional and groups
+entrance, central arena, corners/glass, elevated platform and ritual lights.
+It keeps one soft shadow key and a neutral fill restricted to Player (8) and
+reserved Enemy (9). See [ARENA_Lighting.md](ARENA_Lighting.md) for the scene
+settings, atmosphere impostors, culling masks and performance budget.
 
 ## Conventions for the next prompts
 
@@ -143,3 +149,8 @@ intensity 1.1), flat ambient `(0.12, 0.12, 0.16)`, exponential fog
   matching, build settings, manifest).
 - `csharp_smoke_check.py` — delimiter balance + cross-file API symbol checks
   (substitute for a compiler in this sandbox).
+- `generate_arena_lighting.py`, `generate_arena_master.py`,
+  `generate_arena_scene.py`, `tune_legacy_arena_lighting.py` — deterministic
+  scene lighting assets and both playable chamber variants.
+- `verify_arena_lighting.py` — zone/reference checks, shadows, fog, floor
+  heights, camera grade, light count and future-subject culling mask (PyYAML).
