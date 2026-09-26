@@ -56,11 +56,13 @@ original fogged-plane movement sandbox open `Assets/Scenes/Main/Main.unity`.
 Assets/
   Art/Shaders/        Fullscreen grade + arena haze/glass/particle shaders
   Audio/              Reserved for original audio
-  Materials/          Player placeholders + original arena lighting materials
+  Materials/          Player placeholder + the protagonist's clothing palette
+                      (cloth, wine lining, leather, linen, iron, brass, bone thread)
   Models/Arena/       Reusable modular stonework and two tiny VFX meshes
   Animations/         Reserved for original animation content
   Prefabs/Arena/      Both chambers + shared Arena_LightingRig.prefab
   Prefabs/            Player.prefab, MainCameraRig.prefab
+  Models/Characters/  SM_Character_VeilboundWayfarer.obj - layered clothing mesh
   Scenes/Arena/       Playable boss room (MeshKit first in Build Settings)
   Scenes/Main/        Main.unity - separate movement sandbox
   Scripts/
@@ -100,6 +102,13 @@ Assets/
   (vignette, saturation/contrast/tint, animated grain). Arena camera instances
   override the grade gently so shadowed figures remain visible.
 
+- **Protagonist clothing** — an original layered gothic outfit: linen shirt, wine
+  vest, slate siege coat with a wine lining, storm mantle, standing collar, belt,
+  harness, gauntlets and structured boots. Every layer is a shell with real
+  thickness (outer face, lining, rim bands) and folds at the elbows, shoulders,
+  knees, waist and ankles. Art only: the rig, prefab and gameplay are untouched.
+  See [Docs/Protagonist/CLOTHING.md](Docs/Protagonist/CLOTHING.md).
+
 See [Docs/FOUNDATION.md](Docs/FOUNDATION.md) for core architecture and
 [Docs/ARENA_Lighting.md](Docs/ARENA_Lighting.md) for lighting controls.
 
@@ -115,7 +124,20 @@ python3 Tools/audit_serialized_types.py # object-reference type checks (needs Py
 python3 Tools/test_serialized_types.py  # offline auditor regression tests (needs PyYAML)
 python3 Tools/csharp_smoke_check.py     # delimiter balance + API symbols
 python3 Tools/verify_arena_lighting.py  # zones, budgets, heights, scene wiring (needs PyYAML)
+python3 Tools/audit_clothing.py        # protagonist clothing: layers, folds, kit
 ```
+
+Two authoring tools generate and review the protagonist's art:
+
+* `Tools/create_original_protagonist.py` builds the body, head and hair, then hands
+  the body over to `Tools/character_clothing.py` (garment design + layer tables) and
+  `Tools/clothing_kernel.py` (shell/loft/strap sweeps) to build the clothing. It
+  writes the OBJ, its MTL and `Docs/Protagonist/parts.csv`, a part-to-vertex index
+  used by the audit and preview tools.
+* `Tools/preview_protagonist.py` renders the shipped mesh from a fixed set of angles
+  (turntable, close-ups, `--solo`/`--only`/`--ids` QA modes) into
+  `Docs/Protagonist/`, giving the offline authoring loop a stand-in for Play Mode
+  look-dev. See [Docs/Protagonist/CLOTHING.md](Docs/Protagonist/CLOTHING.md).
 
 All checks pass in the authoring environment. There is no Unity editor here,
 so visual/play-mode QA should be done on first open. Unity may re-serialize a
