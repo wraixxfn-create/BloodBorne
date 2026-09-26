@@ -40,6 +40,15 @@ def norm(a):
     l = math.sqrt(dot(a, a))
     return vmul(a, 1.0/l) if l > 1e-9 else (0.0, 1.0, 0.0)
 
+def interp_val(x, xp, fp):
+    if x <= xp[0]: return fp[0]
+    if x >= xp[-1]: return fp[-1]
+    for i in range(len(xp) - 1):
+        if xp[i] <= x <= xp[i+1]:
+            t = (x - xp[i]) / (xp[i+1] - xp[i])
+            return fp[i] * (1.0 - t) + fp[i+1] * t
+    return fp[-1]
+
 def add_mesh(mat, name, points, polys):
     base = len(verts[mat]) + 1
     verts[mat].extend(points)
@@ -173,30 +182,436 @@ ring_surface("Trouser","LowerBody/TailoredWaist",[(.72,.20,.125,0),(.80,.205,.13
 ellipsoid("Trouser","LowerBody/Pelvis",(0,.91,0),(.235,.15,.142),18,32)
 # Anatomically tapered shirt/torso, neck and visible face/hands.
 ring_surface("Skin","Body/Torso",[(1.00,.18,.105,0),(1.10,.205,.115,0),(1.25,.25,.13,0),(1.39,.29,.135,0),(1.49,.255,.115,0)],36)
-tube("Skin","Body/Neck",[(0,1.43,0),(0,1.53,.012),(0,1.60,.018)],[(.080,.079),(.071,.073),(.068,.071)],24,(1,0,0))
-# Face has tapered jaw/chin proportions, subtle ears, brows, nose and inset eyes.
-ellipsoid("Skin","Head/Face",(0,1.675,.018),(.116,.151,.103),24,36)
-ellipsoid("Skin","Head/Jaw",(0,1.615,.035),(.096,.087,.088),18,32)
-for side,label in ((-1,"L"),(1,"R")):
-    ellipsoid("Skin",f"Head/Ear_{label}",(side*.113,1.674,.005),(.024,.043,.027),14,20)
-    ellipsoid("Hair",f"Head/EyeSocket_{label}",(side*.045,1.683,.108),(.022,.013,.008),12,20)
-    ellipsoid("BoneThread",f"Head/Eye_{label}",(side*.045,1.683,.114),(.010,.006,.004),10,16)
-    tube("Skin",f"Head/Brow_{label}",[(side*.075,1.707,.102),(side*.045,1.716,.113),(side*.018,1.707,.111)],[(.009,.008),(.010,.008),(.006,.006)],12,(1,0,0))
-# Fine angular nose bridge and tip in two softly blended forms.
-tube("Skin","Head/Nose",[(0,1.70,.105),(0,1.672,.136),(0,1.653,.132)],[(.012,.011),(.010,.010),(.014,.012)],14,(1,0,0))
-# Mouth line, subtle and subdued.
-tube("Leather","Head/Mouth",[(-.027,1.625,.111),(0,1.622,.12),(.027,1.625,.111)],[.003,.004,.003],10,(1,0,0))
+# =========================================================================
+# VESPERSHADE PROTAGONIST: ORIGINAL SCULPTED HEAD, FACE, EARS, EYES & HAIR
+# =========================================================================
 
-# Face-framing swept dark hair: short nape, one long asymmetric temple lock, carved locks.
-ellipsoid("Hair","Hair/Crown",(0,1.785,-.002),(.127,.073,.112),20,32)
-for i in range(7):
-    x=-.095+i*.031
-    z=-.012-0.013*math.sin(i*.55)
-    tube("Hair",f"Hair/SweptLock_{i+1}",[(x,1.812,z),(x*.86,1.788,z+.047),(x*.67,1.746,z+.091),(x*.58,1.707,z+.078)],[(.034,.031),(.031,.027),(.022,.021),(.007,.010)],16,(1,0,0))
-# Left temple fall and rear nape locks make the profile distinct.
-tube("Hair","Hair/TempleFall",[(-.092,1.79,.032),(-.119,1.74,.075),(-.122,1.675,.078),(-.105,1.625,.045)],[(.034,.027),(.028,.022),(.021,.018),(.006,.008)],16,(1,0,0))
-for s in (-1,1):
-    tube("Hair",f"Hair/Nape_{s}",[(s*.075,1.755,-.065),(s*.082,1.70,-.092),(s*.07,1.63,-.083)],[(.030,.031),(.024,.025),(.006,.009)],14,(1,0,0))
+# 1. Seamless Anatomically Proportioned Head, Face, and Neck
+def generate_unified_head(rings=110, sides=64):
+    pts = []
+    y_vals = [1.440 + i * (1.815 - 1.440) / (rings - 1) for i in range(rings)]
+    
+    spline_y        = [1.440, 1.490, 1.530, 1.555, 1.580, 1.605, 1.635, 1.665, 1.695, 1.718, 1.745, 1.772, 1.792, 1.808, 1.815]
+    spline_rx       = [0.076, 0.068, 0.064, 0.065, 0.060, 0.068, 0.078, 0.086, 0.084, 0.082, 0.080, 0.074, 0.062, 0.038, 0.006]
+    spline_rz_back  = [0.072, 0.066, 0.066, 0.072, 0.082, 0.092, 0.102, 0.108, 0.112, 0.112, 0.108, 0.098, 0.082, 0.052, 0.010]
+    spline_rz_front = [0.076, 0.068, 0.064, 0.068, 0.074, 0.078, 0.082, 0.086, 0.084, 0.082, 0.078, 0.068, 0.056, 0.035, 0.006]
+    spline_cz       = [0.000, 0.002, 0.004, 0.005, 0.004, 0.000,-0.006,-0.010,-0.014,-0.016,-0.018,-0.018,-0.018,-0.018,-0.018]
+    
+    def g2(x_val, y_val, mx, my, sx, sy):
+        return math.exp(-(((x_val - mx)/sx)**2 + ((y_val - my)/sy)**2)/2.0)
+
+    for r_idx, y in enumerate(y_vals):
+        rx = interp_val(y, spline_y, spline_rx)
+        rz_back = interp_val(y, spline_y, spline_rz_back)
+        rz_front = interp_val(y, spline_y, spline_rz_front)
+        cz = interp_val(y, spline_y, spline_cz)
+        
+        ring = []
+        for s in range(sides):
+            a = 2.0 * math.pi * s / sides
+            cos_a = math.cos(a)
+            sin_a = math.sin(a)
+            
+            blend_t = 0.5 * (cos_a + 1.0)
+            rz = rz_back * (1.0 - blend_t) + rz_front * blend_t
+            
+            px = rx * sin_a
+            pz = cz + rz * cos_a
+            py = y
+            
+            if cos_a > 0.0:
+                front_blend = cos_a ** 1.5
+                
+                # Chin definition
+                chin = g2(px, y, 0.0, 1.588, 0.018, 0.014) * 0.018
+                chin_tub = (g2(px, y, 0.012, 1.588, 0.010, 0.012) + g2(px, y, -0.012, 1.588, 0.010, 0.012)) * 0.007
+                mento = g2(px, y, 0.0, 1.606, 0.024, 0.007) * -0.0055
+                
+                # Lips and philtrum
+                l_lip = g2(px, y, 0.0, 1.618, 0.018, 0.007) * 0.011
+                u_lip_mid = g2(px, y, 0.0, 1.632, 0.008, 0.006) * 0.009
+                u_lip_peaks = (g2(px, y, 0.008, 1.633, 0.006, 0.006) + g2(px, y, -0.008, 1.633, 0.006, 0.006)) * 0.0095
+                fissure = g2(px, y, 0.0, 1.625, 0.022, 0.0035) * -0.006
+                corners = (g2(px, y, 0.022, 1.624, 0.006, 0.006) + g2(px, y, -0.022, 1.624, 0.006, 0.006)) * -0.006
+                phil_trough = g2(px, y, 0.0, 1.644, 0.004, 0.007) * -0.0028
+                phil_cols = (g2(px, y, 0.0045, 1.644, 0.0025, 0.007) + g2(px, y, -0.0045, 1.644, 0.0025, 0.007)) * 0.0025
+                
+                # Nose bridge, tip, alar wings
+                tip = g2(px, y, 0.0, 1.660, 0.011, 0.011) * 0.024
+                bridge = g2(px, y, 0.0, 1.682, 0.007, 0.016) * 0.018
+                hump = g2(px, y, 0.0, 1.674, 0.006, 0.009) * 0.004
+                alar = (g2(px, y, 0.013, 1.652, 0.006, 0.008) + g2(px, y, -0.013, 1.652, 0.006, 0.008)) * 0.008
+                nasion = g2(px, y, 0.0, 1.702, 0.010, 0.008) * -0.0055
+                columella = g2(px, y, 0.0, 1.650, 0.005, 0.006) * 0.007
+                
+                # Zygomatic arches & cheek definition
+                zygoma = (g2(px, y, 0.052, 1.675, 0.018, 0.018) + g2(px, y, -0.052, 1.675, 0.018, 0.018)) * 0.011
+                buccal = (g2(px, y, 0.038, 1.644, 0.016, 0.018) + g2(px, y, -0.038, 1.644, 0.016, 0.018)) * -0.006
+                canine_fossa = (g2(px, y, 0.018, 1.656, 0.007, 0.012) + g2(px, y, -0.018, 1.656, 0.007, 0.012)) * -0.004
+                
+                # Eye sockets & brow ridge
+                socket = (g2(px, y, 0.033, 1.692, 0.013, 0.010) + g2(px, y, -0.033, 1.692, 0.013, 0.010)) * -0.012
+                glabella = g2(px, y, 0.0, 1.714, 0.011, 0.010) * 0.007
+                brow = (g2(px, y, 0.030, 1.716, 0.016, 0.009) + g2(px, y, -0.030, 1.716, 0.016, 0.009)) * 0.009
+                boss = (g2(px, y, 0.026, 1.742, 0.018, 0.014) + g2(px, y, -0.026, 1.742, 0.018, 0.014)) * 0.004
+                
+                # Subtle gothic asymmetry
+                asym = g2(px, y, 0.030, 1.716, 0.016, 0.009) * 0.0014 + g2(px, y, 0.012, 1.588, 0.010, 0.012) * 0.0010
+                
+                pz += (chin + chin_tub + mento + l_lip + u_lip_mid + u_lip_peaks + fissure + corners + 
+                       phil_trough + phil_cols + tip + bridge + hump + alar + nasion + columella + 
+                       zygoma + buccal + canine_fossa + socket + glabella + brow + boss + asym) * front_blend
+                
+            if y < 1.555:
+                scm = (math.exp(-((a - math.radians(40))**2)/0.08) + math.exp(-((a - (2*math.pi - math.radians(40)))**2)/0.08)) * 0.006 * (1.0 - (y-1.44)/0.15)
+                larynx = math.exp(-(a**2)/0.06) * math.exp(-((y - 1.520)/0.018)**2) * 0.007
+                nape = math.exp(-((a - math.pi)**2)/0.06) * -0.004
+                pz += scm * cos_a + larynx + nape
+                px += scm * sin_a
+
+            ring.append((px, py, pz))
+        pts.append(ring)
+        
+    flat_pts = [p for r in pts for p in r]
+    polys = []
+    for r in range(rings - 1):
+        for s in range(sides):
+            p0 = r * sides + s
+            p1 = r * sides + (s + 1) % sides
+            p2 = (r + 1) * sides + s
+            p3 = (r + 1) * sides + (s + 1) % sides
+            polys.append((p0, p1, p2))
+            polys.append((p1, p3, p2))
+            
+    top_pole = len(flat_pts)
+    flat_pts.append((0.0, 1.815, spline_cz[-1]))
+    top_ring = (rings - 1) * sides
+    for s in range(sides):
+        polys.append((top_ring + (s + 1) % sides, top_ring + s, top_pole))
+        
+    return flat_pts, polys
+
+head_pts, head_polys = generate_unified_head()
+add_mesh("Skin", "Head/FaceAndNeck", head_pts, head_polys)
+
+# 2. Detailed Sculpted Anatomical Ears
+def generate_detailed_ears():
+    ear_verts = []
+    ear_polys = []
+    
+    for side in (1, -1):
+        cx = side * 0.080
+        cy = 1.660
+        cz = -0.014
+        
+        num_rim = 16
+        rim_pts = []
+        inner_pts = []
+        concha_pts = []
+        
+        for i in range(num_rim):
+            t = i / (num_rim - 1)
+            theta = 0.15 * math.pi + t * 1.25 * math.pi
+            
+            ry = 0.026
+            rz = 0.016
+            ey = cy + ry * math.cos(theta)
+            ez = cz - rz * math.sin(theta)
+            ex = cx + side * (0.012 * math.sin(t * math.pi) + 0.004)
+            rim_pts.append((ex, ey, ez))
+            
+            iy = cy + ry * 0.70 * math.cos(theta)
+            iz = cz - rz * 0.65 * math.sin(theta)
+            ix = cx + side * (0.007 * math.sin(t * math.pi) + 0.002)
+            inner_pts.append((ix, iy, iz))
+            
+            cy_pt = cy + ry * 0.35 * math.cos(theta) - 0.003
+            cz_pt = cz - rz * 0.30 * math.sin(theta)
+            cx_pt = cx + side * 0.001
+            concha_pts.append((cx_pt, cy_pt, cz_pt))
+            
+        base = len(ear_verts)
+        ear_verts.extend(rim_pts + inner_pts + concha_pts)
+        
+        for i in range(num_rim - 1):
+            p0 = base + i
+            p1 = base + i + 1
+            p2 = base + num_rim + i
+            p3 = base + num_rim + i + 1
+            if side > 0:
+                ear_polys.extend(((p0, p1, p2), (p1, p3, p2)))
+            else:
+                ear_polys.extend(((p0, p2, p1), (p1, p2, p3)))
+                
+        for i in range(num_rim - 1):
+            p0 = base + num_rim + i
+            p1 = base + num_rim + i + 1
+            p2 = base + 2 * num_rim + i
+            p3 = base + 2 * num_rim + i + 1
+            if side > 0:
+                ear_polys.extend(((p0, p1, p2), (p1, p3, p2)))
+            else:
+                ear_polys.extend(((p0, p2, p1), (p1, p2, p3)))
+                
+        tragus_idx = len(ear_verts)
+        ear_verts.append((cx + side * 0.008, cy - 0.002, cz + 0.006))
+        ear_verts.append((cx + side * 0.006, cy - 0.028, cz - 0.008))
+        
+        if side > 0:
+            ear_polys.append((base, base + num_rim, tragus_idx))
+            ear_polys.append((base + num_rim - 1, tragus_idx + 1, base + 2*num_rim - 1))
+        else:
+            ear_polys.append((base, tragus_idx, base + num_rim))
+            ear_polys.append((base + num_rim - 1, base + 2*num_rim - 1, tragus_idx + 1))
+            
+    return ear_verts, ear_polys
+
+ear_pts, ear_polys = generate_detailed_ears()
+add_mesh("Skin", "Head/DetailedEars", ear_pts, ear_polys)
+
+# 3. Eyeballs Inset into Anatomical Orbits (BoneThread material)
+def generate_eyeballs():
+    eye_verts = []
+    eye_polys = []
+    for side in (-1, 1):
+        cx = side * 0.033
+        cy = 1.692
+        cz = 0.052
+        r = 0.0105
+        
+        rings = 10
+        sides = 16
+        base = len(eye_verts)
+        pts = [(cx, cy + r, cz)]
+        for ri in range(1, rings):
+            lat = math.pi * ri / rings
+            y = cy + r * math.cos(lat)
+            rr = r * math.sin(lat)
+            for si in range(sides):
+                lon = 2.0 * math.pi * si / sides
+                x = cx + rr * math.sin(lon)
+                z = cz + rr * math.cos(lon)
+                pts.append((x, y, z))
+        bot = len(pts)
+        pts.append((cx, cy - r, cz))
+        
+        fs = []
+        for si in range(sides):
+            fs.append((0, 1 + si, 1 + (si + 1) % sides))
+        for ri in range(rings - 2):
+            for si in range(sides):
+                p0 = 1 + ri * sides + si
+                p1 = 1 + ri * sides + (si + 1) % sides
+                p2 = 1 + (ri + 1) * sides + si
+                p3 = 1 + (ri + 1) * sides + (si + 1) % sides
+                fs.extend(((p0, p2, p1), (p1, p2, p3)))
+        last = 1 + (rings - 2) * sides
+        for si in range(sides):
+            fs.append((bot, last + (si + 1) % sides, last + si))
+            
+        eye_verts.extend(pts)
+        eye_polys.extend([(base + f[0], base + f[1], base + f[2]) for f in fs])
+    return eye_verts, eye_polys
+
+eye_pts, eye_polys = generate_eyeballs()
+add_mesh("BoneThread", "Head/Eyes", eye_pts, eye_polys)
+
+# 4. Sculpted Arched Eyebrows (Hair material)
+def generate_eyebrows():
+    brow_verts = []
+    brow_polys = []
+    for side in (-1, 1):
+        asym_y = 0.0018 if side < 0 else 0.0
+        pts = [
+            (side * 0.014, 1.712 + asym_y, 0.068),
+            (side * 0.024, 1.719 + asym_y, 0.066),
+            (side * 0.038, 1.722 + asym_y, 0.061),
+            (side * 0.052, 1.718 + asym_y, 0.052),
+            (side * 0.064, 1.710 + asym_y, 0.040)
+        ]
+        radii = [(0.0045, 0.003), (0.0055, 0.0035), (0.0050, 0.0032), (0.0035, 0.0025), (0.0015, 0.0015)]
+        
+        sides = 8
+        n_pts = len(pts)
+        ring_pts = []
+        for i, c in enumerate(pts):
+            p_next = pts[min(i+1, n_pts-1)]
+            p_prev = pts[max(0, i-1)]
+            tangent = norm(vsub(p_next, p_prev))
+            if dot(tangent, tangent) < 1e-6: tangent = (side, 0.0, 0.0)
+            hint = (0.0, 1.0, 0.0)
+            b1 = norm(vsub(hint, vmul(tangent, dot(hint, tangent))))
+            b2 = cross(tangent, b1)
+            rx, rz = radii[i]
+            for s in range(sides):
+                a = 2.0 * math.pi * s / sides
+                off = vadd(vmul(b1, rx * math.cos(a)), vmul(b2, rz * math.sin(a)))
+                ring_pts.append(vadd(c, off))
+                
+        base = len(brow_verts)
+        brow_verts.extend(ring_pts)
+        for r in range(n_pts - 1):
+            for s in range(sides):
+                a = base + r * sides + s
+                an = base + r * sides + (s + 1) % sides
+                b = base + (r + 1) * sides + s
+                bn = base + (r + 1) * sides + (s + 1) % sides
+                brow_polys.extend(((a, an, b), (an, bn, b)))
+    return brow_verts, brow_polys
+
+brow_pts, brow_polys = generate_eyebrows()
+add_mesh("Hair", "Head/Eyebrows", brow_pts, brow_polys)
+
+# 5. Volumetric Layered Gothic Hairstyle
+def generate_gothic_hair():
+    hair_verts = []
+    hair_polys = []
+
+    def add_mesh_hair(points, faces):
+        base = len(hair_verts)
+        hair_verts.extend(points)
+        hair_polys.extend([(base + f[0], base + f[1], base + f[2]) for f in faces])
+
+    spline_y        = [1.440, 1.490, 1.530, 1.555, 1.580, 1.605, 1.635, 1.665, 1.695, 1.718, 1.745, 1.772, 1.792, 1.808, 1.815]
+    spline_rx       = [0.076, 0.068, 0.064, 0.065, 0.060, 0.068, 0.078, 0.086, 0.084, 0.082, 0.080, 0.074, 0.062, 0.038, 0.006]
+    spline_rz_back  = [0.072, 0.066, 0.066, 0.072, 0.082, 0.092, 0.102, 0.108, 0.112, 0.112, 0.108, 0.098, 0.082, 0.052, 0.010]
+    spline_rz_front = [0.076, 0.068, 0.064, 0.068, 0.074, 0.078, 0.082, 0.086, 0.084, 0.082, 0.078, 0.068, 0.056, 0.035, 0.006]
+    spline_cz       = [0.000, 0.002, 0.004, 0.005, 0.004, 0.000,-0.006,-0.010,-0.014,-0.016,-0.018,-0.018,-0.018,-0.018,-0.018]
+
+    # Full Solid Cap Base
+    cap_rings = 36
+    cap_sides = 48
+    pts = []
+    fs = []
+    
+    top_pole = (0.0, 1.824, -0.018)
+    pts.append(top_pole)
+    
+    y_levels = [1.816 - i * (1.816 - 1.560) / (cap_rings - 2) for i in range(cap_rings - 1)]
+    
+    for r_idx, y_ring in enumerate(y_levels):
+        rx_skull = interp_val(y_ring, spline_y, spline_rx)
+        rz_b_skull = interp_val(y_ring, spline_y, spline_rz_back)
+        rz_f_skull = interp_val(y_ring, spline_y, spline_rz_front)
+        cz_skull = interp_val(y_ring, spline_y, spline_cz)
+        
+        hair_offset = 0.0065
+        rx_h = rx_skull + hair_offset
+        rz_b_h = rz_b_skull + hair_offset + 0.002
+        rz_f_h = rz_f_skull + hair_offset
+        
+        for s in range(cap_sides):
+            lon = 2.0 * math.pi * s / cap_sides
+            cos_lon = math.cos(lon)
+            sin_lon = math.sin(lon)
+            
+            blend_t = 0.5 * (cos_lon + 1.0)
+            rz = rz_b_h * (1.0 - blend_t) + rz_f_h * blend_t
+            
+            px = rx_h * sin_lon
+            pz = cz_skull + rz * cos_lon
+            py = y_ring
+            
+            if cos_lon > 0.0:
+                hairline_y = 1.738 + 0.008 * math.cos(lon * 2.0)
+                if py < hairline_y:
+                    py = hairline_y
+                    
+            pts.append((px, py, pz))
+            
+    for s in range(cap_sides):
+        p1 = 1 + s
+        p2 = 1 + (s + 1) % cap_sides
+        fs.append((0, p1, p2))
+        
+    for r in range(cap_rings - 2):
+        for s in range(cap_sides):
+            p0 = 1 + r * cap_sides + s
+            p1 = 1 + r * cap_sides + (s + 1) % cap_sides
+            p2 = 1 + (r + 1) * cap_sides + s
+            p3 = 1 + (r + 1) * cap_sides + (s + 1) % cap_sides
+            fs.extend(((p0, p2, p1), (p1, p2, p3)))
+            
+    add_mesh_hair(pts, fs)
+
+    # Swept volume locks
+    def swept_lock(spline, radii, sides=10, twist=0.0):
+        centers = spline
+        n = len(centers)
+        ring_pts = []
+        ring_fs = []
+        for i, c in enumerate(centers):
+            p_next = centers[min(i+1, n-1)]
+            p_prev = centers[max(0, i-1)]
+            tangent = norm(vsub(p_next, p_prev))
+            if dot(tangent, tangent) < 1e-6: tangent = (0.0, 1.0, 0.0)
+            hint = (1.0, 0.0, 0.0)
+            b1 = norm(vsub(hint, vmul(tangent, dot(hint, tangent))))
+            if dot(b1, b1) < 0.2:
+                hint = (0.0, 0.0, 1.0)
+                b1 = norm(vsub(hint, vmul(tangent, dot(hint, tangent))))
+            b2 = cross(tangent, b1)
+            
+            angle_rot = twist * (i / (n - 1))
+            cr, sr = math.cos(angle_rot), math.sin(angle_rot)
+            rb1 = vadd(vmul(b1, cr), vmul(b2, sr))
+            rb2 = vadd(vmul(b1, -sr), vmul(b2, cr))
+            
+            rx, ry = radii[i] if isinstance(radii[i], (list, tuple)) else (radii[i], radii[i]*0.6)
+            for s in range(sides):
+                a = 2.0 * math.pi * s / sides
+                off = vadd(vmul(rb1, rx * math.cos(a)), vmul(rb2, ry * math.sin(a)))
+                ring_pts.append(vadd(c, off))
+                
+        for r in range(n - 1):
+            for s in range(sides):
+                a = r * sides + s
+                an = r * sides + (s + 1) % sides
+                b = (r + 1) * sides + s
+                bn = (r + 1) * sides + (s + 1) % sides
+                ring_fs.extend(((a, an, b), (an, bn, b)))
+                
+        tc = len(ring_pts); ring_pts.append(centers[0])
+        bc = len(ring_pts); ring_pts.append(centers[-1])
+        for s in range(sides):
+            ring_fs.append((tc, (s+1)%sides, s))
+            base_bot = (n - 1) * sides
+            ring_fs.append((bc, base_bot + s, base_bot + (s+1)%sides))
+            
+        add_mesh_hair(ring_pts, ring_fs)
+
+    locks = [
+        ([(0.025, 1.775, 0.082), (0.005, 1.755, 0.088), (-0.022, 1.730, 0.086), (-0.045, 1.700, 0.078)],
+         [(0.022, 0.014), (0.020, 0.012), (0.015, 0.009), (0.004, 0.003)], 0.2),
+        ([(-0.040, 1.765, 0.072), (-0.068, 1.728, 0.076), (-0.082, 1.675, 0.066), (-0.080, 1.620, 0.048), (-0.068, 1.575, 0.035)],
+         [(0.020, 0.013), (0.018, 0.012), (0.014, 0.010), (0.009, 0.006), (0.003, 0.003)], -0.25),
+        ([(-0.055, 1.760, 0.055), (-0.078, 1.710, 0.050), (-0.085, 1.650, 0.032), (-0.078, 1.595, 0.018)],
+         [(0.018, 0.012), (0.016, 0.010), (0.011, 0.007), (0.003, 0.003)], -0.15),
+        ([(0.038, 1.765, 0.068), (0.065, 1.735, 0.058), (0.082, 1.695, 0.035), (0.084, 1.650, 0.005), (0.078, 1.605, -0.018)],
+         [(0.018, 0.012), (0.016, 0.011), (0.012, 0.008), (0.008, 0.005), (0.003, 0.003)], 0.25),
+        ([(0.000, 1.822, 0.020), (-0.005, 1.832, -0.018), (-0.010, 1.822, -0.060), (-0.008, 1.785, -0.098)],
+         [(0.024, 0.016), (0.026, 0.018), (0.022, 0.014), (0.006, 0.005)], 0.1),
+        ([(0.035, 1.815, 0.010), (0.068, 1.800, -0.015), (0.082, 1.760, -0.045), (0.084, 1.705, -0.070)],
+         [(0.020, 0.014), (0.022, 0.015), (0.016, 0.011), (0.005, 0.004)], 0.15),
+        ([(-0.035, 1.815, 0.010), (-0.068, 1.800, -0.015), (-0.082, 1.760, -0.045), (-0.084, 1.705, -0.070)],
+         [(0.020, 0.014), (0.022, 0.015), (0.016, 0.011), (0.005, 0.004)], -0.15),
+        ([(-0.035, 1.730, -0.095), (-0.038, 1.675, -0.108), (-0.030, 1.620, -0.098), (-0.018, 1.565, -0.082)],
+         [(0.020, 0.014), (0.018, 0.012), (0.012, 0.008), (0.004, 0.003)], -0.1),
+        ([(0.035, 1.730, -0.095), (0.038, 1.675, -0.108), (0.030, 1.620, -0.098), (0.018, 1.565, -0.082)],
+         [(0.020, 0.014), (0.018, 0.012), (0.012, 0.008), (0.004, 0.003)], 0.1),
+        ([(0.000, 1.725, -0.100), (0.000, 1.665, -0.112), (0.000, 1.610, -0.102), (0.000, 1.555, -0.084)],
+         [(0.022, 0.016), (0.020, 0.014), (0.014, 0.010), (0.004, 0.003)], 0.0),
+        ([(0.012, 1.765, 0.084), (-0.004, 1.735, 0.090), (-0.018, 1.705, 0.085)],
+         [(0.012, 0.008), (0.009, 0.006), (0.003, 0.002)], 0.2)
+    ]
+    
+    for spline, radii, twist in locks:
+        swept_lock(spline, radii, sides=10, twist=twist)
+        
+    return hair_verts, hair_polys
+
+hair_pts, hair_polys = generate_gothic_hair()
+add_mesh("Hair", "Hair/WayfarerHairstyle", hair_pts, hair_polys)
 
 # Distinctive fitted high-collared long coat: narrow waist, broad shoulder line, split tails.
 ring_surface("Cloth","UpperClothing/LongCoat_Bodice",[(.94,.237,.153,0),(1.01,.235,.152,0),(1.12,.221,.143,0),(1.26,.265,.147,0),(1.39,.305,.145,0),(1.49,.285,.125,0)],48)
