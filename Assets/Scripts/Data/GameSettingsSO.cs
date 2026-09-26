@@ -44,7 +44,7 @@ namespace Vespershade.Data
         [Tooltip("Desired distance from pivot to camera in meters.")]
         public float cameraDistance = 4.5f;
 
-        [Tooltip("Closest the camera is allowed to come to the pivot.")]
+        [Tooltip("Minimum desired orbit distance. Collision may pull the camera closer.")]
         public float cameraMinDistance = 1.8f;
 
         [Tooltip("Farthest the camera is allowed to sit from the pivot.")]
@@ -57,7 +57,11 @@ namespace Vespershade.Data
         public float cameraPitchMax = 65f;
 
         [Tooltip("Degrees of camera rotation per pixel of mouse delta.")]
+        [Min(0f)]
         public float lookSensitivity = 0.18f;
+
+        [Tooltip("Invert vertical mouse and right-stick look (off: upward input looks up).")]
+        public bool invertY = false;
 
         [Tooltip("Exponential follow rate. Higher values make the camera snappier.")]
         public float cameraSmoothing = 12f;

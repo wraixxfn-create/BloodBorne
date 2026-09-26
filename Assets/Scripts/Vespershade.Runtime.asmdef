@@ -1,0 +1,5 @@
+{
+  "name": "Vespershade.Runtime",
+  "rootNamespace": "Vespershade",
+  "references": ["Unity.InputSystem"]
+}

@@ -5,16 +5,13 @@ using Vespershade.GameInput;
 namespace Vespershade.Cameras
 {
     /// <summary>
-    /// Foundation orbit / follow camera for a third person action game.
-    /// Place it on the GameObject that carries the Camera component; it moves
-    /// itself each LateUpdate: orbit via Look input, smoothed pivot follow, and a
-    /// sphere cast that pulls the camera in when world geometry gets in the way.
+    /// Existing third-person orbit/follow rig. Owns persistent orbit angles,
+    /// smooths the pivot and angles, then collision-constrains the final position.
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Camera))]
     public class ThirdPersonCameraRig : MonoBehaviour
     {
-        // Fallback tuning used when no GameSettingsSO is assigned (or a value is 0).
         private const float DefaultPivotHeight = 1.5f;
         private const float DefaultDistance = 4.5f;
         private const float DefaultMinDistance = 1.8f;
@@ -24,61 +21,59 @@ namespace Vespershade.Cameras
         private const float DefaultSensitivity = 0.18f;
         private const float DefaultSmoothing = 12f;
         private const float DefaultStickTurnSpeed = 240f;
-        private const int DefaultObstructionLayers = 1 << 10; // Environment layer.
-        private const float CollisionRadius = 0.25f;
+        private const int DefaultObstructionLayers = 1 << 10; // Environment; excludes Player.
+        private const float MinimumCollisionRadius = 0.25f;
         private const float CollisionPadding = 0.05f;
-        private const float MinCollisionDistance = 0.3f;
         private const float InitialPitch = 15f;
 
-        // Look values at or below this magnitude are treated as gamepad stick, not mouse delta.
-        private const float StickMagnitudeThreshold = 1.5f;
-
-        /// <summary>The active rig in the scene. Assigned in Awake.</summary>
         public static ThirdPersonCameraRig Instance { get; private set; }
 
         [Header("Data")]
-        [Tooltip("Optional tuning asset. When assigned, its values win over the built-in defaults.")]
+        [Tooltip("Optional tuning asset; otherwise the built-in defaults are used.")]
         [SerializeField] private GameSettingsSO settings;
 
         [Header("Target")]
-        [Tooltip("Transform the camera orbits around. Usually assigned at runtime by GameBootstrap.")]
+        [Tooltip("Transform the camera orbits around. Assigned at runtime by GameBootstrap.")]
         [SerializeField] private Transform target;
 
+        private Camera attachedCamera;
         private float yaw;
-        private float pitch = InitialPitch;
+        private float pitch;
+        private float smoothedYaw;
+        private float smoothedPitch;
         private float currentDistance;
         private Vector3 smoothedPivot;
+        private bool targetInitialized;
 
-        /// <summary>Current orbit yaw in degrees. Useful for camera relative movement systems.</summary>
         public float Yaw => yaw;
-
+        public float Pitch => pitch;
         public Transform Target => target;
 
-        private float PivotHeight => Resolve(settings != null ? settings.cameraPivotHeight : 0f, DefaultPivotHeight);
-        private float Distance => Mathf.Clamp(Resolve(settings != null ? settings.cameraDistance : 0f, DefaultDistance), MinDistanceSetting, MaxDistanceSetting);
-        private float MinDistanceSetting => Resolve(settings != null ? settings.cameraMinDistance : 0f, DefaultMinDistance);
-        private float MaxDistanceSetting => Resolve(settings != null ? settings.cameraMaxDistance : 0f, DefaultMaxDistance);
-        private float PitchMin => Resolve(settings != null ? settings.cameraPitchMin : 0f, DefaultPitchMin);
-        private float PitchMax => Resolve(settings != null ? settings.cameraPitchMax : 0f, DefaultPitchMax);
-        private float LookSensitivity => Resolve(settings != null ? settings.lookSensitivity : 0f, DefaultSensitivity);
-        private float Smoothing => Resolve(settings != null ? settings.cameraSmoothing : 0f, DefaultSmoothing);
-        private float StickTurnSpeed => Resolve(settings != null ? settings.stickTurnSpeed : 0f, DefaultStickTurnSpeed);
+        private float PivotHeight => settings != null ? settings.cameraPivotHeight : DefaultPivotHeight;
+        private float MinDistanceSetting => Mathf.Max(0f, settings != null ? settings.cameraMinDistance : DefaultMinDistance);
+        private float MaxDistanceSetting => Mathf.Max(MinDistanceSetting, settings != null ? settings.cameraMaxDistance : DefaultMaxDistance);
+        private float Distance => Mathf.Clamp(settings != null ? settings.cameraDistance : DefaultDistance, MinDistanceSetting, MaxDistanceSetting);
+        // Even misconfigured assets must not let the orbit flip over a pole. Zero is valid tuning.
+        private float PitchMin => Mathf.Clamp(settings != null ? settings.cameraPitchMin : DefaultPitchMin, -89f, 89f);
+        private float PitchMax => Mathf.Clamp(settings != null ? settings.cameraPitchMax : DefaultPitchMax, PitchMin, 89f);
+        private float LookSensitivity => Mathf.Max(0f, settings != null ? settings.lookSensitivity : DefaultSensitivity);
+        private bool InvertY => settings != null && settings.invertY;
+        private float Smoothing => Mathf.Max(0.01f, settings != null ? settings.cameraSmoothing : DefaultSmoothing);
+        private float StickTurnSpeed => Mathf.Max(0f, settings != null ? settings.stickTurnSpeed : DefaultStickTurnSpeed);
+        private int ObstructionLayers => settings != null && settings.cameraObstructionLayers.value != 0
+            ? settings.cameraObstructionLayers.value : DefaultObstructionLayers;
 
-        private int ObstructionLayers
+        // Enclose the near clip plane, not just the camera's point position.
+        private float CollisionRadius
         {
             get
             {
-                if (settings != null && settings.cameraObstructionLayers.value != 0)
-                {
-                    return settings.cameraObstructionLayers.value;
-                }
-                return DefaultObstructionLayers;
+                float near = attachedCamera.nearClipPlane;
+                float halfHeight = near * Mathf.Tan(attachedCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
+                float halfWidth = halfHeight * attachedCamera.aspect;
+                return Mathf.Max(MinimumCollisionRadius,
+                    Mathf.Sqrt(near * near + halfHeight * halfHeight + halfWidth * halfWidth));
             }
-        }
-
-        private static float Resolve(float primary, float fallback)
-        {
-            return Mathf.Abs(primary) > 1e-5f ? primary : fallback;
         }
 
         private void Awake()
@@ -91,8 +86,13 @@ namespace Vespershade.Cameras
             }
 
             Instance = this;
-            smoothedPivot = transform.position;
-            currentDistance = Distance;
+            attachedCamera = GetComponent<Camera>();
+            yaw = smoothedYaw = transform.eulerAngles.y;
+            pitch = smoothedPitch = Mathf.Clamp(InitialPitch, PitchMin, PitchMax);
+            if (target != null)
+            {
+                SetTarget(target);
+            }
         }
 
         private void OnDestroy()
@@ -103,83 +103,85 @@ namespace Vespershade.Cameras
             }
         }
 
-        /// <summary>Assigns the orbit target and snaps the camera to a sane starting position.</summary>
+        /// <summary>Repeated bootstrap binding must not reset the user's orbit.</summary>
         public void SetTarget(Transform newTarget)
         {
-            target = newTarget;
-            if (target == null)
+            if (target == newTarget && targetInitialized)
             {
                 return;
             }
 
-            yaw = transform.eulerAngles.y;
-            pitch = InitialPitch;
-            currentDistance = Distance;
+            target = newTarget;
+            targetInitialized = target != null;
+            if (!targetInitialized)
+            {
+                return;
+            }
+
             smoothedPivot = ComputePivot();
-            SnapToIdealPosition();
+            smoothedYaw = yaw;
+            smoothedPitch = pitch;
+            Quaternion rotation = Quaternion.Euler(smoothedPitch, smoothedYaw, 0f);
+            Vector3 backward = rotation * Vector3.back;
+            currentDistance = ComputeCollisionDistance(smoothedPivot, backward, Distance);
+            transform.SetPositionAndRotation(smoothedPivot + backward * currentDistance, rotation);
         }
 
         private void LateUpdate()
         {
-            if (target == null)
+            UpdateCamera(Time.deltaTime, Cursor.lockState == CursorLockMode.Locked);
+        }
+
+        private void UpdateCamera(float deltaTime, bool acceptLook)
+        {
+            // Do not accumulate hidden mouse rotation during pause or while using the editor/UI.
+            if (target == null || deltaTime <= 0f)
             {
                 return;
             }
 
-            float deltaTime = Time.deltaTime;
-            float smoothing = Smoothing;
-            float followBlend = 1f - Mathf.Exp(-smoothing * deltaTime);
-
-            UpdateOrbit(deltaTime);
-
-            smoothedPivot = Vector3.Lerp(smoothedPivot, ComputePivot(), followBlend);
-
-            Quaternion orbitRotation = Quaternion.Euler(pitch, yaw, 0f);
-            Vector3 backward = orbitRotation * Vector3.back;
-
-            float desiredDistance = ComputeCollisionDistance(smoothedPivot, backward);
-            float distanceBlend = 1f - Mathf.Exp(-smoothing * 2f * deltaTime);
-            currentDistance = Mathf.Lerp(currentDistance, desiredDistance, distanceBlend);
-
-            Vector3 desiredPosition = smoothedPivot + backward * currentDistance;
-            transform.position = Vector3.Lerp(transform.position, desiredPosition, followBlend);
-
-            Vector3 lookVector = smoothedPivot - transform.position;
-            if (lookVector.sqrMagnitude > 1e-6f)
+            if (acceptLook)
             {
-                transform.rotation = Quaternion.LookRotation(lookVector, Vector3.up);
+                UpdateOrbit(deltaTime);
             }
+
+            float blend = 1f - Mathf.Exp(-Smoothing * deltaTime);
+            pitch = Mathf.Clamp(pitch, PitchMin, PitchMax);
+            smoothedYaw = Mathf.LerpAngle(smoothedYaw, yaw, blend);
+            smoothedPitch = Mathf.Clamp(Mathf.Lerp(smoothedPitch, pitch, blend), PitchMin, PitchMax);
+
+            Vector3 pivot = ComputePivot();
+            smoothedPivot = Vector3.Lerp(smoothedPivot, pivot, blend);
+            // Pivot lag must not leave the camera looking through a wall the player has rounded.
+            Vector3 pivotOffset = smoothedPivot - pivot;
+            float pivotLag = pivotOffset.magnitude;
+            if (pivotLag > 0.0001f)
+            {
+                smoothedPivot = pivot + pivotOffset / pivotLag *
+                    ComputeCollisionDistance(pivot, pivotOffset / pivotLag, pivotLag);
+            }
+
+            Quaternion orbitRotation = Quaternion.Euler(smoothedPitch, smoothedYaw, 0f);
+            Vector3 backward = orbitRotation * Vector3.back;
+            float safeDistance = ComputeCollisionDistance(smoothedPivot, backward, Distance);
+            // Obstructions pull in immediately. Only return to the full orbit is smoothed.
+            float distanceBlend = 1f - Mathf.Exp(-Smoothing * 2f * deltaTime);
+            currentDistance = safeDistance < currentDistance ? safeDistance :
+                Mathf.Lerp(currentDistance, safeDistance, distanceBlend);
+
+            // No position Lerp after the cast: it could interpolate back inside the obstruction.
+            transform.SetPositionAndRotation(smoothedPivot + backward * currentDistance, orbitRotation);
         }
 
         private void UpdateOrbit(float deltaTime)
         {
             CoreInput input = CoreInput.Instance;
-            if (input == null || input.Look == null)
-            {
-                return;
-            }
-
-            Vector2 lookDelta = input.LookDelta;
-            if (lookDelta.sqrMagnitude <= 1e-8f)
-            {
-                return;
-            }
-
-            Vector2 applied;
-            if (lookDelta.magnitude <= StickMagnitudeThreshold)
-            {
-                // Gamepad stick: values are roughly -1..1, so turn at a fixed rate.
-                // Stick up should look up, hence the inverted y relative to mouse.
-                applied = new Vector2(lookDelta.x, -lookDelta.y) * StickTurnSpeed * deltaTime;
-            }
-            else
-            {
-                // Mouse: values are pixels of delta since the previous frame.
-                applied = lookDelta * LookSensitivity;
-            }
-
-            yaw += applied.x;
-            pitch = Mathf.Clamp(pitch + applied.y, PitchMin, PitchMax);
+            Vector2 look = input.LookDelta; // Look is always read as Vector2.
+            // Mouse delta is already pixels/frame; multiplying by deltaTime would be incorrect.
+            // A stick expresses deflection, so it needs degrees/second * deltaTime.
+            float scale = input.LookIsMouse ? LookSensitivity : StickTurnSpeed * deltaTime;
+            yaw = Mathf.Repeat(yaw + look.x * scale, 360f);
+            pitch = Mathf.Clamp(pitch + look.y * scale * (InvertY ? 1f : -1f), PitchMin, PitchMax);
         }
 
         private Vector3 ComputePivot()
@@ -187,35 +189,25 @@ namespace Vespershade.Cameras
             return target.position + Vector3.up * PivotHeight;
         }
 
-        private float ComputeCollisionDistance(Vector3 pivot, Vector3 direction)
+        private float ComputeCollisionDistance(Vector3 pivot, Vector3 direction, float desired)
         {
-            float desired = Distance;
             int layers = ObstructionLayers;
-            if (layers == 0)
+            float radius = CollisionRadius;
+            // SphereCast does not report colliders overlapping its starting sphere.
+            // Collapse the arm rather than incorrectly treating that path as unobstructed.
+            if (Physics.CheckSphere(pivot, radius, layers, QueryTriggerInteraction.Ignore))
             {
-                return desired;
+                return 0f;
             }
 
-            RaycastHit hit;
-            if (Physics.SphereCast(pivot, CollisionRadius, direction, out hit, desired, layers, QueryTriggerInteraction.Ignore))
+            if (Physics.SphereCast(pivot, radius, direction, out RaycastHit hit, desired,
+                layers, QueryTriggerInteraction.Ignore))
             {
-                return Mathf.Max(hit.distance - CollisionPadding, MinCollisionDistance);
+                // Never enforce the desired minimum orbit distance through a nearby wall.
+                return Mathf.Max(0f, hit.distance - CollisionPadding);
             }
 
             return desired;
-        }
-
-        private void SnapToIdealPosition()
-        {
-            Vector3 pivot = ComputePivot();
-            Quaternion orbitRotation = Quaternion.Euler(pitch, yaw, 0f);
-            transform.position = pivot + orbitRotation * Vector3.back * Distance;
-
-            Vector3 lookVector = pivot - transform.position;
-            if (lookVector.sqrMagnitude > 1e-6f)
-            {
-                transform.rotation = Quaternion.LookRotation(lookVector, Vector3.up);
-            }
         }
     }
 }

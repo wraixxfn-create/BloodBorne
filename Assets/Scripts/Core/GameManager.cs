@@ -38,6 +38,14 @@ namespace Vespershade.Core
             {
                 SetPaused(!IsPaused);
             }
+
+            // Unity/editor focus changes can release the cursor without pausing the game.
+            // A click in the focused Game view restores capture instead of leaving look disabled.
+            if (lockCursorOnStart && !IsPaused && Application.isFocused &&
+                Cursor.lockState != CursorLockMode.Locked && input.Attack.WasPressedThisFrame())
+            {
+                SetCursorLocked(true);
+            }
         }
 
         public void SetPaused(bool paused)

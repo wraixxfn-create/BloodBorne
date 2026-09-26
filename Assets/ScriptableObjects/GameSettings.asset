@@ -26,6 +26,7 @@ MonoBehaviour:
   cameraMaxDistance: 8
   cameraPitchMin: -20
   cameraPitchMax: 65
+  invertY: 0
   lookSensitivity: 0.18
   cameraSmoothing: 12
   stickTurnSpeed: 240

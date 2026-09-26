@@ -18,7 +18,7 @@ scalable base that later prompts will build gameplay on.
 - **Unity 2022.3 LTS** (authored against 2022.3.20f1; any 2022.3.x works)
 - Internet connection on first open (Unity resolves packages from the manifest)
 - Render pipeline: **Built-in**, linear color space
-- Input: **Both** (new Input System enabled via `activeInputHandler: 2`)
+- Input: **Unity Input System only** (`activeInputHandler: 1`; package 1.7.0)
 
 ## Opening & playing
 
@@ -38,7 +38,12 @@ A capsule placeholder spawns at the south doorway, the cursor locks, and you can
 | `Left Shift` / L3 | Sprint |
 | `Space` / A | Jump |
 | `Esc` / Start | Pause (freezes time, unlocks cursor) |
-| `E`, `Q`-area keys, mouse buttons, triggers | Reserved gameplay actions (Interact, Dodge, Light/Heavy Attack) — wired in the input layer, awaiting gameplay |
+| `E`, `Left Ctrl`, mouse buttons, triggers | Reserved input actions (Interact, Dodge, Light/Heavy Attack) — no gameplay implementation yet |
+| Middle mouse / R3 | Reserved LockOn input — no lock-on behaviour yet |
+
+Click the focused Game view to recapture the cursor if the Editor releases it.
+Camera sensitivity, pitch limits and **Invert Y** are on
+`Assets/ScriptableObjects/GameSettings.asset`.
 
 The camera pulls itself in when the environment blocks it. The two arena scene
 instances use a softer vignette/grain grade for visibility. For the earlier
@@ -83,7 +88,7 @@ Assets/
   prompts iterate on the prefab, not the scene.
 - **Input** — one `CoreInput` component owns a code-defined Input System map
   (`Move, Look, Sprint, Jump, Dodge, Interact, LightAttack, HeavyAttack,
-  Pause`) with keyboard+mouse and gamepad bindings.
+  LockOn, Pause`; `Attack` aliases `LightAttack`) with keyboard+mouse and gamepad bindings.
 - **Scene management** — `SceneFlowManager` loads scenes asynchronously with
   progress + events, ready for a future loading screen.
 - **Boss-room lighting** — reusable five-zone lighting rig: one controlled
@@ -113,3 +118,13 @@ python3 Tools/verify_arena_lighting.py  # zones, budgets, heights, scene wiring 
 All checks pass in the authoring environment. There is no Unity editor here,
 so visual/play-mode QA should be done on first open. Unity may re-serialize a
 few files and download the packages in `Packages/manifest.json`.
+
+### Input/camera repair verification
+
+See [Docs/INPUT_CAMERA_AUDIT.md](Docs/INPUT_CAMERA_AUDIT.md) for the verified
+source defects, exception investigation limits and the manual Play Mode checklist.
+Regression tests are under `Assets/Tests/PlayMode`; run **Window > General > Test
+Runner > PlayMode > Run All**. These tests use virtual Input System devices.
+They have **not been executed in the authoring environment** (no Unity Editor).
+The reported `InvalidCastException` remains unconfirmed/unresolved; static
+checks are not evidence of an exception-free Unity Console.
