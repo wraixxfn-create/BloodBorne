@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: M_Char_Leather
-  m_Shader: {fileID: 4800000, guid: 5666e5b9a2e15606ba7ca8f8e6f6d2d3, type: 3}
+  m_Name: M_Char_Eyes
+  m_Shader: {fileID: 4800000, guid: b1d9c55bfb0c5b2f8c8acaea831032e5, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedProperties:
   m_ValidKeywords: []
@@ -25,16 +25,16 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _GlossVar: 0.24
-    - _Glossiness: 0.48
-    - _GrainScale: 42
-    - _GrainStrength: 0.42
-    - _Metallic: 0.03
-    - _OcclusionStrength: 0.9
-    - _ScratchScale: 165
-    - _WearAmount: 0.20
+    - _Glossiness: 0.92
+    - _IrisDepth: 0.35
+    - _IrisScale: 18
+    - _Metallic: 0
+    - _OcclusionStrength: 0.6
+    - _PupilSize: 0.32
     m_Colors:
-    - _Color: {r: 0.165, g: 0.105, b: 0.072, a: 1}
-    - _ColorVar: {r: 0.205, g: 0.13, b: 0.085, a: 1}
-    - _WearColor: {r: 0.26, g: 0.18, b: 0.12, a: 1}
+    - _CorneaColor: {r: 0.85, g: 0.90, b: 0.98, a: 1}
+    - _IrisColor: {r: 0.22, g: 0.36, b: 0.48, a: 1}
+    - _IrisVar: {r: 0.28, g: 0.44, b: 0.55, a: 1}
+    - _PupilColor: {r: 0.04, g: 0.045, b: 0.06, a: 1}
+    - _ScleraColor: {r: 0.92, g: 0.905, b: 0.87, a: 1}
   m_BuildTextureStacks: []

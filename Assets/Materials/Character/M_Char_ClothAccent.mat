@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: M_Char_ClothAccent
-  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
+  m_Shader: {fileID: 4800000, guid: 38541bce6536576ca78ab34c6e0b6be4, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedProperties:
   m_ValidKeywords: []
@@ -25,23 +25,18 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _BumpScale: 1
-    - _Cutoff: 0.5
-    - _DetailNormalMapScale: 1
-    - _DstBlend: 0
-    - _GlossMapScale: 1
-    - _Glossiness: 0.23
-    - _GlossyReflections: 1
-    - _Metallic: 0.05
-    - _Mode: 0
-    - _OcclusionStrength: 1
-    - _Parallax: 0.02
-    - _SmoothnessTextureChannel: 0
-    - _SpecularHighlights: 1
-    - _SrcBlend: 1
-    - _UVSec: 0
-    - _ZWrite: 1
+    - _DetailScale: 1.25
+    - _FabricSheen: 0.28
+    - _GlossVar: 0.16
+    - _Glossiness: 0.28
+    - _Metallic: 0.025
+    - _OcclusionStrength: 0.84
+    - _WeaveScale: 92
+    - _WeaveStrength: 0.34
+    - _WearAmount: 0.14
     m_Colors:
-    - _Color: {r: 0.235, g: 0.072, b: 0.095, a: 1}
-    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _Color: {r: 0.235, g: 0.075, b: 0.11, a: 1}
+    - _ColorVar: {r: 0.285, g: 0.105, b: 0.14, a: 1}
+    - _SheenColor: {r: 0.48, g: 0.28, b: 0.32, a: 1}
+    - _WearColor: {r: 0.32, g: 0.15, b: 0.17, a: 1}
   m_BuildTextureStacks: []

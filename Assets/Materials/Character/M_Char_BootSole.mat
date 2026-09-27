@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: M_Char_BootSole
-  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
+  m_Shader: {fileID: 4800000, guid: d37f03431804515d8a59d80b8364b19a, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedProperties:
   m_ValidKeywords: []
@@ -25,23 +25,15 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _BumpScale: 1
-    - _Cutoff: 0.5
-    - _DetailNormalMapScale: 1
-    - _DstBlend: 0
-    - _GlossMapScale: 1
-    - _Glossiness: 0.18
-    - _GlossyReflections: 1
+    - _GlossVar: 0.16
+    - _Glossiness: 0.22
+    - _GrainScale: 32
     - _Metallic: 0.02
-    - _Mode: 0
-    - _OcclusionStrength: 1
-    - _Parallax: 0.02
-    - _SmoothnessTextureChannel: 0
-    - _SpecularHighlights: 1
-    - _SrcBlend: 1
-    - _UVSec: 0
-    - _ZWrite: 1
+    - _OcclusionStrength: 0.92
+    - _ScuffAmount: 0.26
     m_Colors:
-    - _Color: {r: 0.045, g: 0.038, b: 0.034, a: 1}
-    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _Color: {r: 0.095, g: 0.065, b: 0.05, a: 1}
+    - _ColorVar: {r: 0.125, g: 0.085, b: 0.065, a: 1}
+    - _ScuffColor: {r: 0.18, g: 0.15, b: 0.11, a: 1}
+    - _SoleColor: {r: 0.055, g: 0.045, b: 0.04, a: 1}
   m_BuildTextureStacks: []

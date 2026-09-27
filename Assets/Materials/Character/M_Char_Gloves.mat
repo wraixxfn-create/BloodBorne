@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: M_Char_Leather
-  m_Shader: {fileID: 4800000, guid: 5666e5b9a2e15606ba7ca8f8e6f6d2d3, type: 3}
+  m_Name: M_Char_Gloves
+  m_Shader: {fileID: 4800000, guid: ddce542fb5d154328f9cf077e8f53281, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedProperties:
   m_ValidKeywords: []
@@ -25,16 +25,16 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _GlossVar: 0.24
-    - _Glossiness: 0.48
-    - _GrainScale: 42
-    - _GrainStrength: 0.42
-    - _Metallic: 0.03
-    - _OcclusionStrength: 0.9
-    - _ScratchScale: 165
-    - _WearAmount: 0.20
+    - _FuzzAmount: 0.32
+    - _GlossVar: 0.20
+    - _Glossiness: 0.34
+    - _GrainScale: 58
+    - _Metallic: 0.02
+    - _OcclusionStrength: 0.88
+    - _WearAmount: 0.16
     m_Colors:
-    - _Color: {r: 0.165, g: 0.105, b: 0.072, a: 1}
-    - _ColorVar: {r: 0.205, g: 0.13, b: 0.085, a: 1}
-    - _WearColor: {r: 0.26, g: 0.18, b: 0.12, a: 1}
+    - _Color: {r: 0.145, g: 0.095, b: 0.065, a: 1}
+    - _ColorVar: {r: 0.18, g: 0.115, b: 0.078, a: 1}
+    - _FuzzColor: {r: 0.24, g: 0.18, b: 0.13, a: 1}
+    - _WearColor: {r: 0.22, g: 0.15, b: 0.10, a: 1}
   m_BuildTextureStacks: []
