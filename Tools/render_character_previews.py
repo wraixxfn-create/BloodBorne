@@ -50,6 +50,10 @@ VIEWS = [
     ("close_knees",  -20,  0.52, 1.15, 34),
     ("close_boots",  26,   0.18, 1.15, 34),
     ("back_close",   150,  1.10, 1.20, 34),
+    # hand close-ups: (name, yaw, pitch, ty, dist, fov, target) - full 7-tuple
+    # form targets the hands directly (world-space hand centers).
+    ("close_hand_R",  38, 8, 0.92, 0.46, 26, (0.390, 0.930, 0.046)),
+    ("close_hand_L", -38, 8, 0.92, 0.46, 26, (-0.390, 0.930, 0.046)),
 ]
 SHEET_COLS = 3
 
@@ -195,8 +199,13 @@ def main():
     vnorm = vnorm / ln[:, None]
 
     paths = []
-    for name, yaw, ty, dist, fov in VIEWS:
-        img = render_view(verts, tris, mat_ids, vnorm, yaw, 3.0, (0.0, ty, 0.0), dist, fov, 640, 800)
+    for view in VIEWS:
+        if len(view) == 7:
+            name, yaw, pitch, ty, dist, fov, target = view
+        else:
+            name, yaw, ty, dist, fov = view
+            pitch, target = 3.0, (0.0, ty, 0.0)
+        img = render_view(verts, tris, mat_ids, vnorm, yaw, pitch, target, dist, fov, 640, 800)
         path = os.path.join(out_dir, f"PC_{name}.png")
         Image.fromarray(img).save(path)
         paths.append(path)

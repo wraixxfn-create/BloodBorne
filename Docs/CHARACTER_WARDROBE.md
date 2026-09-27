@@ -12,9 +12,9 @@ figure, its costume and every ornament are original to Vespershade.
 | --- | --- |
 | `Tools/create_original_protagonist.py` | Procedural generator: writes the OBJ + MTL (head/hair preserved from the previous revision, wardrobe rebuilt from scratch) |
 | `Tools/render_character_previews.py` | Offline 12-angle preview renderer (numpy z-buffer rasterizer) used for multi-angle QA; also writes `Docs/CharacterPreviews/` |
-| `Assets/Models/Characters/SM_Character_VeilboundWayfarer.obj` | Base mesh, ~42.2k triangles, 9 material submeshes (path and GUID unchanged, so the prefab keeps working) |
-| `Assets/Models/Characters/SM_Character_VeilboundWayfarer_L1.obj` | LOD1, ~31.5k triangles |
-| `Assets/Models/Characters/SM_Character_VeilboundWayfarer_L2.obj` | LOD2, ~27.4k triangles |
+| `Assets/Models/Characters/SM_Character_VeilboundWayfarer.obj` | Base mesh, ~68.5k triangles, 9 material submeshes (path and GUID unchanged, so the prefab keeps working) |
+| `Assets/Models/Characters/SM_Character_VeilboundWayfarer_L1.obj` | LOD1, ~45.5k triangles |
+| `Assets/Models/Characters/SM_Character_VeilboundWayfarer_L2.obj` | LOD2, ~38.9k triangles |
 | `Assets/Prefabs/Player/Player.prefab` | Base renderer + LOD1/LOD2 renderers driven by a `LODGroup` (50% / 18% / 6% screen height) |
 | `Docs/CharacterPreviews/` | Rendered verification images (`sheet.jpg`, per-angle PNGs, `PC_lod_comparison.png`) |
 
@@ -70,9 +70,16 @@ boot shafts**.
     block, stitched toe cap, heel counter, laced shaft with slouch wrinkles,
     folded wine cuff with lining, back pull tab, crossed instep straps
     (buckled on the right boot only - deliberate asymmetry).
-11. **Gauntlet gloves (Leather)** - bound gauntlet cuffs, reinforced knuckle
-    band, five articulated fingers, thumb; wrist strap + buckle on the right
-    hand, brass button on the left.
+11. **Gauntlet gloves (Leather/Skin)** - anatomically rebuilt hands: skin
+    palms with thenar/hypothenar bulges and 12-station sculpting, four
+    individual fingers (root flare, MCP/PIP/DIP knuckle bumps, palmar creases,
+    tapered fingertips with pulp flatten) and an opposable thumb with saddle
+    root, per side. Over each hand a fitted leather glove: palm stall, five
+    finger stalls and a thumb stall as ~2.6-2.9 mm offset shells, dorsal
+    seam beads, web gussets between the fingers, thumb-web gore, a bridged
+    knuckle guard band with four raised ridges and saddle stitching, bound
+    gauntlet cuff, wrist strap + buckle on the right hand, brass button on
+    the left.
 
 ### Small straps and fasteners (inventory)
 
@@ -106,14 +113,20 @@ stud, mantle stud pins, toe-cap and flap saddle stitching.
   (this foundation has no animation rig yet); the wardrobe adds no bones,
   no scripts, no physics and no input changes. `CharacterController`,
   `PlayerController` and the camera are untouched.
+- Each LOD regenerates a `SM_Character_VeilboundWayfarer*.handrig.json`
+  sidecar (`vespershade.handrig/1`): 41 joints (Root + per side
+  Shoulder/Elbow/Forearm/Wrist/Hand chain + full digit chains) with axis
+  conventions, and the 66 rigged part ranges (global OBJ vertex indices)
+  that map hand geometry to those joints. The sidecar is authored data for
+  future rigging - the prefab consumes nothing from it at runtime.
 
 ## Multi-angle verification (offline)
 
 Because this repository is authored without a Unity editor, Play-Mode-style
 visual QA runs through `Tools/render_character_previews.py`, which renders
-the exact OBJ the game imports from 12 cameras (front / three-quarter L+R /
-back / profiles / collar, torso, belt, knee, boot close-ups / rear close-up)
-into `Docs/CharacterPreviews/`. The exported `sheet.jpg` is the final
+the exact OBJ the game imports from 14 cameras (front / three-quarter L+R /
+back / profiles / collar, torso, belt, knee, boot close-ups / rear close-up /
+left + right hand close-ups) into `Docs/CharacterPreviews/`. The exported `sheet.jpg` is the final
 verification of this revision. `PC_lod_comparison.png` shows L0/L1/L2 side by
 side. In-editor checks on first open: open
 `Assets/Scenes/Arena/Arena_RitualChamber_MeshKit.unity`, press Play, orbit the
@@ -126,3 +139,19 @@ LODGroup can be verified with the Scene view's "Render Modes > LOD" overlay.
 id 205 in this change), `Tools/audit_serialized_types.py`,
 `Tools/csharp_smoke_check.py`, `Tools/test_serialized_types.py` and
 `Tools/verify_arena_lighting.py` all pass after this redesign.
+
+`Tools/verify_hands.py [--obj ...]` performs offline hand QA on any LOD:
+part inventory, palm/finger/thumb proportions and knuckle definition, skin
+finger separation (anti-mitten), skin weights (sums, influence counts, side
+purity, per-digit chains), glove containment and clearance, and full
+linear-blend-skin deformation for the stand / walk / attack / dodge poses
+(palm tracks the hand joint, glove shell drift, no stall interpenetration,
+fingertips never tunnel through the palm, grip closure). All 114 checks pass
+on all three LODs.
+
+A full-mesh winding audit (signed volume per connected component + raycast
+visibility) now runs as part of regeneration QA: every one of the 729 closed
+components on the base mesh (and every closed component on L1/L2) has
+positive orientation, and raycast spot checks confirm previously inside-out
+parts (belt, shirt cuffs, cuff buttons, coat skirt, shoulder mantle, boot
+rims, button rims) are visible from outside.
