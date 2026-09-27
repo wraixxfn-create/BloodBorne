@@ -1,0 +1,1631 @@
+{
+ "format": "vespershade.handrig/1",
+ "mesh": "SM_Character_VeilboundWayfarer_L2.obj",
+ "units": "metres",
+ "up": "Y",
+ "character_faces": "+Z",
+ "bind_pose": "identity (mesh authored in bind pose; zero-rotation FK reproduces the OBJ exactly)",
+ "default_bone": "Root (any vertex outside the parts list binds 100% to Root)",
+ "weights": "computed deterministically from vertex positions by Tools/hand_rig.py:weights_for(side, chain, point)",
+ "bones": [
+  {
+   "name": "Root",
+   "parent": null,
+   "head": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "RShoulder",
+   "parent": "Root",
+   "head": [
+    0.201,
+    1.462,
+    -0.008
+   ],
+   "axes": {
+    "flex": [
+     -1,
+     0,
+     0
+    ],
+    "abd": [
+     0,
+     0,
+     1
+    ],
+    "twist": [
+     0,
+     -1,
+     0
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "RElbow",
+   "parent": "RShoulder",
+   "head": [
+    0.352,
+    1.185,
+    0.02
+   ],
+   "axes": {
+    "flex": [
+     -1,
+     0,
+     0
+    ],
+    "abd": [
+     0,
+     0,
+     1
+    ],
+    "twist": [
+     0.27993,
+     -0.949763,
+     0.139965
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "RForearm",
+   "parent": "RElbow",
+   "head": [
+    0.38,
+    1.09,
+    0.034
+   ],
+   "axes": {
+    "flex": [
+     -1,
+     0,
+     0
+    ],
+    "abd": [
+     0,
+     0,
+     1
+    ],
+    "twist": [
+     0.060659,
+     -0.990759,
+     0.121317
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "RWrist",
+   "parent": "RForearm",
+   "head": [
+    0.386,
+    0.992,
+    0.046
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     -0.052662,
+     -0.914748
+    ],
+    "abd": [
+     -0.913024,
+     -0.106809,
+     -0.393674
+    ],
+    "twist": [
+     0.076972,
+     -0.992884,
+     0.090867
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "RHand",
+   "parent": "RWrist",
+   "head": [
+    0.389695,
+    0.944342,
+    0.050362
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     -0.052662,
+     -0.914748
+    ],
+    "abd": [
+     -0.913024,
+     -0.106809,
+     -0.393674
+    ],
+    "twist": [
+     0.076972,
+     -0.992884,
+     0.090867
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "RThumbCMC",
+   "parent": "RHand",
+   "head": [
+    0.373318,
+    0.97507,
+    0.069844
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     -0.052662,
+     -0.914748
+    ],
+    "abd": [
+     -0.913024,
+     -0.106809,
+     -0.393674
+    ],
+    "twist": [
+     -0.372879,
+     -0.67336,
+     0.638394
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "RThumbMCP",
+   "parent": "RThumbCMC",
+   "head": [
+    0.359426,
+    0.949983,
+    0.093628
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     -0.052662,
+     -0.914748
+    ],
+    "abd": [
+     -0.913024,
+     -0.106809,
+     -0.393674
+    ],
+    "twist": [
+     -0.278644,
+     -0.317768,
+     0.906301
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "RThumbIP",
+   "parent": "RThumbMCP",
+   "head": [
+    0.351284,
+    0.940697,
+    0.120113
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     -0.052662,
+     -0.914748
+    ],
+    "abd": [
+     -0.913024,
+     -0.106809,
+     -0.393674
+    ],
+    "twist": [
+     -0.03171,
+     -0.367248,
+     0.929582
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "RIndexMCP",
+   "parent": "RHand",
+   "head": [
+    0.386321,
+    0.904001,
+    0.085642
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     -0.052662,
+     -0.914748
+    ],
+    "abd": [
+     -0.913024,
+     -0.106809,
+     -0.393674
+    ],
+    "twist": [
+     -0.078665,
+     -0.991981,
+     0.098918
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "RIndexPIP",
+   "parent": "RIndexMCP",
+   "head": [
+    0.383332,
+    0.866305,
+    0.089401
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     -0.052662,
+     -0.914748
+    ],
+    "abd": [
+     -0.913024,
+     -0.106809,
+     -0.393674
+    ],
+    "twist": [
+     -0.173782,
+     -0.983147,
+     0.056756
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "RIndexDIP",
+   "parent": "RIndexPIP",
+   "head": [
+    0.379508,
+    0.844676,
+    0.09065
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     -0.052662,
+     -0.914748
+    ],
+    "abd": [
+     -0.913024,
+     -0.106809,
+     -0.393674
+    ],
+    "twist": [
+     -0.220806,
+     -0.974665,
+     0.035676
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "RMiddleMCP",
+   "parent": "RHand",
+   "head": [
+    0.395195,
+    0.896937,
+    0.066978
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     -0.052662,
+     -0.914748
+    ],
+    "abd": [
+     -0.913024,
+     -0.106809,
+     -0.393674
+    ],
+    "twist": [
+     -0.082742,
+     -0.996347,
+     0.021126
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "RMiddlePIP",
+   "parent": "RMiddleMCP",
+   "head": [
+    0.391802,
+    0.856087,
+    0.067844
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     -0.052662,
+     -0.914748
+    ],
+    "abd": [
+     -0.913024,
+     -0.106809,
+     -0.393674
+    ],
+    "twist": [
+     -0.193334,
+     -0.980728,
+     -0.028203
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "RMiddleDIP",
+   "parent": "RMiddlePIP",
+   "head": [
+    0.386969,
+    0.831569,
+    0.067139
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     -0.052662,
+     -0.914748
+    ],
+    "abd": [
+     -0.913024,
+     -0.106809,
+     -0.393674
+    ],
+    "twist": [
+     -0.255339,
+     -0.965214,
+     -0.056248
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "RRingMCP",
+   "parent": "RHand",
+   "head": [
+    0.402899,
+    0.899856,
+    0.048319
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     -0.052662,
+     -0.914748
+    ],
+    "abd": [
+     -0.913024,
+     -0.106809,
+     -0.393674
+    ],
+    "twist": [
+     -0.070472,
+     -0.996272,
+     -0.049763
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "RRingPIP",
+   "parent": "RRingMCP",
+   "head": [
+    0.40015,
+    0.861001,
+    0.046379
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     -0.052662,
+     -0.914748
+    ],
+    "abd": [
+     -0.913024,
+     -0.106809,
+     -0.393674
+    ],
+    "twist": [
+     -0.195983,
+     -0.974866,
+     -0.105958
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "RRingDIP",
+   "parent": "RRingPIP",
+   "head": [
+    0.395447,
+    0.837604,
+    0.043836
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     -0.052662,
+     -0.914748
+    ],
+    "abd": [
+     -0.913024,
+     -0.106809,
+     -0.393674
+    ],
+    "twist": [
+     -0.257254,
+     -0.957034,
+     -0.133816
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "RLittleMCP",
+   "parent": "RHand",
+   "head": [
+    0.409052,
+    0.911709,
+    0.029561
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     -0.052662,
+     -0.914748
+    ],
+    "abd": [
+     -0.913024,
+     -0.106809,
+     -0.393674
+    ],
+    "twist": [
+     -0.073368,
+     -0.989144,
+     -0.127327
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "RLittlePIP",
+   "parent": "RLittleMCP",
+   "head": [
+    0.406851,
+    0.882035,
+    0.025741
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     -0.052662,
+     -0.914748
+    ],
+    "abd": [
+     -0.913024,
+     -0.106809,
+     -0.393674
+    ],
+    "twist": [
+     -0.242363,
+     -0.948567,
+     -0.203668
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "RLittleDIP",
+   "parent": "RLittlePIP",
+   "head": [
+    0.402489,
+    0.864961,
+    0.022075
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     -0.052662,
+     -0.914748
+    ],
+    "abd": [
+     -0.913024,
+     -0.106809,
+     -0.393674
+    ],
+    "twist": [
+     -0.330308,
+     -0.911709,
+     -0.244302
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "LShoulder",
+   "parent": "Root",
+   "head": [
+    -0.201,
+    1.462,
+    -0.008
+   ],
+   "axes": {
+    "flex": [
+     -1,
+     0,
+     0
+    ],
+    "abd": [
+     0,
+     0,
+     -1
+    ],
+    "twist": [
+     0,
+     -1,
+     0
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "LElbow",
+   "parent": "LShoulder",
+   "head": [
+    -0.352,
+    1.185,
+    0.02
+   ],
+   "axes": {
+    "flex": [
+     -1,
+     0,
+     0
+    ],
+    "abd": [
+     0,
+     0,
+     -1
+    ],
+    "twist": [
+     -0.27993,
+     -0.949763,
+     0.139965
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "LForearm",
+   "parent": "LElbow",
+   "head": [
+    -0.38,
+    1.09,
+    0.034
+   ],
+   "axes": {
+    "flex": [
+     -1,
+     0,
+     0
+    ],
+    "abd": [
+     0,
+     0,
+     -1
+    ],
+    "twist": [
+     -0.060659,
+     -0.990759,
+     0.121317
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "LWrist",
+   "parent": "LForearm",
+   "head": [
+    -0.386,
+    0.992,
+    0.046
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     0.052662,
+     0.914748
+    ],
+    "abd": [
+     -0.913024,
+     0.106809,
+     0.393674
+    ],
+    "twist": [
+     -0.076972,
+     -0.992884,
+     0.090867
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "LHand",
+   "parent": "LWrist",
+   "head": [
+    -0.389695,
+    0.944342,
+    0.050362
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     0.052662,
+     0.914748
+    ],
+    "abd": [
+     -0.913024,
+     0.106809,
+     0.393674
+    ],
+    "twist": [
+     -0.076972,
+     -0.992884,
+     0.090867
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "LThumbCMC",
+   "parent": "LHand",
+   "head": [
+    -0.373318,
+    0.97507,
+    0.069844
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     0.052662,
+     0.914748
+    ],
+    "abd": [
+     -0.913024,
+     0.106809,
+     0.393674
+    ],
+    "twist": [
+     0.372879,
+     -0.67336,
+     0.638394
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "LThumbMCP",
+   "parent": "LThumbCMC",
+   "head": [
+    -0.359426,
+    0.949983,
+    0.093628
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     0.052662,
+     0.914748
+    ],
+    "abd": [
+     -0.913024,
+     0.106809,
+     0.393674
+    ],
+    "twist": [
+     0.278644,
+     -0.317768,
+     0.906301
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "LThumbIP",
+   "parent": "LThumbMCP",
+   "head": [
+    -0.351284,
+    0.940697,
+    0.120113
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     0.052662,
+     0.914748
+    ],
+    "abd": [
+     -0.913024,
+     0.106809,
+     0.393674
+    ],
+    "twist": [
+     0.03171,
+     -0.367248,
+     0.929582
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "LIndexMCP",
+   "parent": "LHand",
+   "head": [
+    -0.386321,
+    0.904001,
+    0.085642
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     0.052662,
+     0.914748
+    ],
+    "abd": [
+     -0.913024,
+     0.106809,
+     0.393674
+    ],
+    "twist": [
+     0.078665,
+     -0.991981,
+     0.098918
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "LIndexPIP",
+   "parent": "LIndexMCP",
+   "head": [
+    -0.383332,
+    0.866305,
+    0.089401
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     0.052662,
+     0.914748
+    ],
+    "abd": [
+     -0.913024,
+     0.106809,
+     0.393674
+    ],
+    "twist": [
+     0.173782,
+     -0.983147,
+     0.056756
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "LIndexDIP",
+   "parent": "LIndexPIP",
+   "head": [
+    -0.379508,
+    0.844676,
+    0.09065
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     0.052662,
+     0.914748
+    ],
+    "abd": [
+     -0.913024,
+     0.106809,
+     0.393674
+    ],
+    "twist": [
+     0.220806,
+     -0.974665,
+     0.035676
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "LMiddleMCP",
+   "parent": "LHand",
+   "head": [
+    -0.395195,
+    0.896937,
+    0.066978
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     0.052662,
+     0.914748
+    ],
+    "abd": [
+     -0.913024,
+     0.106809,
+     0.393674
+    ],
+    "twist": [
+     0.082742,
+     -0.996347,
+     0.021126
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "LMiddlePIP",
+   "parent": "LMiddleMCP",
+   "head": [
+    -0.391802,
+    0.856087,
+    0.067844
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     0.052662,
+     0.914748
+    ],
+    "abd": [
+     -0.913024,
+     0.106809,
+     0.393674
+    ],
+    "twist": [
+     0.193334,
+     -0.980728,
+     -0.028203
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "LMiddleDIP",
+   "parent": "LMiddlePIP",
+   "head": [
+    -0.386969,
+    0.831569,
+    0.067139
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     0.052662,
+     0.914748
+    ],
+    "abd": [
+     -0.913024,
+     0.106809,
+     0.393674
+    ],
+    "twist": [
+     0.255339,
+     -0.965214,
+     -0.056248
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "LRingMCP",
+   "parent": "LHand",
+   "head": [
+    -0.402899,
+    0.899856,
+    0.048319
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     0.052662,
+     0.914748
+    ],
+    "abd": [
+     -0.913024,
+     0.106809,
+     0.393674
+    ],
+    "twist": [
+     0.070472,
+     -0.996272,
+     -0.049763
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "LRingPIP",
+   "parent": "LRingMCP",
+   "head": [
+    -0.40015,
+    0.861001,
+    0.046379
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     0.052662,
+     0.914748
+    ],
+    "abd": [
+     -0.913024,
+     0.106809,
+     0.393674
+    ],
+    "twist": [
+     0.195983,
+     -0.974866,
+     -0.105958
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "LRingDIP",
+   "parent": "LRingPIP",
+   "head": [
+    -0.395447,
+    0.837604,
+    0.043836
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     0.052662,
+     0.914748
+    ],
+    "abd": [
+     -0.913024,
+     0.106809,
+     0.393674
+    ],
+    "twist": [
+     0.257254,
+     -0.957034,
+     -0.133816
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "LLittleMCP",
+   "parent": "LHand",
+   "head": [
+    -0.409052,
+    0.911709,
+    0.029561
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     0.052662,
+     0.914748
+    ],
+    "abd": [
+     -0.913024,
+     0.106809,
+     0.393674
+    ],
+    "twist": [
+     0.073368,
+     -0.989144,
+     -0.127327
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "LLittlePIP",
+   "parent": "LLittleMCP",
+   "head": [
+    -0.406851,
+    0.882035,
+    0.025741
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     0.052662,
+     0.914748
+    ],
+    "abd": [
+     -0.913024,
+     0.106809,
+     0.393674
+    ],
+    "twist": [
+     0.242363,
+     -0.948567,
+     -0.203668
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  },
+  {
+   "name": "LLittleDIP",
+   "parent": "LLittlePIP",
+   "head": [
+    -0.402489,
+    0.864961,
+    0.022075
+   ],
+   "axes": {
+    "flex": [
+     0.400579,
+     0.052662,
+     0.914748
+    ],
+    "abd": [
+     -0.913024,
+     0.106809,
+     0.393674
+    ],
+    "twist": [
+     0.330308,
+     -0.911709,
+     -0.244302
+    ]
+   },
+   "axis_convention": "flex=+palmar curl (arm: swing forward), abd=+towards thumb side, twist=+segment roll"
+  }
+ ],
+ "parts": [
+  {
+   "name": "Hand/Glove/Gauntlet_L",
+   "mat": "Leather",
+   "start": 2877,
+   "end": 2919,
+   "side": "L",
+   "chain": "cuff"
+  },
+  {
+   "name": "Hand/Glove/GauntletStitch_L",
+   "mat": "BoneThread",
+   "start": 18747,
+   "end": 18777,
+   "side": "L",
+   "chain": "cuff"
+  },
+  {
+   "name": "Hand/Skin/Palm_L",
+   "mat": "Skin",
+   "start": 12542,
+   "end": 12664,
+   "side": "L",
+   "chain": "palm"
+  },
+  {
+   "name": "Hand/Skin/Index_L",
+   "mat": "Skin",
+   "start": 12664,
+   "end": 12726,
+   "side": "L",
+   "chain": "digit0"
+  },
+  {
+   "name": "Hand/Skin/Middle_L",
+   "mat": "Skin",
+   "start": 12726,
+   "end": 12788,
+   "side": "L",
+   "chain": "digit1"
+  },
+  {
+   "name": "Hand/Skin/Ring_L",
+   "mat": "Skin",
+   "start": 12788,
+   "end": 12850,
+   "side": "L",
+   "chain": "digit2"
+  },
+  {
+   "name": "Hand/Skin/Little_L",
+   "mat": "Skin",
+   "start": 12850,
+   "end": 12912,
+   "side": "L",
+   "chain": "digit3"
+  },
+  {
+   "name": "Hand/Skin/Thumb_L",
+   "mat": "Skin",
+   "start": 12912,
+   "end": 12968,
+   "side": "L",
+   "chain": "thumb"
+  },
+  {
+   "name": "Hand/Glove/PalmStall_L",
+   "mat": "Leather",
+   "start": 2919,
+   "end": 3041,
+   "side": "L",
+   "chain": "palm"
+  },
+  {
+   "name": "Hand/Glove/IndexStall_L",
+   "mat": "Leather",
+   "start": 3041,
+   "end": 3103,
+   "side": "L",
+   "chain": "digit0"
+  },
+  {
+   "name": "Hand/Glove/MiddleStall_L",
+   "mat": "Leather",
+   "start": 3103,
+   "end": 3165,
+   "side": "L",
+   "chain": "digit1"
+  },
+  {
+   "name": "Hand/Glove/RingStall_L",
+   "mat": "Leather",
+   "start": 3165,
+   "end": 3227,
+   "side": "L",
+   "chain": "digit2"
+  },
+  {
+   "name": "Hand/Glove/LittleStall_L",
+   "mat": "Leather",
+   "start": 3227,
+   "end": 3289,
+   "side": "L",
+   "chain": "digit3"
+  },
+  {
+   "name": "Hand/Glove/ThumbStall_L",
+   "mat": "Leather",
+   "start": 3289,
+   "end": 3345,
+   "side": "L",
+   "chain": "thumb"
+  },
+  {
+   "name": "Hand/Glove/Bridge_L",
+   "mat": "Leather",
+   "start": 3345,
+   "end": 3393,
+   "side": "L",
+   "chain": "bridge"
+  },
+  {
+   "name": "Hand/Glove/IndexSeam_L",
+   "mat": "Leather",
+   "start": 3393,
+   "end": 3411,
+   "side": "L",
+   "chain": "digit0"
+  },
+  {
+   "name": "Hand/Glove/MiddleSeam_L",
+   "mat": "Leather",
+   "start": 3411,
+   "end": 3429,
+   "side": "L",
+   "chain": "digit1"
+  },
+  {
+   "name": "Hand/Glove/RingSeam_L",
+   "mat": "Leather",
+   "start": 3429,
+   "end": 3447,
+   "side": "L",
+   "chain": "digit2"
+  },
+  {
+   "name": "Hand/Glove/LittleSeam_L",
+   "mat": "Leather",
+   "start": 3447,
+   "end": 3465,
+   "side": "L",
+   "chain": "digit3"
+  },
+  {
+   "name": "Hand/Glove/ThumbSeam_L",
+   "mat": "Leather",
+   "start": 3465,
+   "end": 3479,
+   "side": "L",
+   "chain": "thumb"
+  },
+  {
+   "name": "Hand/Glove/Web0_L",
+   "mat": "Leather",
+   "start": 3479,
+   "end": 3493,
+   "side": "L",
+   "chain": "web0"
+  },
+  {
+   "name": "Hand/Glove/Web1_L",
+   "mat": "Leather",
+   "start": 3493,
+   "end": 3507,
+   "side": "L",
+   "chain": "web1"
+  },
+  {
+   "name": "Hand/Glove/Web2_L",
+   "mat": "Leather",
+   "start": 3507,
+   "end": 3521,
+   "side": "L",
+   "chain": "web2"
+  },
+  {
+   "name": "Hand/Glove/ThumbWeb_L",
+   "mat": "Leather",
+   "start": 3521,
+   "end": 3535,
+   "side": "L",
+   "chain": "webT"
+  },
+  {
+   "name": "Hand/Glove/KnuckleGuard_L",
+   "mat": "Leather",
+   "start": 3535,
+   "end": 3571,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/KnuckleGuardStitch_L",
+   "mat": "BoneThread",
+   "start": 18777,
+   "end": 18797,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/KnuckleGuardStitch_L",
+   "mat": "BoneThread",
+   "start": 18797,
+   "end": 18817,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/KnuckleRidge_Index_L",
+   "mat": "Leather",
+   "start": 3571,
+   "end": 3585,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/KnuckleRidge_Middle_L",
+   "mat": "Leather",
+   "start": 3585,
+   "end": 3599,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/KnuckleRidge_Ring_L",
+   "mat": "Leather",
+   "start": 3599,
+   "end": 3613,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/KnuckleRidge_Little_L",
+   "mat": "Leather",
+   "start": 3613,
+   "end": 3627,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/WristStrap_L",
+   "mat": "Leather",
+   "start": 3627,
+   "end": 3679,
+   "side": "L",
+   "chain": "cuff"
+  },
+  {
+   "name": "Hand/Glove/WristButton_L",
+   "mat": "AgedBrass",
+   "start": 16311,
+   "end": 16359,
+   "side": "L",
+   "chain": "cuff"
+  },
+  {
+   "name": "Hand/Glove/Gauntlet_R",
+   "mat": "Leather",
+   "start": 3679,
+   "end": 3721,
+   "side": "R",
+   "chain": "cuff"
+  },
+  {
+   "name": "Hand/Glove/GauntletStitch_R",
+   "mat": "BoneThread",
+   "start": 18889,
+   "end": 18919,
+   "side": "R",
+   "chain": "cuff"
+  },
+  {
+   "name": "Hand/Skin/Palm_R",
+   "mat": "Skin",
+   "start": 12968,
+   "end": 13090,
+   "side": "R",
+   "chain": "palm"
+  },
+  {
+   "name": "Hand/Skin/Index_R",
+   "mat": "Skin",
+   "start": 13090,
+   "end": 13152,
+   "side": "R",
+   "chain": "digit0"
+  },
+  {
+   "name": "Hand/Skin/Middle_R",
+   "mat": "Skin",
+   "start": 13152,
+   "end": 13214,
+   "side": "R",
+   "chain": "digit1"
+  },
+  {
+   "name": "Hand/Skin/Ring_R",
+   "mat": "Skin",
+   "start": 13214,
+   "end": 13276,
+   "side": "R",
+   "chain": "digit2"
+  },
+  {
+   "name": "Hand/Skin/Little_R",
+   "mat": "Skin",
+   "start": 13276,
+   "end": 13338,
+   "side": "R",
+   "chain": "digit3"
+  },
+  {
+   "name": "Hand/Skin/Thumb_R",
+   "mat": "Skin",
+   "start": 13338,
+   "end": 13394,
+   "side": "R",
+   "chain": "thumb"
+  },
+  {
+   "name": "Hand/Glove/PalmStall_R",
+   "mat": "Leather",
+   "start": 3721,
+   "end": 3843,
+   "side": "R",
+   "chain": "palm"
+  },
+  {
+   "name": "Hand/Glove/IndexStall_R",
+   "mat": "Leather",
+   "start": 3843,
+   "end": 3905,
+   "side": "R",
+   "chain": "digit0"
+  },
+  {
+   "name": "Hand/Glove/MiddleStall_R",
+   "mat": "Leather",
+   "start": 3905,
+   "end": 3967,
+   "side": "R",
+   "chain": "digit1"
+  },
+  {
+   "name": "Hand/Glove/RingStall_R",
+   "mat": "Leather",
+   "start": 3967,
+   "end": 4029,
+   "side": "R",
+   "chain": "digit2"
+  },
+  {
+   "name": "Hand/Glove/LittleStall_R",
+   "mat": "Leather",
+   "start": 4029,
+   "end": 4091,
+   "side": "R",
+   "chain": "digit3"
+  },
+  {
+   "name": "Hand/Glove/ThumbStall_R",
+   "mat": "Leather",
+   "start": 4091,
+   "end": 4147,
+   "side": "R",
+   "chain": "thumb"
+  },
+  {
+   "name": "Hand/Glove/Bridge_R",
+   "mat": "Leather",
+   "start": 4147,
+   "end": 4195,
+   "side": "R",
+   "chain": "bridge"
+  },
+  {
+   "name": "Hand/Glove/IndexSeam_R",
+   "mat": "Leather",
+   "start": 4195,
+   "end": 4213,
+   "side": "R",
+   "chain": "digit0"
+  },
+  {
+   "name": "Hand/Glove/MiddleSeam_R",
+   "mat": "Leather",
+   "start": 4213,
+   "end": 4231,
+   "side": "R",
+   "chain": "digit1"
+  },
+  {
+   "name": "Hand/Glove/RingSeam_R",
+   "mat": "Leather",
+   "start": 4231,
+   "end": 4249,
+   "side": "R",
+   "chain": "digit2"
+  },
+  {
+   "name": "Hand/Glove/LittleSeam_R",
+   "mat": "Leather",
+   "start": 4249,
+   "end": 4267,
+   "side": "R",
+   "chain": "digit3"
+  },
+  {
+   "name": "Hand/Glove/ThumbSeam_R",
+   "mat": "Leather",
+   "start": 4267,
+   "end": 4281,
+   "side": "R",
+   "chain": "thumb"
+  },
+  {
+   "name": "Hand/Glove/Web0_R",
+   "mat": "Leather",
+   "start": 4281,
+   "end": 4295,
+   "side": "R",
+   "chain": "web0"
+  },
+  {
+   "name": "Hand/Glove/Web1_R",
+   "mat": "Leather",
+   "start": 4295,
+   "end": 4309,
+   "side": "R",
+   "chain": "web1"
+  },
+  {
+   "name": "Hand/Glove/Web2_R",
+   "mat": "Leather",
+   "start": 4309,
+   "end": 4323,
+   "side": "R",
+   "chain": "web2"
+  },
+  {
+   "name": "Hand/Glove/ThumbWeb_R",
+   "mat": "Leather",
+   "start": 4323,
+   "end": 4337,
+   "side": "R",
+   "chain": "webT"
+  },
+  {
+   "name": "Hand/Glove/KnuckleGuard_R",
+   "mat": "Leather",
+   "start": 4337,
+   "end": 4373,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/KnuckleGuardStitch_R",
+   "mat": "BoneThread",
+   "start": 18919,
+   "end": 18939,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/KnuckleGuardStitch_R",
+   "mat": "BoneThread",
+   "start": 18939,
+   "end": 18959,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/KnuckleRidge_Index_R",
+   "mat": "Leather",
+   "start": 4373,
+   "end": 4387,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/KnuckleRidge_Middle_R",
+   "mat": "Leather",
+   "start": 4387,
+   "end": 4401,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/KnuckleRidge_Ring_R",
+   "mat": "Leather",
+   "start": 4401,
+   "end": 4415,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/KnuckleRidge_Little_R",
+   "mat": "Leather",
+   "start": 4415,
+   "end": 4429,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/WristStrap_R",
+   "mat": "Leather",
+   "start": 4429,
+   "end": 4481,
+   "side": "R",
+   "chain": "cuff"
+  },
+  {
+   "name": "Hand/Glove/WristBuckle_R",
+   "mat": "AgedBrass",
+   "start": 16503,
+   "end": 16563,
+   "side": "R",
+   "chain": "cuff"
+  }
+ ]
+}

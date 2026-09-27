@@ -34,14 +34,19 @@ High-value physical details included:
 - Small decorative elements: gothic navigational astrolabe/compass, hip mourning tassel,
   watch fob chain, rear coat tail pleat buttons.
 
-Running this script writes only
-Assets/Models/Characters/SM_Character_VeilboundWayfarer.obj and its MTL.
+Running this script writes
+Assets/Models/Characters/SM_Character_VeilboundWayfarer.obj, its MTL and the
+hand-rig sidecar SM_Character_VeilboundWayfarer.handrig.json (skeleton joints
+plus the rigged hand/glove part ranges; see Tools/hand_rig.py).
 
 Material order is also the order of submeshes assigned by Player.prefab;
 the nine Unity materials are referenced by GUID and never change here.
 """
 import math
 import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import hand_rig
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "Assets/Models/Characters")
@@ -208,6 +213,14 @@ def thick_ring_shell(mat, name, rows, thick, sides, a0, a1,
         for c in range(n_cols-1 if not wrap else n_cols):
             cn = (c+1) % n_cols
             fs.append((base+c, off+base+c, off+base+cn)); fs.append((base+c, off+base+cn, base+cn))
+    # Orientation: with this face pattern and shell_point's angular sweep,
+    # the winding is outward only when the rows run downward (-Y); callers
+    # whose rows advance upward (cuffs, waistcoat, collar) come out inside-out,
+    # so flip those. (Verified by signed-volume + raycast audits.)
+    y_first = rows[0](row_spans[0][0])[0]
+    y_last = rows[-1](row_spans[-1][0])[0]
+    if y_last > y_first:
+        fs = [f[::-1] for f in fs]
     add_mesh(mat, name, pts, fs)
 
 def tube_frames(centers, preferred=(1, 0, 0)):
@@ -280,7 +293,7 @@ def thick_tube(mat, name, points, radii, sides, thick, fold=None,
         base = (n-1)*sides
         for s in range(sides):
             sn = (s+1) % sides
-            fs.append((base+s, off+base+s, off+base+sn)); fs.append((base+s, off+base+sn, base+sn))
+            fs.append((off+base+sn, off+base+s, base+s)); fs.append((base+sn, off+base+sn, base+s))
     add_mesh(mat, name, pts, fs)
 
 def tube(mat, name, points, radii, sides=16, preferred=(1, 0, 0), depth_scale=1.0):
@@ -327,6 +340,11 @@ def tube(mat, name, points, radii, sides=16, preferred=(1, 0, 0), depth_scale=1.
 def ellipsoid(mat, name, center, scale, rings=18, sides=28, rotation=None):
     rings = _segs(rings, 6); sides = _segs(sides, 6)
     rot = rotation or ((1, 0, 0), (0, 1, 0), (0, 0, 1))
+    # a left-handed rotation basis mirrors the surface and would invert the
+    # winding; track it so faces can be flipped back below
+    mirrored = (rot[0][0]*(rot[1][1]*rot[2][2]-rot[1][2]*rot[2][1])
+                - rot[0][1]*(rot[1][0]*rot[2][2]-rot[1][2]*rot[2][0])
+                + rot[0][2]*(rot[1][0]*rot[2][1]-rot[1][1]*rot[2][0])) < 0
     def transform(p):
         return (center[0]+rot[0][0]*p[0]+rot[0][1]*p[1]+rot[0][2]*p[2],
                 center[1]+rot[1][0]*p[0]+rot[1][1]*p[1]+rot[1][2]*p[2],
@@ -348,6 +366,8 @@ def ellipsoid(mat, name, center, scale, rings=18, sides=28, rotation=None):
             fs.extend(((a+n, b+s, a+s), (b+n, b+s, a+n)))
     last = 1+(rings-2)*sides
     for s in range(sides): fs.append((last+(s+1) % sides, bottom, last+s))
+    if mirrored:
+        fs = [f[::-1] for f in fs]
     add_mesh(mat, name, pts, fs)
 
 def ring_surface(mat, name, profile, sides=48, front_split=0.0):
@@ -377,7 +397,7 @@ def sweep_rect(mat, name, corners_per_station, closed):
         b0, b1 = i*4, j*4
         for k in range(4):
             kn = (k+1) % 4
-            fs.extend(((b0+k, b1+k, b1+kn), (b0+k, b1+kn, b0+kn)))
+            fs.extend(((b1+kn, b1+k, b0+k), (b0+kn, b1+kn, b0+k)))
     if not closed and n > 0:
         fs.extend(((0, 3, 2), (0, 2, 1)))
         last = (n-1)*4
@@ -426,7 +446,7 @@ def torus_arc(mat, name, center, R, r, sides, segs, axis=(0, 1, 0), arc=2*math.p
             sn = (s+1) % sides
             a = i*sides+s; an = i*sides+sn
             b = i2*sides+s; bn = i2*sides+sn
-            fs.extend(((a, an, b), (an, bn, b)))
+            fs.extend(((a, b, an), (an, b, bn)))   # flipped: outward normals
     add_mesh(mat, name, pts, fs)
 
 def stitch_dashes(mat, name, path_pts, count, r=0.0024, length=0.011):
@@ -1076,13 +1096,302 @@ for side, label in ((-1, "L"), (1, "R")):
 
 
 # =========================================================================
-# GLOVES & CUFFS: flared gauntlets with bound rims, wrist cinch straps +
-# miniature brass buckles, reinforced knuckle band, articulated fingers,
-# turned-back coat cuffs with miniature brass buttons & ivory shirt cuffs.
+# HANDS: anatomical base + fitted gloves, rigged for deformation.
+#
+# The hand is authored once in hand_rig.py's canonical local space (axes
+# r = radial, d = distal, n = dorsal; wrist joint at the origin) and placed
+# per side, so left and right are exact mirrors. The visible surface is the
+# fitted leather glove; the anatomical skin hand underneath is built from the
+# same profiles with a measured leather offset, so the glove provably follows
+# the hand. Every hand/glove piece is registered in RIG_PARTS with a rig
+# chain id; Tools/verify_hands.py uses the same module to skin, pose and
+# check the hands (stand / walk / attack / dodge).
 # =========================================================================
+
+RIG_PARTS = []   # per-material vertex ranges: name/mat/start/end/side/chain
+
+def _record_part(mat, name, side, chain, base):
+    end = len(verts[mat])
+    if end > base:
+        RIG_PARTS.append({"name": name, "mat": mat, "start": base, "end": end,
+                          "side": "R" if side > 0 else "L", "chain": chain})
+
+def add_part(mat, name, points, polys, side, chain):
+    """add_mesh + rig part record (points already in world space)."""
+    base = len(verts[mat])
+    add_mesh(mat, name, points, polys)
+    _record_part(mat, name, side, chain, base)
+
+def place_local(points, polys, side):
+    """Canonical local (r,d,n) -> world. The left hand is an exact mirror
+    (world-x flip), so face winding is reversed to keep normals outward."""
+    w = [hand_rig.to_world(p, 1) for p in points]
+    if side < 0:
+        w = [(-px, py, pz) for (px, py, pz) in w]
+        polys = [tuple(reversed(f)) for f in polys]
+    return w, polys
+
+def local_tube(centers, radii, sides, preferred=(1, 0, 0)):
+    """tube() ring logic returning (points, polys) in local space."""
+    sides = _segs(sides, 4)
+    centers = [tuple(p) for p in centers]
+    if isinstance(radii, (float, int)):
+        radii = [radii] * len(centers)
+    elif len(radii) != len(centers):
+        radii = [radii[min(i, len(radii)-1)] for i in range(len(centers))]
+    pts = []
+    for i, c in enumerate(centers):
+        tangent = norm(vsub(centers[min(i+1, len(centers)-1)], centers[max(0, i-1)]))
+        hint = preferred
+        b1 = vsub(hint, vmul(tangent, dot(hint, tangent)))
+        if dot(b1, b1) < 1e-6:
+            hint = (0, 0, 1) if abs(tangent[2]) < 0.8 else (0, 1, 0)
+            b1 = vsub(hint, vmul(tangent, dot(hint, tangent)))
+        b1 = norm(b1); b2 = norm(cross(tangent, b1))
+        rad = radii[i]
+        rw, rd = (rad, rad) if isinstance(rad, (float, int)) else rad
+        for s in range(sides):
+            a = 2*math.pi*s/sides
+            pts.append(vadd(c, vadd(vmul(b1, rw*math.cos(a)), vmul(b2, rd*math.sin(a)))))
+    fs = []
+    for r in range(len(centers)-1):
+        for s in range(sides):
+            a = r*sides+s; an = r*sides+(s+1) % sides
+            b = (r+1)*sides+s; bn = (r+1)*sides+(s+1) % sides
+            fs.extend(((a, an, b), (an, bn, b)))
+    cap0 = len(pts); pts.append(centers[0])
+    for s in range(sides):
+        fs.append((cap0, (s+1) % sides, s))
+    cap1 = len(pts); pts.append(centers[-1])
+    base = (len(centers)-1)*sides
+    for s in range(sides):
+        fs.append((cap1, base+s, base+(s+1) % sides))
+    return pts, fs
+
+def _chain_interp(chain, s, back_dir):
+    """Point at arc length s along the chain (s<0 extends along back_dir)."""
+    if s <= 0.0:
+        return vadd(chain[0], vmul(back_dir, s))
+    acc = 0.0
+    for i in range(len(chain)-1):
+        seg = vsub(chain[i+1], chain[i]); L = math.sqrt(dot(seg, seg))
+        if acc + L >= s or i == len(chain)-2:
+            t = clamp((s-acc)/L, 0.0, 1.0) if L > 1e-12 else 0.0
+            return lerp(chain[i], chain[i+1], t)
+        acc += L
+    return chain[-1]
+
+# Palm station rows (d, width scale, thickness scale) from the wrist cap to
+# the webbing dome; scales are relative to the wrist half width/thickness.
+PALM_ROWS = [
+    (-0.0215, 0.62, 0.66), (-0.0120, 0.92, 0.94), (-0.0020, 1.00, 1.00),
+    ( 0.0100, 0.99, 0.99), ( 0.0260, 1.06, 0.97), ( 0.0440, 1.18, 0.95),
+    ( 0.0620, 1.30, 0.93), ( 0.0790, 1.40, 0.91), ( 0.0925, 1.44, 0.90),
+    ( 0.1005, 1.30, 0.86), ( 0.1055, 0.80, 0.62), ( 0.1095, 0.28, 0.24),
+]
+PALM_POLE_P = (0.0000, -0.0270, 0.0012)   # wrist cap pole (hidden in the gauntlet)
+PALM_POLE_D = (0.0015, 0.1125, 0.0020)    # webbing dome pole (between fingers)
+
+def _palm_ring_raw(d, phi, row):
+    """Skin-layer palm cross-section (r, n) at station d, angle phi
+    (phi = 0 radial apex, pi/2 dorsal, pi ulnar, 3*pi/2 palmar)."""
+    w = hand_rig.PALM_HALF_R * row[1]
+    t = hand_rig.PALM_HALF_N * row[2]
+    ca, sa = math.cos(phi), math.sin(phi)
+    ulnar = 0.80 + 0.20*smoothstep(0.02, 0.09, d)   # trapezoid plan shape
+    r = w * ca * (ulnar if ca < 0 else 1.0)
+    n = t * sa
+    dorsal = max(0.0, sa)
+    palmar = max(0.0, -sa)
+    if dorsal > 0.0:
+        # metacarpal arch, knuckle row bumps, valleys between the knuckles
+        n += 0.0008 * dorsal**1.5 * smoothstep(0.02, 0.07, d)
+        bump = 0.0
+        for di, dig in enumerate(hand_rig.DIGITS):
+            bump += (0.0015, 0.0018, 0.0016, 0.0012)[di] * gauss(r, dig["mcp"][0], 0.011)
+        n += bump * dorsal**1.6 * gauss(d, 0.094, 0.012)
+        valley = (gauss(r, 0.0210, 0.0065) + gauss(r, 0.0005, 0.0065)
+                  + gauss(r, -0.0190, 0.0065))
+        n -= 0.0011 * valley * dorsal**1.6 * smoothstep(0.055, 0.08, d) \
+             * (1.0 - smoothstep(0.098, 0.108, d))
+    if palmar > 0.0:
+        n -= 0.0012 * palmar**1.6 * smoothstep(0.03, 0.06, d)   # palmar cup
+        n -= 0.0006 * palmar**2.0 * gauss(d, 0.006, 0.006)      # wrist crease
+    # thenar (thumb base) and hypothenar eminences
+    th = 0.0028 * gauss(d, 0.032, 0.024) * max(0.0, math.cos(phi + math.pi/4))**2.5
+    r += 0.7071 * th; n -= 0.7071 * th
+    hy = 0.0016 * gauss(d, 0.055, 0.030) * max(0.0, math.cos(phi + 3*math.pi/4))**2.5
+    r -= 0.7071 * hy; n -= 0.7071 * hy
+    return r, n
+
+GLOVE_PALM_OFF = 0.0029     # leather thickness between hand and glove palm
+GLOVE_DIGIT_OFF = 0.0026    # leather thickness of a finger stall
+
+def _palm_ring(d, phi, row, glove):
+    r, n = _palm_ring_raw(d, phi, row)
+    if glove:
+        # parallel offset of the cross-section curve -> true fitted shell
+        dphi = (2*math.pi/_segs(18, 10)) * 0.6
+        r1, n1 = _palm_ring_raw(d, phi + dphi, row)
+        r0, n0 = _palm_ring_raw(d, phi - dphi, row)
+        tr, tn = r1 - r0, n1 - n0
+        ln = math.hypot(tr, tn)
+        if ln > 1e-9:
+            off = GLOVE_PALM_OFF
+            if math.sin(phi) > 0.3 and 0.078 <= d <= 0.101:
+                off += 0.0006                     # leather ease over knuckles
+            r += (tn/ln) * off; n += (-tr/ln) * off
+    return r, n
+
+def build_palm_local(glove):
+    """Palm solid: wrist cap pole + PALM_ROWS rings + webbing dome pole.
+    Ring points are ordered (r, d, n) to match hand_rig's local axes."""
+    sides = _segs(18, 10)
+    rows = []
+    for row in PALM_ROWS:
+        d = row[0]
+        rows.append([(lambda rn, d=d: (rn[0], d, rn[1]))(
+                        _palm_ring(d, 2*math.pi*s/sides, row, glove))
+                     for s in range(sides)])
+    off = GLOVE_PALM_OFF if glove else 0.0
+    pole_p = (PALM_POLE_P[0], PALM_POLE_P[1]-off, PALM_POLE_P[2])
+    pole_d = (PALM_POLE_D[0], PALM_POLE_D[1]+0.8*off, PALM_POLE_D[2])
+    pts = [pole_p] + [p for row in rows for p in row] + [pole_d]
+    fs = []
+    for s in range(sides):                       # proximal cap fan
+        fs.append((0, 1+(s+1) % sides, 1+s))
+    for ri in range(len(rows)-1):
+        for s in range(sides):
+            a = 1+ri*sides+s; an = 1+ri*sides+(s+1) % sides
+            b = 1+(ri+1)*sides+s; bn = 1+(ri+1)*sides+(s+1) % sides
+            fs.extend(((a, an, b), (an, bn, b)))
+    base = 1+(len(rows)-1)*sides                 # distal cap fan
+    for s in range(sides):
+        fs.append((len(pts)-1, base+s, base+(s+1) % sides))
+    fs = [f[::-1] for f in fs]   # rings advance +d; flip to keep normals out
+    return pts, fs
+
+def _tube_solid(centers, stations, base_radius, off, sides):
+    """Shared digit solid: rings at stations with joint bulges (dorsal),
+    creases (palmar) and a tapered pulp fingertip. Returns (points, polys)
+    in the digit's local space."""
+    # preferred = -n so the parallel-transport frames give b2 ~ +n (dorsal)
+    # and b1 ~ -r: knuckle bulges land dorsally, creases palmarly.
+    frames = tube_frames(centers, preferred=(0, 0, -1))
+    pts = []
+    for i, c in enumerate(centers):
+        _, b1, b2 = frames[i]
+        ws, ts, bulp, crease, pulp = stations[i][1:]
+        rw = base_radius[0]*ws + off
+        rn = base_radius[1]*ts + off
+        for s in range(sides):
+            phi = 2*math.pi*s/sides
+            p = vadd(c, vadd(vmul(b1, rw*math.cos(phi)), vmul(b2, rn*math.sin(phi))))
+            if bulp:
+                p = vadd(p, vmul(b2, bulp * max(0.0, math.sin(phi))**1.5))
+            if crease:
+                p = vsub(p, vmul(b2, crease * max(0.0, -math.sin(phi))**1.5))
+            if pulp:
+                p = vsub(p, vmul(b2, pulp * 0.0009 * max(0.0, -math.sin(phi))**2.0))
+            pts.append(p)
+    fs = []
+    for r in range(len(centers)-1):
+        for s in range(sides):
+            a = r*sides+s; an = r*sides+(s+1) % sides
+            b = (r+1)*sides+s; bn = (r+1)*sides+(s+1) % sides
+            fs.extend(((a, an, b), (an, bn, b)))
+    cap0 = len(pts)
+    # Root cap: flat disc for the skin; for the glove stall (off>0) the apex
+    # sits 'off' behind the root plane so the skin disc stays strictly inside.
+    back = norm(vsub(centers[1], centers[0]))
+    pts.append(vsub(centers[0], vmul(back, off)))
+    for s in range(sides):
+        fs.append((cap0, (s+1) % sides, s))
+    return pts, fs, frames
+
+def _tip_cap(pts, fs, chain, frames, sides, pull, extra):
+    tipdir = norm(vsub(chain[-1], chain[-2]))
+    cap = len(pts)
+    pts.append(vsub(vadd(chain[-1], vmul(tipdir, extra)), vmul(frames[-1][2], pull)))
+    # pts layout here: rings (n*sides) + root pole, so the last ring starts at
+    # len(pts) - sides - 1  (root pole is the final vertex before the cap).
+    base = len(pts) - sides - 2
+    for s in range(sides):
+        fs.append((cap, base+s, base+(s+1) % sides))
+    return pts, fs
+
+def build_digit_local(dig, glove):
+    """One finger: root flare buried in the palm, three phalanges, MCP/PIP/DIP
+    knuckle bulges + palmar creases, tapered fingertip with pulp."""
+    sides = _segs(8, 6)
+    chain = dig["chain"]
+    l1, l2, l3 = dig["segs"]
+    ltip = l1 + l2 + l3
+    off = GLOVE_DIGIT_OFF if glove else 0.0
+    bm, bp, bd = hand_rig.KNUCKLE_BUMP
+    cm, cp, cd = hand_rig.CREASE_DIP
+    if glove:
+        bm += 0.0004; bp += 0.0004; bd += 0.0004
+        cm *= 0.7; cp *= 0.7; cd *= 0.7
+    stations = [  # (arc length, width x, thickness x, bulge, crease, pulp)
+        # Monotonic in arc length: root flare in the palm, knuckle bumps just
+        # past each joint (dorsal) with matching palmar creases, then a smooth
+        # distal taper with pulp flatten into the tip ring.
+        (-0.0200,        1.16, 1.14, 0.0, 0.0, 0.0),
+        (-0.0090,        1.09, 1.07, 0.0, 0.0, 0.0),
+        (0.0040,         1.00, 1.00, bm,  cm, 0.0),
+        (l1-0.0060,      1.02, 1.01, 0.0, 0.0, 0.0),
+        (l1+0.0050,      0.97, 0.96, bp,  cp, 0.0),
+        (l1+l2-0.0070,   0.945, 0.94, 0.0, 0.0, 0.0),
+        (l1+l2+0.0050,   0.91, 0.90, bd,  cd, 0.0),
+        (l1+l2+0.5*l3,   0.85, 0.83, 0.0, 0.0, 0.12),
+        (ltip-0.0060,    0.79, 0.76, 0.0, 0.0, 0.35),
+        (ltip-0.0015,    0.74, 0.70, 0.0, 0.0, 0.55),
+    ]
+    centers = [_chain_interp(chain, s[0], dig["prox"]) for s in stations]
+    pts, fs, frames = _tube_solid(centers, stations, dig["radius"], off, sides)
+    return _tip_cap(pts, fs, chain, frames, sides, 0.0008, 0.0035 + off)
+
+def build_thumb_local(glove):
+    """Thumb: saddle root blended into the thenar, two phalanges, tip."""
+    sides = _segs(8, 6)
+    chain = hand_rig.local_anatomy()["thumb"]
+    cmc, mcp, ip, tip = chain
+    l1 = math.dist(cmc, mcp); l2 = math.dist(mcp, ip); l3 = math.dist(ip, tip)
+    off = GLOVE_DIGIT_OFF if glove else 0.0
+    bm, bp = 0.0012, 0.0008
+    cm_, cp_ = 0.0010, 0.0006
+    if glove:
+        bm += 0.0004; bp += 0.0004; cm_ *= 0.7; cp_ *= 0.7
+    # Root stations (s<0) extend BACK from the CMC into the thenar: the
+    # _chain_interp convention is chain[0] + dir*s with s negative, so the
+    # direction must point FORWARD along the chain (toward the MCP).
+    fwd = norm(vsub(mcp, cmc))
+    stations = [  # monotonic: saddle root, MCP/IP knuckles, pulp taper
+        (-0.0180,          1.20, 1.18, 0.0, 0.0, 0.0),
+        (-0.0080,          1.12, 1.10, 0.0, 0.0, 0.0),
+        (l1+0.0040,        1.02, 1.01, bm,  cm_, 0.0),
+        (l1+l2-0.0070,     1.00, 0.99, 0.0, 0.0, 0.0),
+        (l1+l2+0.0050,     0.97, 0.96, bp,  cp_, 0.0),
+        (l1+l2+0.5*l3,     0.90, 0.88, 0.0, 0.0, 0.15),
+        (l1+l2+l3-0.0100,  0.84, 0.82, 0.0, 0.0, 0.30),
+        (l1+l2+l3-0.0040,  0.79, 0.76, 0.0, 0.0, 0.45),
+        (l1+l2+l3-0.0015,  0.74, 0.71, 0.0, 0.0, 0.55),
+    ]
+    centers = [_chain_interp(chain, s[0], fwd) for s in stations]
+    pts, fs, frames = _tube_solid(centers, stations, hand_rig.THUMB["radius"], off, sides)
+    return _tip_cap(pts, fs, chain, frames, sides, 0.0008, 0.0032 + off)
+
+def _knuckle_surface_n(dig):
+    """Dorsal n height of a gloved knuckle apex (guard/ridge/seam riding)."""
+    return (dig["mcp_n"] + dig["radius"][1] + GLOVE_DIGIT_OFF
+            + hand_rig.KNUCKLE_BUMP[0] + 0.0004)
 
 for side, label in ((-1, "L"), (1, "R")):
     x = side
+    ana = hand_rig.local_anatomy()
+
+    # --- sleeve-side cuffs (ivory shirt cuff + turned-back coat cuff) ---
     thick_ring_shell("BoneThread", f"UpperClothing/ShirtCuff_{label}",
         [(lambda a, y=y, rx=rx, rz=rz: (y, rx, rz, .037)) for y, rx, rz in
          ((.962, .051, .048), (.986, .054, .051))],
@@ -1099,32 +1408,174 @@ for side, label in ((-1, "L"), (1, "R")):
         bz = .036
         button_disc("AgedBrass", f"UpperClothing/CuffButton_{label}_{bi+1}", (bx, by, bz), (x*1.0, 0, 0), radius=.0048, thick=.0025, thread_mat=None)
 
+    # --- flared leather gauntlet over the coat cuff (rigid on the wrist) ---
+    base = len(verts["Leather"])
     thick_tube("Leather", f"Accessories/Gauntlet_{label}",
-        [(x*.387, 1.060, .034), (x*.383, 1.005, .040)],
-        [(.068, .072), (.061, .065)], sides=20, thick=.005, rim_start=True, rim_end=True)
-    g_rim = [(x*.387 + .069*math.cos(2*math.pi*k/10), 1.058, .034 + .073*math.sin(2*math.pi*k/10)) for k in range(10)]
+        [(x*.387, 1.062, .035), (x*.385, 1.034, .038), (x*.384, 1.008, .040)],
+        [(.072, .076), (.0695, .0735), (.0675, .0715)],
+        sides=20, thick=.005, rim_start=True, rim_end=True)
+    _record_part("Leather", f"Hand/Glove/Gauntlet_{label}", side, "cuff", base)
+    base = len(verts["BoneThread"])
+    g_rim = [(x*.387 + .0718*math.cos(2*math.pi*k/10), 1.058, .035 + .0758*math.sin(2*math.pi*k/10)) for k in range(10)]
     stitch_dashes("BoneThread", f"Accessories/GauntletStitch_{label}", g_rim, 8, r=0.0020, length=0.010)
+    _record_part("BoneThread", f"Hand/Glove/GauntletStitch_{label}", side, "cuff", base)
 
-    ellipsoid("Leather", f"Accessories/GloveHand_{label}", (x*.385, .950, .054), (.048, .066, .058), 10, 16)
-    ellipsoid("Leather", f"Accessories/KnuckleBand_{label}", (x*.402, .965, .056), (.010, .022, .030), 8, 12)
-    k_pts = [(x*.404, .965 + .018*math.cos(2*math.pi*k/6), .056 + .026*math.sin(2*math.pi*k/6)) for k in range(6)]
-    stitch_dashes("BoneThread", f"Accessories/KnuckleStitch_{label}", k_pts, 6, r=0.0018, length=0.008)
+    # --- anatomical skin hand (base layer under the glove) ---
+    pts, polys = build_palm_local(False)
+    wpts, wpolys = place_local(pts, polys, side)
+    add_part("Skin", f"Hand/Skin/Palm_{label}", wpts, wpolys, side, "palm")
+    for di, dig in enumerate(ana["digits"]):
+        pts, polys = build_digit_local(dig, False)
+        wpts, wpolys = place_local(pts, polys, side)
+        add_part("Skin", f"Hand/Skin/{dig['key']}_{label}", wpts, wpolys, side, f"digit{di}")
+    pts, polys = build_thumb_local(False)
+    wpts, wpolys = place_local(pts, polys, side)
+    add_part("Skin", f"Hand/Skin/Thumb_{label}", wpts, wpolys, side, "thumb")
 
-    for j in range(4):
-        fz = .054 + (1.5 - j) * .021
-        length = (.052, .058, .054, .042)[j]
-        tube("Leather", f"Accessories/Glove_{label}_Finger{j+1}",
-            [(x*.387, .914, fz), (x*.388, .886, fz+.004), (x*.388, .872, fz+.009), (x*.390, .914 - length, fz+.014)],
-            [(.0115, .0115), (.0092, .0092), (.0099, .0099), (.0068, .0070)], 10, (1, 0, 0))
-    tube("Leather", f"Accessories/Glove_{label}_Thumb",
-        [(x*.360, .928, .082), (x*.344, .898, .096), (x*.336, .872, .102)],
-        [(.016, .016), (.0125, .0125), (.0085, .0085)], 10, (1, 0, 0))
+    # --- fitted glove: palm stall, individual finger stalls, thumb stall ---
+    pts, polys = build_palm_local(True)
+    wpts, wpolys = place_local(pts, polys, side)
+    add_part("Leather", f"Hand/Glove/PalmStall_{label}", wpts, wpolys, side, "palm")
+    for di, dig in enumerate(ana["digits"]):
+        pts, polys = build_digit_local(dig, True)
+        wpts, wpolys = place_local(pts, polys, side)
+        add_part("Leather", f"Hand/Glove/{dig['key']}Stall_{label}", wpts, wpolys, side, f"digit{di}")
+    pts, polys = build_thumb_local(True)
+    wpts, wpolys = place_local(pts, polys, side)
+    add_part("Leather", f"Hand/Glove/ThumbStall_{label}", wpts, wpolys, side, "thumb")
 
-    ring_pts = [(x*.386 + .064*math.cos(2*math.pi*k/12), 1.030, .036 + .064*math.sin(2*math.pi*k/12)*0.9) for k in range(12)]
+    # glove wrist bridge: flares up inside the gauntlet, seals the cuff gap
+    fr = hand_rig.frame(side)
+    Cw, Dw = fr["wrist"], fr["D"]
+    base = len(verts["Leather"])
+    thick_tube("Leather", f"Accessories/GloveBridge_{label}",
+        [vsub(Cw, vmul(Dw, u)) for u in (.006, .018, .032, .048)],
+        [(.0345, .0245), (.040, .029), (.047, .035), (.053, .0415)],
+        sides=16, thick=.0025, rim_start=True, rim_end=True)
+    _record_part("Leather", f"Hand/Glove/Bridge_{label}", side, "bridge", base)
+
+    # dorsal seams along every stall (bulge-aware, so they ride the knuckles)
+    for di, dig in enumerate(ana["digits"]):
+        chain = dig["chain"]
+        l1, l2, l3 = dig["segs"]; ltip = l1+l2+l3
+        nfr = tube_frames(chain, preferred=(0, 0, -1))
+        bulges = [hand_rig.KNUCKLE_BUMP[0]+0.0004, hand_rig.KNUCKLE_BUMP[1]+0.0004,
+                  hand_rig.KNUCKLE_BUMP[2]+0.0004, 0.0]
+        nodes_s = [0.0, l1, l1+l2, ltip]
+        def seam_pt(s, chain=chain, nfr=nfr, bulges=bulges, nodes_s=nodes_s, dig=dig, ltip=ltip):
+            i = max(0, [k for k in range(3) if nodes_s[k] <= s][-1])
+            u = clamp((s-nodes_s[i])/max(nodes_s[i+1]-nodes_s[i], 1e-9), 0.0, 1.0)
+            c = lerp(chain[i], chain[i+1], u)
+            b2 = norm(lerp(nfr[i][2], nfr[i+1][2], u))
+            bl = lerp(bulges[i], bulges[i+1], u)
+            rn = dig["radius"][1]*(0.95 - 0.18*s/ltip) + GLOVE_DIGIT_OFF
+            return vadd(c, vmul(b2, rn + bl + 0.0005))
+        pts, polys = local_tube([seam_pt(s) for s in
+                                 (l1+.006, l1+l2*.55, l1+l2+.004, ltip-.006)],
+                                [.0011, .0011, .0011, .0011], 5)
+        wpts, wpolys = place_local(pts, polys, side)
+        add_part("Leather", f"Hand/Glove/{dig['key']}Seam_{label}", wpts, wpolys, side, f"digit{di}")
+    tchain = ana["thumb"]
+    tl = [math.dist(tchain[0], tchain[1]), math.dist(tchain[1], tchain[2]),
+          math.dist(tchain[2], tchain[3])]
+    tnfr = tube_frames(tchain, preferred=(0, 0, -1))
+    tbul = [0.0, hand_rig.KNUCKLE_BUMP[0]+0.0004, hand_rig.KNUCKLE_BUMP[1]+0.0004, 0.0]
+    tnodes = [0.0, tl[0], tl[0]+tl[1], tl[0]+tl[1]+tl[2]]
+    def tseam_pt(s):
+        i = max(0, [k for k in range(3) if tnodes[k] <= s][-1])
+        u = clamp((s-tnodes[i])/max(tnodes[i+1]-tnodes[i], 1e-9), 0.0, 1.0)
+        c = lerp(tchain[i], tchain[i+1], u)
+        b2 = norm(lerp(tnfr[i][2], tnfr[i+1][2], u))
+        bl = lerp(tbul[i], tbul[i+1], u)
+        rn = hand_rig.THUMB["radius"][1]*0.95 + GLOVE_DIGIT_OFF
+        return vadd(c, vmul(b2, rn + bl + 0.0005))
+    pts, polys = local_tube([tseam_pt(s) for s in
+                             (tl[0]+.006, tl[0]+tl[1]*.6, tl[0]+tl[1]+tl[2]-.007)],
+                            [.0011, .0011, .0011], 5)
+    wpts, wpolys = place_local(pts, polys, side)
+    add_part("Leather", f"Hand/Glove/ThumbSeam_{label}", wpts, wpolys, side, "thumb")
+
+    # webbing gussets: leather Vs filling the valley between adjacent stalls
+    for wi in range(3):
+        d0, d1 = ana["digits"][wi], ana["digits"][wi+1]
+        m0, m1 = d0["chain"][0], d1["chain"][0]
+        bpt = ((m0[0]+m1[0])*0.5, (m0[1]+m1[1])*0.5 - 0.004, 0.0025)
+        bdir = norm(vadd(vmul(d0["prox"], 0.5), vmul(d1["prox"], 0.5)))
+        pts, polys = local_tube(
+            [vadd(bpt, vmul(bdir, u)) for u in (0.006, 0.013, 0.020)],
+            [(.0040, .0017), (.0036, .0015), (.0032, .0013)], 6,
+            preferred=(0, 0, -1))
+        wpts, wpolys = place_local(pts, polys, side)
+        add_part("Leather", f"Hand/Glove/Web{wi}_{label}", wpts, wpolys, side, f"web{wi}")
+    # thumb web (thenar span between the thumb metacarpal and the index base)
+    iw = ana["digits"][0]["chain"][0]
+    tbpt = ((hand_rig.THUMB["mcp"][0] + iw[0])*0.5,
+            (hand_rig.THUMB["mcp"][1] + iw[1])*0.5 - 0.003, 0.0010)
+    tbdir = norm((0.62, 0.76, -0.18))
+    pts, polys = local_tube(
+        [vadd(tbpt, vmul(tbdir, u)) for u in (0.004, 0.011, 0.018)],
+        [(.0046, .0020), (.0041, .0018), (.0036, .0015)], 6,
+        preferred=(0, 0, -1))
+    wpts, wpolys = place_local(pts, polys, side)
+    add_part("Leather", f"Hand/Glove/ThumbWeb_{label}", wpts, wpolys, side, "webT")
+
+    # reinforced knuckle guard riding the MCP bumps, one ridge per knuckle
+    krow = [(dig["chain"][0][0], dig["chain"][0][1], _knuckle_surface_n(dig))
+            for dig in [ana["digits"][3], ana["digits"][2], ana["digits"][1], ana["digits"][0]]]
+    guard_local = [(krow[0][0]-0.0075, krow[0][1]-0.0010, krow[0][2]-0.0026)]
+    for k in range(4):
+        rr, dd, nn = krow[k]
+        guard_local.append((rr, dd+0.0015, nn+0.0009))
+        if k < 3:
+            rr2, dd2, nn2 = krow[k+1]
+            guard_local.append(((rr+rr2)*0.5, (dd+dd2)*0.5+0.0012, (nn+nn2)*0.5-0.0012))
+    guard_local.append((krow[3][0]+0.0075, krow[3][1]-0.0010, krow[3][2]-0.0026))
+    guard_pts = [hand_rig.to_world(p, side) for p in guard_local]
+    knuckle_worlds = [hand_rig.to_world(dig["chain"][0], side) for dig in ana["digits"]]
+    def guard_normal(p, t, side=side):
+        loc = hand_rig.to_local(p, side)
+        best = min(ana["digits"], key=lambda d: abs(d["chain"][0][0]-loc[0]))
+        m = hand_rig.to_world(best["chain"][0], side)
+        return norm(vsub(p, m))
+    base = len(verts["Leather"])
+    strap_band("Leather", f"Accessories/KnuckleGuard_{label}", guard_pts,
+        width=.016, thick=.0028, normal_fn=guard_normal, closed=False)
+    _record_part("Leather", f"Hand/Glove/KnuckleGuard_{label}", side, "guard", base)
+    for edge in (-0.0072, 0.0072):
+        stitch_path = [hand_rig.to_world((p[0], p[1]+edge, p[2]+0.0015), side)
+                       for p in guard_local]
+        base = len(verts["BoneThread"])
+        stitch_dashes("BoneThread", f"Accessories/KnuckleGuardStitch_{label}_{edge:+.4f}",
+                      stitch_path, 7, r=0.0016, length=0.007)
+        _record_part("BoneThread", f"Hand/Glove/KnuckleGuardStitch_{label}", side, "guard", base)
+    for dig in ana["digits"]:
+        mp = dig["chain"][0]
+        nn = _knuckle_surface_n(dig) + 0.0009 + 0.0014 + 0.0010
+        pts, polys = local_tube(
+            [(mp[0]-0.0060, mp[1]+0.0015, nn), (mp[0], mp[1]+0.0015, nn+0.0004),
+             (mp[0]+0.0060, mp[1]+0.0015, nn)],
+            [.0023, .0026, .0023], 5)
+        wpts, wpolys = place_local(pts, polys, side)
+        add_part("Leather", f"Hand/Glove/KnuckleRidge_{dig['key']}_{label}",
+                 wpts, wpolys, side, "guard")
+
+    # wrist cinch strap over the gauntlet: buckle right, brass button left
+    base = len(verts["Leather"])
+    ring_pts = [(x*.3847 + .0693*math.cos(2*math.pi*k/12), 1.030, .0383 + .0733*math.sin(2*math.pi*k/12)*0.9) for k in range(12)]
     ring_pts.append(ring_pts[0])
-    strap_band("Leather", f"Accessories/WristStrap_{label}", ring_pts, width=.014, thick=.003, normal_fn=lambda p, t: norm((p[0]-x*.386, 0, p[2]-.036)), closed=True)
-    wbx, wby, wbz = x*(.386 + .065), 1.030, .036
-    buckle_frame("AgedBrass", f"Accessories/WristBuckle_{label}", (wbx, wby, wbz), (x*1.0, 0, 0), up=(0, 1, 0), width=.018, height=.022, bar_r=.0022)
+    strap_band("Leather", f"Accessories/WristStrap_{label}", ring_pts, width=.014, thick=.003,
+        normal_fn=lambda p, t: norm((p[0]-x*.3847, 0, p[2]-.0383)), closed=True)
+    _record_part("Leather", f"Hand/Glove/WristStrap_{label}", side, "cuff", base)
+    if side > 0:
+        base = len(verts["AgedBrass"])
+        buckle_frame("AgedBrass", f"Accessories/WristBuckle_{label}", (x*(.3847+.0705), 1.030, .0383),
+                     (x*1.0, 0, 0), up=(0, 1, 0), width=.018, height=.022, bar_r=.0022)
+        _record_part("AgedBrass", f"Hand/Glove/WristBuckle_{label}", side, "cuff", base)
+    else:
+        base = len(verts["AgedBrass"])
+        button_disc("AgedBrass", f"Accessories/WristButton_{label}", (x*(.3847+.0705), 1.030, .0383),
+                    (x*1.0, 0, 0), radius=.0052, thick=.0028, thread_mat=None)
+        _record_part("AgedBrass", f"Hand/Glove/WristButton_{label}", side, "cuff", base)
 
 
 # =========================================================================
@@ -1766,5 +2217,42 @@ with open(mtl_path, "w", encoding="utf-8") as f:
     for mat in MATERIALS:
         rgb, shine = colors[mat]
         f.write(f"newmtl {mat}\nKa 0.03 0.03 0.03\nKd {rgb[0]:.4f} {rgb[1]:.4f} {rgb[2]:.4f}\nKs {shine:.3f} {shine:.3f} {shine:.3f}\nNs 32\n\n")
+
+# --- hand rig sidecar: joints + rigged part ranges (per LOD mesh) ---------
+import json
+offsets = {}
+acc = 0
+for mat in MATERIALS:
+    offsets[mat] = acc
+    acc += len(verts[mat])
+
+rig_path = os.path.join(OUT, f"SM_Character_VeilboundWayfarer{SUFFIX}.handrig.json")
+rig = {
+    "format": "vespershade.handrig/1",
+    "mesh": os.path.basename(obj_path),
+    "units": "metres", "up": "Y", "character_faces": "+Z",
+    "bind_pose": "identity (mesh authored in bind pose; zero-rotation FK "
+                 "reproduces the OBJ exactly)",
+    "default_bone": "Root (any vertex outside the parts list binds 100% to Root)",
+    "weights": "computed deterministically from vertex positions by "
+               "Tools/hand_rig.py:weights_for(side, chain, point)",
+    "bones": [
+        {"name": name, "parent": parent, "head": [round(c, 6) for c in head],
+         **({"axes": {k: [round(c, 6) for c in v] for k, v in axes.items()},
+             "axis_convention": "flex=+palmar curl (arm: swing forward), "
+                                "abd=+towards thumb side, twist=+segment roll"}
+            if axes else {})}
+        for (name, parent, head, axes) in hand_rig.joint_list()
+    ],
+    "parts": [
+        {"name": p["name"], "mat": p["mat"],
+         "start": offsets[p["mat"]] + p["start"],
+         "end": offsets[p["mat"]] + p["end"],
+         "side": p["side"], "chain": p["chain"]}
+        for p in RIG_PARTS
+    ],
+}
+with open(rig_path, "w", encoding="utf-8") as f:
+    json.dump(rig, f, indent=1)
 
 print(f"Wrote {obj_path}: {sum(map(len, verts.values()))} vertices, {sum(map(len, faces.values()))} triangles, {len(MATERIALS)} material regions")
