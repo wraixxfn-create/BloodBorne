@@ -104,10 +104,14 @@ Assets/
 The player capsule carries the **Veilbound Wayfarer**, an original
 procedurally generated figure whose gothic wardrobe is built as real layered
 geometry (every garment is a cloth solid with lining and bound edges, with an
-asymmetric closure, half-cape, baldric and buckled boots). It streams through
-a three-level `LODGroup`. See
+asymmetric closure, half-cape, baldric and buckled boots) and whose hair is
+the sectioned "Vigil Sweep" - 70 swept-solid locks over a padded scalp cap
+with a bound tail, shaded by an object-space anisotropic hair shader. It
+streams through a three-level `LODGroup`. See
 [Docs/CHARACTER_WARDROBE.md](Docs/CHARACTER_WARDROBE.md) for the layer map,
-regeneration commands and the offline multi-angle preview tool.
+[Docs/CHARACTER_HAIR.md](Docs/CHARACTER_HAIR.md) for the hairstyle design and
+verification, and the regeneration commands for the offline multi-angle
+preview tools.
 
 See [Docs/FOUNDATION.md](Docs/FOUNDATION.md) for core architecture and
 [Docs/ARENA_Lighting.md](Docs/ARENA_Lighting.md) for lighting controls.
@@ -128,6 +132,8 @@ python3 Tools/create_original_protagonist.py  # regenerate the protagonist mesh 
 python3 Tools/render_character_previews.py    # offline multi-angle wardrobe renders
 python3 Tools/verify_boots.py           # boots: anatomy, floor contact, rig poses (all LODs)
 python3 Tools/render_boot_previews.py   # pose the boots (idle/walk/run/dodge) over a floor
+python3 Tools/verify_hair.py            # hair: sections, solids, silhouette, zoning (all LODs)
+python3 Tools/render_hair_previews.py   # hair renders: close + normal gameplay distance
 ```
 
 All checks pass in the authoring environment. There is no Unity editor here,

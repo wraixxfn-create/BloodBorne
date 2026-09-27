@@ -1,0 +1,546 @@
+{
+ "format": "vespershade.hair/1",
+ "mesh": "SM_Character_VeilboundWayfarer_L1.obj",
+ "units": "metres",
+ "up": "Y",
+ "character_faces": "+Z",
+ "style": "Vigil Sweep (original): offset part, deep diagonal sweep, gathered bound tail with bone twine tie, layered nape, face-framing temple strands",
+ "attachment": "rigid (same transform as the player mesh; no cloth/jiggle simulation - stable under locomotion by construction)",
+ "ranges_note": "start/end are global OBJ vertex indices, 0-based, end-exclusive; every face of a section uses only its range",
+ "design": {
+  "part_line_lon_y": [
+   [
+    0.3,
+    1.742
+   ],
+   [
+    0.26,
+    1.772
+   ],
+   [
+    0.18,
+    1.8
+   ],
+   [
+    0.06,
+    1.82
+   ],
+   [
+    -0.06,
+    1.812
+   ],
+   [
+    -0.16,
+    1.786
+   ],
+   [
+    -0.2,
+    1.758
+   ]
+  ],
+  "hairline_ctrl_lon_y": [
+   [
+    0.0,
+    1.7285
+   ],
+   [
+    0.42,
+    1.743
+   ],
+   [
+    0.78,
+    1.7255
+   ],
+   [
+    1.1,
+    1.711
+   ],
+   [
+    1.3,
+    1.6985
+   ],
+   [
+    1.48,
+    1.709
+   ],
+   [
+    1.62,
+    1.7125
+   ],
+   [
+    1.8,
+    1.7095
+   ],
+   [
+    1.98,
+    1.699
+   ],
+   [
+    2.14,
+    1.648
+   ],
+   [
+    2.42,
+    1.594
+   ],
+   [
+    3.141592653589793,
+    1.566
+   ]
+  ],
+  "scalp_pad_m": 0.0075,
+  "crown_apex_y": 1.833,
+  "skull_apex_y": 1.815,
+  "gather_center": [
+   0.0,
+   1.63,
+   -0.114833
+  ],
+  "clearance": {
+   "collar_top_back_y": 1.564,
+   "tail_axis_min_clearance_m": 0.01,
+   "face_zone_rule": "no hair vertex with z > 0.082, y < 1.702, |x| < 0.055"
+  }
+ },
+ "sections": [
+  {
+   "name": "Hair/CrownCap",
+   "role": "cap",
+   "mat": "Hair",
+   "start": 18408,
+   "end": 18844
+  },
+  {
+   "name": "CrownSweep_R1",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 18844,
+   "end": 18900
+  },
+  {
+   "name": "CrownSweep_R2",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 18900,
+   "end": 18956
+  },
+  {
+   "name": "CrownSweep_R3",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 18956,
+   "end": 19012
+  },
+  {
+   "name": "CrownSweep_R4",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 19012,
+   "end": 19068
+  },
+  {
+   "name": "CrownSweep_R5",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 19068,
+   "end": 19124
+  },
+  {
+   "name": "CrownSweep_L1",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 19124,
+   "end": 19180
+  },
+  {
+   "name": "CrownSweep_L2",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 19180,
+   "end": 19236
+  },
+  {
+   "name": "CrownSweep_L3",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 19236,
+   "end": 19292
+  },
+  {
+   "name": "CrownSweep_L4",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 19292,
+   "end": 19348
+  },
+  {
+   "name": "CrownSweep_L5",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 19348,
+   "end": 19404
+  },
+  {
+   "name": "CrownSweep_B1",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 19404,
+   "end": 19460
+  },
+  {
+   "name": "CrownSweep_B2",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 19460,
+   "end": 19516
+  },
+  {
+   "name": "CrownSweep_B3",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 19516,
+   "end": 19572
+  },
+  {
+   "name": "CrownSweep_B4",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 19572,
+   "end": 19628
+  },
+  {
+   "name": "CrownSweep_B5",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 19628,
+   "end": 19684
+  },
+  {
+   "name": "CrownSweep_B6",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 19684,
+   "end": 19740
+  },
+  {
+   "name": "CrownSweep_B7",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 19740,
+   "end": 19796
+  },
+  {
+   "name": "CrownSweep_B8",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 19796,
+   "end": 19852
+  },
+  {
+   "name": "CrownWhorl_1",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 19852,
+   "end": 19914
+  },
+  {
+   "name": "CrownWhorl_2",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 19914,
+   "end": 19976
+  },
+  {
+   "name": "DomeFan_R0",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 19976,
+   "end": 20032
+  },
+  {
+   "name": "DomeFan_R1",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 20032,
+   "end": 20088
+  },
+  {
+   "name": "DomeFan_R2",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 20088,
+   "end": 20144
+  },
+  {
+   "name": "DomeFan_R3",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 20144,
+   "end": 20200
+  },
+  {
+   "name": "DomeFan_L0",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 20200,
+   "end": 20256
+  },
+  {
+   "name": "DomeFan_L1",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 20256,
+   "end": 20312
+  },
+  {
+   "name": "DomeFan_L2",
+   "role": "crown",
+   "mat": "Hair",
+   "start": 20312,
+   "end": 20368
+  },
+  {
+   "name": "SideSweep_R1",
+   "role": "side",
+   "mat": "Hair",
+   "start": 20368,
+   "end": 20418
+  },
+  {
+   "name": "SideSweep_R2",
+   "role": "side",
+   "mat": "Hair",
+   "start": 20418,
+   "end": 20468
+  },
+  {
+   "name": "SideSweep_L1",
+   "role": "side",
+   "mat": "Hair",
+   "start": 20468,
+   "end": 20518
+  },
+  {
+   "name": "SideSweep_L2",
+   "role": "side",
+   "mat": "Hair",
+   "start": 20518,
+   "end": 20568
+  },
+  {
+   "name": "EarFill_R",
+   "role": "side",
+   "mat": "Hair",
+   "start": 20568,
+   "end": 20618
+  },
+  {
+   "name": "EarFill_L",
+   "role": "side",
+   "mat": "Hair",
+   "start": 20618,
+   "end": 20668
+  },
+  {
+   "name": "Fringe_Sweep",
+   "role": "fringe",
+   "mat": "Hair",
+   "start": 20668,
+   "end": 20718
+  },
+  {
+   "name": "Fringe_Sweep_R",
+   "role": "fringe",
+   "mat": "Hair",
+   "start": 20718,
+   "end": 20768
+  },
+  {
+   "name": "Fringe_Sweep_L",
+   "role": "fringe",
+   "mat": "Hair",
+   "start": 20768,
+   "end": 20818
+  },
+  {
+   "name": "Fringe_PartShort",
+   "role": "fringe",
+   "mat": "Hair",
+   "start": 20818,
+   "end": 20868
+  },
+  {
+   "name": "Fringe_WidowsPeak",
+   "role": "fringe",
+   "mat": "Hair",
+   "start": 20868,
+   "end": 20918
+  },
+  {
+   "name": "Temple_Frame_R",
+   "role": "temple",
+   "mat": "Hair",
+   "start": 20918,
+   "end": 20968
+  },
+  {
+   "name": "Temple_Frame_L",
+   "role": "temple",
+   "mat": "Hair",
+   "start": 20968,
+   "end": 21018
+  },
+  {
+   "name": "Temple_Tuck_R",
+   "role": "temple",
+   "mat": "Hair",
+   "start": 21018,
+   "end": 21068
+  },
+  {
+   "name": "Temple_Tuck_L",
+   "role": "temple",
+   "mat": "Hair",
+   "start": 21068,
+   "end": 21118
+  },
+  {
+   "name": "NapeLayer_1",
+   "role": "nape",
+   "mat": "Hair",
+   "start": 21118,
+   "end": 21174
+  },
+  {
+   "name": "NapeLayer_2",
+   "role": "nape",
+   "mat": "Hair",
+   "start": 21174,
+   "end": 21230
+  },
+  {
+   "name": "NapeLayer_3",
+   "role": "nape",
+   "mat": "Hair",
+   "start": 21230,
+   "end": 21286
+  },
+  {
+   "name": "NapeLayer_4",
+   "role": "nape",
+   "mat": "Hair",
+   "start": 21286,
+   "end": 21342
+  },
+  {
+   "name": "NapeLayer_5",
+   "role": "nape",
+   "mat": "Hair",
+   "start": 21342,
+   "end": 21398
+  },
+  {
+   "name": "NapeLayer_6",
+   "role": "nape",
+   "mat": "Hair",
+   "start": 21398,
+   "end": 21454
+  },
+  {
+   "name": "NapeLayer_7",
+   "role": "nape",
+   "mat": "Hair",
+   "start": 21454,
+   "end": 21510
+  },
+  {
+   "name": "NapeLayer_8",
+   "role": "nape",
+   "mat": "Hair",
+   "start": 21510,
+   "end": 21566
+  },
+  {
+   "name": "Hair/Gather",
+   "role": "gather",
+   "mat": "Hair",
+   "start": 21566,
+   "end": 21615
+  },
+  {
+   "name": "TailRope_1",
+   "role": "tail",
+   "mat": "Hair",
+   "start": 21615,
+   "end": 21665
+  },
+  {
+   "name": "TailRope_2",
+   "role": "tail",
+   "mat": "Hair",
+   "start": 21665,
+   "end": 21715
+  },
+  {
+   "name": "TailRope_3",
+   "role": "tail",
+   "mat": "Hair",
+   "start": 21715,
+   "end": 21765
+  },
+  {
+   "name": "TailRope_4",
+   "role": "tail",
+   "mat": "Hair",
+   "start": 21765,
+   "end": 21815
+  },
+  {
+   "name": "Accessories/HairTieWrap_1",
+   "role": "tie",
+   "mat": "BoneThread",
+   "start": 26099,
+   "end": 26177
+  },
+  {
+   "name": "Accessories/HairTieWrap_2",
+   "role": "tie",
+   "mat": "BoneThread",
+   "start": 26177,
+   "end": 26255
+  },
+  {
+   "name": "Accessories/HairTieKnot_1",
+   "role": "tie",
+   "mat": "BoneThread",
+   "start": 26255,
+   "end": 26309
+  },
+  {
+   "name": "Accessories/HairTieKnot_2",
+   "role": "tie",
+   "mat": "BoneThread",
+   "start": 26309,
+   "end": 26363
+  },
+  {
+   "name": "Accessories/HairTieEnd_1",
+   "role": "tie",
+   "mat": "BoneThread",
+   "start": 26363,
+   "end": 26381
+  },
+  {
+   "name": "Accessories/HairTieEnd_2",
+   "role": "tie",
+   "mat": "BoneThread",
+   "start": 26381,
+   "end": 26399
+  }
+ ],
+ "budget": {
+  "hair_triangles": 6553,
+  "hair_vertices": 3407,
+  "detail_level": 0.62
+ }
+}
