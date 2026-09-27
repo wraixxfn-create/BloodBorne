@@ -66,10 +66,24 @@ boot shafts**.
    right shoulder to the left hip carrying the Wayfarer's original navigation
    instrument: two nested brass rings, a balanced needle and a dark face on a
    drop strap. (Original ornament - not a weapon, not from any existing game.)
-10. **Boots (Leather/BootSole)** - multi-part: welted sole, separate heel
-    block, stitched toe cap, heel counter, laced shaft with slouch wrinkles,
-    folded wine cuff with lining, back pull tab, crossed instep straps
-    (buckled on the right boot only - deliberate asymmetry).
+10. **Boots (Leather/BootSole)** - rebuilt on real foot anatomy
+    (`Tools/boot_rig.py`): the foot is 276 mm long with the ball line at 70 %
+    of its length, an ankle joint raised by the heel; the boot is a full-length
+    sole slab whose ground faces are exactly on the floor plane (feathered
+    edges, a measured outboard wear flat, toe spring over the last 25 mm) with
+    a canvas shank lifted between the heel breast and the ball; three stacked
+    heel laminations, a brass heel edge plate and nail heads; a welt bead with
+    welt stitching; a vamp lofted through 24 fitted cross-sections, a stitched
+    toe cap panel and a heel counter; a fitted shaft (closed ankle tube plus a
+    laced upper with a real lacing slit, raised facings, tongue, four brass
+    eyelets + three speed hooks per facing, crossed leather laces and a tied
+    bow); a folded wine cuff with lining and a riveted rear pull tab; and
+    crossed instep straps with a brass buckle + keeper on **both** boots -
+    replacing the old one-sided asymmetry with a properly fastened pair (the
+    left/right asymmetry of the figure now lives in the coat, lapels and
+    wrist). The trouser legs are *tucked*: they are compressed inside the
+    shaft (>= 12 mm of clearance to the lining) and flare back out above the
+    cuff opening, so no wool pokes through the leather.
 11. **Gauntlet gloves (Leather/Skin)** - anatomically rebuilt hands: skin
     palms with thenar/hypothenar bulges and 12-station sculpting, four
     individual fingers (root flare, MCP/PIP/DIP knuckle bumps, palmar creases,
@@ -84,9 +98,10 @@ boot shafts**.
 ### Small straps and fasteners (inventory)
 
 Collar tab + buckle, 4 coat hooks + studs, 5 waistcoat buttons, belt buckle +
-prong + 2 keepers + eyelet, 2 boot instep straps + 1 buckle, right cuff strap
-+ buckle, wrist strap + buckle, baldric with stitch dashes, pouch flap +
-stud, mantle stud pins, toe-cap and flap saddle stitching.
+prong + 2 keepers + eyelet, 2 boot instep straps + 2 buckles, boot heel plates
++ nail heads, right cuff strap + buckle, wrist strap + buckle, baldric with
+stitch dashes, pouch flap + stud, mantle stud pins, toe-cap, counter, welt and
+flap saddle stitching.
 
 ### Believability details
 
@@ -97,8 +112,8 @@ stud, mantle stud pins, toe-cap and flap saddle stitching.
   elbow patch (left), waist gathers under the belt, shoulder-blade drape
   creases, knee creases, ankle wrinkles, boot-shaft slouch, skirt sway folds.
 - **Asymmetry**: left-over-right closure, deeper left shoulder mantle,
-  broader left lapel, single baldric, one boot buckle, one wrist buckle,
-  unequal coat tails, offset button plackets.
+  broader left lapel, single baldric, one wrist buckle, unequal coat tails,
+  offset button plackets. (The boots are a matched, properly buckled pair.)
 - **Budget discipline**: the head/hair (unchanged from the previous revision)
   remains the densest region; garments use fewer segments where cloth is flat
   or hidden; hidden body parts are absent entirely (the coat and gloves cover
@@ -126,7 +141,9 @@ Because this repository is authored without a Unity editor, Play-Mode-style
 visual QA runs through `Tools/render_character_previews.py`, which renders
 the exact OBJ the game imports from 14 cameras (front / three-quarter L+R /
 back / profiles / collar, torso, belt, knee, boot close-ups / rear close-up /
-left + right hand close-ups) into `Docs/CharacterPreviews/`. The exported `sheet.jpg` is the final
+left + right hand close-ups) into `Docs/CharacterPreviews/`, plus
+`Tools/render_boot_previews.py`, which poses the boots through the LBS rig for
+idle / walk / run / dodge over a 0.5 m floor grid (`PC_boots_<pose>_*.png`). The exported `sheet.jpg` is the final
 verification of this revision. `PC_lod_comparison.png` shows L0/L1/L2 side by
 side. In-editor checks on first open: open
 `Assets/Scenes/Arena/Arena_RitualChamber_MeshKit.unity`, press Play, orbit the
@@ -139,6 +156,19 @@ LODGroup can be verified with the Scene view's "Render Modes > LOD" overlay.
 id 205 in this change), `Tools/audit_serialized_types.py`,
 `Tools/csharp_smoke_check.py`, `Tools/test_serialized_types.py` and
 `Tools/verify_arena_lighting.py` all pass after this redesign.
+
+`Tools/verify_boots.py [--obj ...]` performs offline foot/boot QA on any LOD:
+part inventory (39 boot parts per side) and part-range integrity, closed-shell
+and outward-winding checks, measured anatomy (foot length, ball position and
+width, heel width, ankle height, sole thickness, shaft height) against
+`Tools/boot_rig.py`, exact left/right mirror symmetry, the floor-contact
+contract (minimum vertex exactly 0.000, both boots resting on a real contact
+patch, shank lift, toe spring, flat parallel sole plane), trouser-tuck
+clearance, skin weights, and LBS deformation for idle / walk / run / dodge
+with each planted boot grounded at exactly the floor by foot IK and each swing
+boot clear of it. `Tools/render_boot_previews.py` renders those four states
+over a checkerboard floor (`Docs/CharacterPreviews/PC_boots_*.png` + contact
+sheet). All 47 checks pass on all three LODs.
 
 `Tools/verify_hands.py [--obj ...]` performs offline hand QA on any LOD:
 part inventory, palm/finger/thumb proportions and knuckle definition, skin

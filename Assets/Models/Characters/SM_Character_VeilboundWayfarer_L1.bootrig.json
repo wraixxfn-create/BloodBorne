@@ -1,0 +1,923 @@
+{
+ "format": "vespershade.bootrig/1",
+ "mesh": "SM_Character_VeilboundWayfarer_L1.obj",
+ "units": "metres",
+ "up": "Y",
+ "character_faces": "+Z",
+ "bind_pose": "identity (mesh authored in bind pose; zero-rotation FK reproduces the OBJ exactly)",
+ "floor": {
+  "contact_plane_y": 0.0,
+  "contact_patch_min_mm": 40.0,
+  "contact_patch_tol_mm": 1.5,
+  "note": "sole ground faces and the heel laminations are authored exactly at y = 0; the shank is lifted between the heel breast and the ball and the toe springs up over the last 25 mm, so a planted boot always has a flat contact patch and never clips the floor"
+ },
+ "default_bone": "Root (any vertex outside the parts list binds 100% to Root)",
+ "weights": "computed deterministically from vertex positions by Tools/boot_rig.py:weights_for(side, chain, point)",
+ "bones": [
+  {
+   "name": "Root",
+   "parent": null,
+   "head": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "RHip",
+   "parent": "Root",
+   "head": [
+    0.1,
+    0.905,
+    0.0
+   ],
+   "axes": {
+    "flex": [
+     -1,
+     0,
+     0
+    ],
+    "abd": [
+     0,
+     0,
+     1
+    ],
+    "twist": [
+     0,
+     1,
+     0
+    ]
+   },
+   "axis_convention": "flex + = dorsiflexion / forward swing, abd + = outboard, twist + = toes out"
+  },
+  {
+   "name": "RKnee",
+   "parent": "RHip",
+   "head": [
+    0.116,
+    0.492,
+    0.008
+   ],
+   "axes": {
+    "flex": [
+     1,
+     0,
+     0
+    ],
+    "abd": [
+     0,
+     0,
+     1
+    ],
+    "twist": [
+     0,
+     1,
+     0
+    ]
+   },
+   "axis_convention": "flex + = dorsiflexion / forward swing, abd + = outboard, twist + = toes out"
+  },
+  {
+   "name": "RAnkle",
+   "parent": "RKnee",
+   "head": [
+    0.118,
+    0.105,
+    -0.034
+   ],
+   "axes": {
+    "flex": [
+     -1,
+     0,
+     0
+    ],
+    "abd": [
+     0,
+     0,
+     1
+    ],
+    "twist": [
+     0,
+     1,
+     0
+    ]
+   },
+   "axis_convention": "flex + = dorsiflexion / forward swing, abd + = outboard, twist + = toes out"
+  },
+  {
+   "name": "RBall",
+   "parent": "RAnkle",
+   "head": [
+    0.118,
+    0.031,
+    0.112
+   ],
+   "axes": {
+    "flex": [
+     -1,
+     0,
+     0
+    ],
+    "abd": [
+     0,
+     0,
+     1
+    ],
+    "twist": [
+     0,
+     1,
+     0
+    ]
+   },
+   "axis_convention": "flex + = dorsiflexion / forward swing, abd + = outboard, twist + = toes out"
+  },
+  {
+   "name": "RToe",
+   "parent": "RBall",
+   "head": [
+    0.118,
+    0.036,
+    0.176
+   ],
+   "axes": {
+    "flex": [
+     -1,
+     0,
+     0
+    ],
+    "abd": [
+     0,
+     0,
+     1
+    ],
+    "twist": [
+     0,
+     1,
+     0
+    ]
+   },
+   "axis_convention": "flex + = dorsiflexion / forward swing, abd + = outboard, twist + = toes out"
+  },
+  {
+   "name": "LHip",
+   "parent": "Root",
+   "head": [
+    -0.1,
+    0.905,
+    0.0
+   ],
+   "axes": {
+    "flex": [
+     -1,
+     0,
+     0
+    ],
+    "abd": [
+     0,
+     0,
+     -1
+    ],
+    "twist": [
+     0,
+     -1,
+     0
+    ]
+   },
+   "axis_convention": "flex + = dorsiflexion / forward swing, abd + = outboard, twist + = toes out"
+  },
+  {
+   "name": "LKnee",
+   "parent": "LHip",
+   "head": [
+    -0.116,
+    0.492,
+    0.008
+   ],
+   "axes": {
+    "flex": [
+     1,
+     0,
+     0
+    ],
+    "abd": [
+     0,
+     0,
+     -1
+    ],
+    "twist": [
+     0,
+     -1,
+     0
+    ]
+   },
+   "axis_convention": "flex + = dorsiflexion / forward swing, abd + = outboard, twist + = toes out"
+  },
+  {
+   "name": "LAnkle",
+   "parent": "LKnee",
+   "head": [
+    -0.118,
+    0.105,
+    -0.034
+   ],
+   "axes": {
+    "flex": [
+     -1,
+     0,
+     0
+    ],
+    "abd": [
+     0,
+     0,
+     -1
+    ],
+    "twist": [
+     0,
+     -1,
+     0
+    ]
+   },
+   "axis_convention": "flex + = dorsiflexion / forward swing, abd + = outboard, twist + = toes out"
+  },
+  {
+   "name": "LBall",
+   "parent": "LAnkle",
+   "head": [
+    -0.118,
+    0.031,
+    0.112
+   ],
+   "axes": {
+    "flex": [
+     -1,
+     0,
+     0
+    ],
+    "abd": [
+     0,
+     0,
+     -1
+    ],
+    "twist": [
+     0,
+     -1,
+     0
+    ]
+   },
+   "axis_convention": "flex + = dorsiflexion / forward swing, abd + = outboard, twist + = toes out"
+  },
+  {
+   "name": "LToe",
+   "parent": "LBall",
+   "head": [
+    -0.118,
+    0.036,
+    0.176
+   ],
+   "axes": {
+    "flex": [
+     -1,
+     0,
+     0
+    ],
+    "abd": [
+     0,
+     0,
+     -1
+    ],
+    "twist": [
+     0,
+     -1,
+     0
+    ]
+   },
+   "axis_convention": "flex + = dorsiflexion / forward swing, abd + = outboard, twist + = toes out"
+  }
+ ],
+ "parts": [
+  {
+   "name": "Boots/Sole_R",
+   "mat": "BootSole",
+   "start": 29093,
+   "end": 29163,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Heel1_R",
+   "mat": "BootSole",
+   "start": 29163,
+   "end": 29193,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Heel2_R",
+   "mat": "BootSole",
+   "start": 29193,
+   "end": 29223,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Heel3_R",
+   "mat": "BootSole",
+   "start": 29223,
+   "end": 29253,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/HeelPlate_R",
+   "mat": "AgedBrass",
+   "start": 22885,
+   "end": 23019,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/HeelNails_R",
+   "mat": "AgedBrass",
+   "start": 23019,
+   "end": 23097,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Welt_R",
+   "mat": "Leather",
+   "start": 6553,
+   "end": 6843,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/WeltStitch_R",
+   "mat": "BoneThread",
+   "start": 27189,
+   "end": 27379,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Vamp_R",
+   "mat": "Leather",
+   "start": 6843,
+   "end": 7085,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/ToeCap_R",
+   "mat": "Leather",
+   "start": 7085,
+   "end": 7193,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/ToeCapStitch1_R",
+   "mat": "BoneThread",
+   "start": 27379,
+   "end": 27459,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/ToeCapStitch2_R",
+   "mat": "BoneThread",
+   "start": 27459,
+   "end": 27529,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Counter_R",
+   "mat": "Leather",
+   "start": 7193,
+   "end": 7273,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/CounterStitch_R",
+   "mat": "BoneThread",
+   "start": 27529,
+   "end": 27629,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/ThroatSeam_R",
+   "mat": "BoneThread",
+   "start": 27629,
+   "end": 27739,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/ShaftAnkle_R",
+   "mat": "Leather",
+   "start": 7273,
+   "end": 7423,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/Shaft_R",
+   "mat": "Leather",
+   "start": 7423,
+   "end": 7753,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/FacingOut_R",
+   "mat": "Leather",
+   "start": 7753,
+   "end": 7873,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/FacingIn_R",
+   "mat": "Leather",
+   "start": 7873,
+   "end": 7993,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/Tongue_R",
+   "mat": "Leather",
+   "start": 7993,
+   "end": 8053,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/EyeletRow1_R",
+   "mat": "AgedBrass",
+   "start": 23097,
+   "end": 23149,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/EyeletRow2_R",
+   "mat": "AgedBrass",
+   "start": 23149,
+   "end": 23201,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/EyeletRow3_R",
+   "mat": "AgedBrass",
+   "start": 23201,
+   "end": 23253,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/EyeletRow4_R",
+   "mat": "AgedBrass",
+   "start": 23253,
+   "end": 23305,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/HookRow1_R",
+   "mat": "AgedBrass",
+   "start": 23305,
+   "end": 23405,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/HookRow2_R",
+   "mat": "AgedBrass",
+   "start": 23405,
+   "end": 23505,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/HookRow3_R",
+   "mat": "AgedBrass",
+   "start": 23505,
+   "end": 23605,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/Laces_R",
+   "mat": "BoneThread",
+   "start": 27739,
+   "end": 28003,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/LaceBow_R",
+   "mat": "ClothAccent",
+   "start": 2907,
+   "end": 3137,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/CuffFold_R",
+   "mat": "ClothAccent",
+   "start": 3137,
+   "end": 3257,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/CuffLining_R",
+   "mat": "ClothAccent",
+   "start": 3257,
+   "end": 3347,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/PullTab_R",
+   "mat": "Leather",
+   "start": 8053,
+   "end": 8067,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/PullTabRivet_R",
+   "mat": "AgedBrass",
+   "start": 23605,
+   "end": 23631,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/InstepStrap_R",
+   "mat": "Leather",
+   "start": 8067,
+   "end": 8121,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/InstepStrapStitch_R",
+   "mat": "BoneThread",
+   "start": 28003,
+   "end": 28093,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/InstepBuckle_R",
+   "mat": "AgedBrass",
+   "start": 23631,
+   "end": 23691,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/InstepKeeper_R",
+   "mat": "AgedBrass",
+   "start": 23691,
+   "end": 23715,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/CuffStrap_R",
+   "mat": "Leather",
+   "start": 8121,
+   "end": 8181,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/CuffBuckle_R",
+   "mat": "AgedBrass",
+   "start": 23715,
+   "end": 23775,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/Sole_L",
+   "mat": "BootSole",
+   "start": 29253,
+   "end": 29323,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Heel1_L",
+   "mat": "BootSole",
+   "start": 29323,
+   "end": 29353,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Heel2_L",
+   "mat": "BootSole",
+   "start": 29353,
+   "end": 29383,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Heel3_L",
+   "mat": "BootSole",
+   "start": 29383,
+   "end": 29413,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/HeelPlate_L",
+   "mat": "AgedBrass",
+   "start": 23775,
+   "end": 23909,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/HeelNails_L",
+   "mat": "AgedBrass",
+   "start": 23909,
+   "end": 23987,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Welt_L",
+   "mat": "Leather",
+   "start": 8181,
+   "end": 8471,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/WeltStitch_L",
+   "mat": "BoneThread",
+   "start": 28093,
+   "end": 28283,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Vamp_L",
+   "mat": "Leather",
+   "start": 8471,
+   "end": 8713,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/ToeCap_L",
+   "mat": "Leather",
+   "start": 8713,
+   "end": 8821,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/ToeCapStitch1_L",
+   "mat": "BoneThread",
+   "start": 28283,
+   "end": 28363,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/ToeCapStitch2_L",
+   "mat": "BoneThread",
+   "start": 28363,
+   "end": 28433,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Counter_L",
+   "mat": "Leather",
+   "start": 8821,
+   "end": 8901,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/CounterStitch_L",
+   "mat": "BoneThread",
+   "start": 28433,
+   "end": 28533,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/ThroatSeam_L",
+   "mat": "BoneThread",
+   "start": 28533,
+   "end": 28643,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/ShaftAnkle_L",
+   "mat": "Leather",
+   "start": 8901,
+   "end": 9051,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/Shaft_L",
+   "mat": "Leather",
+   "start": 9051,
+   "end": 9381,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/FacingOut_L",
+   "mat": "Leather",
+   "start": 9381,
+   "end": 9501,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/FacingIn_L",
+   "mat": "Leather",
+   "start": 9501,
+   "end": 9621,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/Tongue_L",
+   "mat": "Leather",
+   "start": 9621,
+   "end": 9681,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/EyeletRow1_L",
+   "mat": "AgedBrass",
+   "start": 23987,
+   "end": 24039,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/EyeletRow2_L",
+   "mat": "AgedBrass",
+   "start": 24039,
+   "end": 24091,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/EyeletRow3_L",
+   "mat": "AgedBrass",
+   "start": 24091,
+   "end": 24143,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/EyeletRow4_L",
+   "mat": "AgedBrass",
+   "start": 24143,
+   "end": 24195,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/HookRow1_L",
+   "mat": "AgedBrass",
+   "start": 24195,
+   "end": 24295,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/HookRow2_L",
+   "mat": "AgedBrass",
+   "start": 24295,
+   "end": 24395,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/HookRow3_L",
+   "mat": "AgedBrass",
+   "start": 24395,
+   "end": 24495,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/Laces_L",
+   "mat": "BoneThread",
+   "start": 28643,
+   "end": 28907,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/LaceBow_L",
+   "mat": "ClothAccent",
+   "start": 3347,
+   "end": 3577,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/CuffFold_L",
+   "mat": "ClothAccent",
+   "start": 3577,
+   "end": 3697,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/CuffLining_L",
+   "mat": "ClothAccent",
+   "start": 3697,
+   "end": 3787,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/PullTab_L",
+   "mat": "Leather",
+   "start": 9681,
+   "end": 9695,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/PullTabRivet_L",
+   "mat": "AgedBrass",
+   "start": 24495,
+   "end": 24521,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/InstepStrap_L",
+   "mat": "Leather",
+   "start": 9695,
+   "end": 9749,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/InstepStrapStitch_L",
+   "mat": "BoneThread",
+   "start": 28907,
+   "end": 28997,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/InstepBuckle_L",
+   "mat": "AgedBrass",
+   "start": 24521,
+   "end": 24581,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/InstepKeeper_L",
+   "mat": "AgedBrass",
+   "start": 24581,
+   "end": 24605,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/CuffStrap_L",
+   "mat": "Leather",
+   "start": 9749,
+   "end": 9809,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/CuffBuckle_L",
+   "mat": "AgedBrass",
+   "start": 24605,
+   "end": 24665,
+   "side": "L",
+   "chain": "shaft"
+  }
+ ]
+}
