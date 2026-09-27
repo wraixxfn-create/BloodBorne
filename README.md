@@ -126,6 +126,8 @@ python3 Tools/csharp_smoke_check.py     # delimiter balance + API symbols
 python3 Tools/verify_arena_lighting.py  # zones, budgets, heights, scene wiring (needs PyYAML)
 python3 Tools/create_original_protagonist.py  # regenerate the protagonist mesh + LODs
 python3 Tools/render_character_previews.py    # offline multi-angle wardrobe renders
+python3 Tools/verify_boots.py           # boots: anatomy, floor contact, rig poses (all LODs)
+python3 Tools/render_boot_previews.py   # pose the boots (idle/walk/run/dodge) over a floor
 ```
 
 All checks pass in the authoring environment. There is no Unity editor here,

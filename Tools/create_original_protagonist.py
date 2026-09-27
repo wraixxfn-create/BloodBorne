@@ -47,6 +47,7 @@ import os
 import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import hand_rig
+import boot_rig
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "Assets/Models/Characters")
@@ -530,6 +531,286 @@ def welt_seam(mat, name, points, radius=0.0032):
     tube(mat, name, pts, [radius]*len(pts), 6, (0, 1, 0))
 
 
+# ---------------------------------------------------------------------------
+# Footwear kit: contour lofts, stacked slabs, swept bands and surface panels
+#
+# Every piece below is a closed solid whose winding is fixed automatically from
+# its signed volume, so the boot meshes are provably outward-facing (the boot
+# parts are also re-audited by Tools/verify_boots.py).
+# ---------------------------------------------------------------------------
+
+def _signed_volume(pts, fs):
+    """Six times the signed volume of a triangle soup (winding probe)."""
+    vol = 0.0
+    for a, b, c in fs:
+        pa, pb, pc = pts[a], pts[b], pts[c]
+        vol += (pa[0]*(pb[1]*pc[2]-pb[2]*pc[1])
+                - pa[1]*(pb[0]*pc[2]-pb[2]*pc[0])
+                + pa[2]*(pb[0]*pc[1]-pb[1]*pc[0]))
+    return vol / 6.0
+
+
+def _orient(pts, fs):
+    """Flip the winding when the enclosed signed volume is negative."""
+    return [f[::-1] for f in fs] if _signed_volume(pts, fs) < 0.0 else fs
+
+
+def _fix_winding(pts, fs):
+    """Make every face of a closed shell consistent, then point it outward.
+
+    Boot parts are assembled from separate wall / rim patches (and open shells
+    are wrapped around the lacing slit), so a hand-written winding is easy to
+    get subtly wrong: one inverted patch renders as a hole. This walks the face
+    graph across shared edges - flipping a face whenever it meets a shared edge
+    in the same direction as its neighbour - and finishes by orienting the whole
+    shell outwards from its signed volume. Deterministic, O(faces).
+    """
+    fs = [tuple(f) for f in fs]
+    edge = {}
+    for fi, f in enumerate(fs):
+        for k in range(len(f)):
+            a, b = f[k], f[(k + 1) % len(f)]
+            if a == b:
+                continue
+            lo, hi = (a, b) if a < b else (b, a)
+            edge.setdefault((lo, hi), []).append((fi, 1 if a == lo else -1))
+    flip = [False] * len(fs)
+    seen = [False] * len(fs)
+    for start in range(len(fs)):
+        if seen[start]:
+            continue
+        seen[start] = True
+        stack = [start]
+        while stack:
+            fi = stack.pop()
+            f = fs[fi]
+            for k in range(len(f)):
+                a, b = f[k], f[(k + 1) % len(f)]
+                if a == b:
+                    continue
+                lo, hi = (a, b) if a < b else (b, a)
+                si = (1 if a == lo else -1) * (-1 if flip[fi] else 1)
+                for fj, sj in edge[(lo, hi)]:
+                    if seen[fj]:
+                        continue
+                    seen[fj] = True
+                    if sj * (-si) < 0:
+                        flip[fj] = True
+                    stack.append(fj)
+    out = [f[::-1] if flip[fi] else f for fi, f in enumerate(fs)]
+    return _orient(pts, out) if _signed_volume(pts, out) < 0.0 else out
+
+
+def _connect_rings(pts, rings, closed=False):
+    """Quads between consecutive rings of a point stack, as flat index faces.
+
+    `rings` are point lists laid out in `pts` in the same order (every caller
+    builds `pts` by flattening the ring stack); a one-point ring becomes a cap
+    fan. `closed=True` welds the last ring back onto the first (a torus with a
+    single set of seam vertices, not two coincident boundaries). Winding is
+    normalised afterwards by _fix_winding from the shell graph and volume.
+    """
+    fs = []
+    offs, acc = [], 0
+    for r in rings:
+        offs.append(acc)
+        acc += len(r)
+    pairs = list(range(len(rings) - 1))
+    if closed:
+        pairs.append(len(rings) - 1)
+    for i in pairs:
+        A, B = rings[i], rings[(i + 1) % len(rings)]
+        oa, ob = offs[i], offs[(i + 1) % len(rings)]
+        if len(A) == 1:
+            for k in range(len(B)):
+                fs.append((oa, ob + (k+1) % len(B), ob + k))
+        elif len(B) == 1:
+            for k in range(len(A)):
+                fs.append((ob, oa + k, oa + (k+1) % len(A)))
+        else:
+            n = len(A)
+            for k in range(n):
+                kn = (k+1) % n
+                fs.append((oa + k, oa + kn, ob + kn))
+                fs.append((oa + k, ob + kn, ob + k))
+    return fs
+
+
+def _ring_centre(ring):
+    n = len(ring)
+    return (sum(p[0] for p in ring)/n, sum(p[1] for p in ring)/n,
+            sum(p[2] for p in ring)/n)
+
+
+def _shrink_ring(ring, thick, centre=None):
+    """Copy of a ring offset `thick` towards its centre (lining wall)."""
+    c = centre or _ring_centre(ring)
+    out = []
+    for p in ring:
+        dx, dy, dz = p[0]-c[0], p[1]-c[1], p[2]-c[2]
+        l = math.sqrt(dx*dx + dy*dy + dz*dz)
+        k = max(0.0, l - thick)/l if l > 1e-9 else 1.0
+        out.append((c[0]+dx*k, c[1]+dy*k, c[2]+dz*k))
+    return out
+
+
+def _stamp(mat, name, pts, fs, place=None, flip=False, orient=True, part=None):
+    """Auto-orient, place and append a closed solid to a material buffer.
+
+    Local-frame solids are stamped through here: `place`/`flip` mirror the part
+    for the left side and `_orient` guarantees the winding is outward, so a
+    mirrored part can never end up inside-out. `part=(side, chain)` registers
+    the vertex range in RIG_PARTS for the boot rig sidecar.
+    """
+    if orient:
+        # if the mesh is not edge-consistent already (checked offline by
+        # Tools/verify_boots.py) this also repairs the offending patch
+        fs = _fix_winding(pts, fs)
+    if place is not None:
+        pts = [place(p) for p in pts]
+    if flip:
+        fs = [f[::-1] for f in fs]
+    if part is not None:
+        add_part(mat, name, pts, fs, part[0], part[1])
+    else:
+        add_mesh(mat, name, pts, fs)
+
+
+def loft_solid(mat, name, rings, cap_start=True, cap_end=True, place=None, flip=False,
+               part=None):
+    """Closed solid lofted through a stack of equal-length rings."""
+    rings = [list(r) for r in rings]
+    if cap_start and len(rings[0]) > 1:
+        rings = [[_ring_centre(rings[0])]] + rings
+    if cap_end and len(rings[-1]) > 1:
+        rings = rings + [[_ring_centre(rings[-1])]]
+    pts = [p for ring in rings for p in ring]
+    _stamp(mat, name, pts, _connect_rings(pts, rings), place, flip, part=part)
+
+
+def loft_shell(mat, name, rings, thick, closed=True, rim_start=True, rim_end=True,
+               place=None, flip=False, part=None):
+    """Hollow leather shell: outer wall, lining wall and border rims.
+
+    Works for closed loops (a tube) and for open arcs (a sheet wrapped into a
+    solid: the lacing slit keeps real leather edges).
+    """
+    n_r = len(rings)
+    n_c = len(rings[0])
+    inner = [_shrink_ring(r, thick) for r in rings]
+    pts = [p for r in rings for p in r] + [p for r in inner for p in r]
+    off = n_r * n_c
+    span = n_c if closed else n_c - 1
+    fs = []
+    for i in range(n_r - 1):
+        for k in range(span):
+            kn = (k + 1) % n_c
+            a0, a1 = i*n_c + k, i*n_c + kn
+            b0, b1 = (i+1)*n_c + k, (i+1)*n_c + kn
+            fs.append((a0, b0, b1)); fs.append((a0, b1, a1))
+            fs.append((off+a0, off+a1, off+b1)); fs.append((off+a0, off+b1, off+b0))
+        if not closed:
+            for k in (0, n_c - 1):
+                a = i*n_c + k; b = (i+1)*n_c + k
+                fs.append((a, b, off+b)); fs.append((a, off+b, off+a))
+    if rim_start:
+        for k in range(span):
+            kn = (k + 1) % n_c
+            fs.append((kn, k, off+k)); fs.append((kn, off+k, off+kn))
+    if rim_end:
+        base = (n_r-1)*n_c
+        for k in range(span):
+            kn = (k + 1) % n_c
+            fs.append((base+k, base+kn, off+base+kn))
+            fs.append((base+k, off+base+kn, off+base+k))
+    _stamp(mat, name, pts, fs, place, flip, part=part)
+
+
+def rect_ring(z, y0, y1, half_w, taper=0.94, n_edge=4):
+    """Closed trapezoid section: top edge +-half_w, ground edge +-half_w*taper.
+
+    Used for the sole slab, the stacked heel laminations and thin plates. The
+    taper feathers the ground edge (a raw box section reads as plastic) and the
+    `n_edge` interior samples keep the long wall from collapsing on thin slabs.
+    """
+    wb = max(0.0008, half_w * taper)
+    n_edge = max(2, int(n_edge))
+    out = []
+    for k in range(n_edge):                     # outboard wall: top -> ground
+        u = k / (n_edge - 1.0)
+        out.append((half_w + (wb - half_w) * u, y1 + (y0 - y1) * u))
+    for k in range(n_edge):                     # inboard wall: ground -> top
+        u = k / (n_edge - 1.0)
+        out.append((-wb + (wb - half_w) * u, y0 + (y1 - y0) * u))
+    return [(x, y, z) for (x, y) in out]
+
+
+def sweep_loop(mat, name, path, profile, closed=True, place=None, flip=False,
+               centre=None, cap=True, part=None):
+    """Sweep a closed 2D profile (outward, along-surface) along a 3D path.
+
+    `profile` is a list of (u, v): u runs along the surface's outward normal,
+    v runs along the surface tangent perpendicular to the path - so a welt, a
+    strap or a fold band is described by its cross-section alone.
+    """
+    n = len(path)
+    if centre is None:
+        # centre for the outward normal: full 3D centroid, so the hint also
+        # works for vertical sweeps (buckle edges, cuff beads)
+        centre = (sum(p[0] for p in path)/n, sum(p[1] for p in path)/n,
+                  sum(p[2] for p in path)/n)
+    rings = []
+    for i, p in enumerate(path):
+        a = path[(i-1) % n] if closed else path[max(0, i-1)]
+        b = path[(i+1) % n] if closed else path[min(n-1, i+1)]
+        t = norm(vsub(b, a))
+        hint = (p[0]-centre[0], p[1]-centre[1], p[2]-centre[2])
+        if dot(hint, hint) < 1e-10:
+            hint = (1.0, 0.0, 0.0)
+        nn = norm(vsub(hint, vmul(t, dot(hint, t))))
+        bn = norm(cross(t, nn))
+        rings.append([vadd(p, vadd(vmul(nn, u), vmul(bn, v))) for (u, v) in profile])
+    if not closed and cap:
+        rings = [[_ring_centre(rings[0])]] + rings + [[_ring_centre(rings[-1])]]
+    pts = [q for ring in rings for q in ring]
+    _stamp(mat, name, pts, _connect_rings(pts, rings, closed=closed), place, flip,
+           part=part)
+
+
+def panel_solid(mat, name, grid, thick, place=None, flip=False, out_sign=1.0,
+                part=None):
+    """Curved panel with thickness, built from a rows x cols surface grid."""
+    rows, cols = len(grid), len(grid[0])
+    norms = []
+    for r in range(rows):
+        row = []
+        for c in range(cols):
+            r0 = grid[max(0, r-1)][c]; r1 = grid[min(rows-1, r+1)][c]
+            c0 = grid[r][max(0, c-1)]; c1 = grid[r][min(cols-1, c+1)]
+            n = norm(cross(vsub(r1, r0), vsub(c1, c0)))
+            row.append(vmul(n, out_sign) if (n[0] or n[1] or n[2]) else (0.0, 1.0, 0.0))
+        norms.append(row)
+    outer = [vadd(grid[r][c], vmul(norms[r][c], thick*0.5))
+             for r in range(rows) for c in range(cols)]
+    inner = [vsub(grid[r][c], vmul(norms[r][c], thick*0.5))
+             for r in range(rows) for c in range(cols)]
+    pts = outer + inner
+    o = rows*cols
+    fs = quad_grid(outer, rows, cols, False, flip=False)
+    # the inner wall is built from its own point list, so its face indices have
+    # to be shifted into the merged (outer + inner) buffer
+    fs += [tuple(i + o for i in f) for f in quad_grid(inner, rows, cols, False, flip=True)]
+    for r in range(rows-1):                       # side rims (cols 0 and last)
+        for c0, c1 in ((0, 0), (cols-1, cols-1)):
+            i00 = r*cols + c0; i10 = (r+1)*cols + c0
+            fs.append((i00, i10, o+i10)); fs.append((i00, o+i10, o+i00))
+    for c in range(cols-1):                       # end rims (rows 0 and last)
+        for r0 in (0, rows-1):
+            i00 = r0*cols + c; i01 = r0*cols + c + 1
+            fs.append((i00, i01, o+i01)); fs.append((i00, o+i01, o+i00))
+    _stamp(mat, name, pts, fs, place, flip, part=part)
+
+
 # =========================================================================
 # VESPERSHADE PROTAGONIST: ORIGINAL SCULPTED HEAD, FACE, EARS, EYES & HAIR
 # =========================================================================
@@ -984,115 +1265,34 @@ def trouser_fold(i, s_idx, a):
     ankle = 0.0028 * math.sin(5*a) * math.exp(-((i - 3.5)/0.5)**2)
     return knee + ankle
 
+# Leg profile: (world x offset from the leg axis, y, z centre, rx, rz).
+# The three lowest stations are the boot_rig trouser tuck: the wool leg is
+# compressed inside the shaft (the shaft's inner wall clears it by >= 2 mm
+# everywhere below the cuff opening, checked by Tools/verify_boots.py) and
+# flares back out above the opening so the cloth drapes over the boot cuff.
+LEG_PROFILE = [(0.113, 0.915, -0.002, 0.102, 0.106),
+               (0.117, 0.660, -0.004, 0.084, 0.088)]
+# boot_rig.TROUSER_TUCK starts at the knee flare (y = 0.485), so the stations
+# stay strictly monotonic - a duplicated station folds the tube onto itself
+LEG_PROFILE += [(0.118, y, zc, rx, rz) for (y, rx, rz, zc) in boot_rig.TROUSER_TUCK]
+
+
+def trouser_fold_tuck(i, s_idx, a):
+    """Knee / ankle creases, faded out where the leg is inside the boot."""
+    y = LEG_PROFILE[max(0, min(len(LEG_PROFILE) - 1, int(round(i))))][1]
+    return trouser_fold(i, s_idx, a) * smoothstep(0.470, 0.560, y)
+
+
 for side, label in ((-1, "L"), (1, "R")):
     x = side
-    leg_pts = [(x*.113, .915, -.002), (x*.117, .660, -.004), (x*.116, .485, .012), (x*.111, .365, .008), (x*.113, .285, .013)]
+    leg_pts = [(x*dx, y, zc) for (dx, y, zc, rx, rz) in LEG_PROFILE]
     thick_tube("Trouser", f"LowerBody/Leg_{label}", leg_pts,
-        [(.102, .106), (.084, .088), (.066, .070), (.069, .073), (.061, .065)],
-        sides=18, thick=.006, fold=trouser_fold, rim_start=True, rim_end=False)
-    side_seam_pts = [(x*(.117 + .082), .880, -.002), (x*(.117 + .068), .660, -.004),
-                     (x*(.116 + .054), .485, .012), (x*(.111 + .056), .365, .008), (x*(.113 + .052), .290, .013)]
+        [(rx, rz) for (dx, y, zc, rx, rz) in LEG_PROFILE],
+        sides=18, thick=.006, fold=trouser_fold_tuck, rim_start=True, rim_end=False)
+    side_seam_pts = [(x*(dx + 0.97*rx), y + 0.012*(1 if i == 0 else 0), zc)
+                     for i, (dx, y, zc, rx, rz) in enumerate(LEG_PROFILE)]
     welt_seam("Trouser", f"LowerBody/SideSeam_{label}", side_seam_pts, radius=0.0032)
     stitch_dashes("BoneThread", f"LowerBody/SideSeamStitch_{label}", side_seam_pts, 8, r=0.0020, length=0.012)
-
-
-# =========================================================================
-# BOOTS: multi-part leather cavalry boots - continuous tall shaft,
-# stitched vamp, toe cap with saddle stitching, heel counter,
-# welted sole, brass heel plate, crossed instep straps + buckles,
-# upper calf strap + buckle, rear pull tab & vertical back spine seam.
-# =========================================================================
-
-def boot_normal(side):
-    def fn(p, tangent):
-        return norm(((p[0] - side*.118)*1.25, 0.0, (p[2] - 0.05)*0.8))
-    return fn
-
-for side, label in ((-1, "L"), (1, "R")):
-    x = side
-    # 1. Welted Sole, Stacked Heel and Aged Brass Heel Plate Rim
-    ellipsoid("BootSole", f"Boots/Sole_{label}", (x*.118, .038, .058), (.102, .026, .188), 10, 22)
-    ellipsoid("BootSole", f"Boots/Heel_{label}", (x*.118, .045, -.065), (.068, .042, .072), 8, 16)
-    torus_arc("AgedBrass", f"Boots/HeelPlate_{label}", (x*.118, .026, -.065), .058, .0032, 6, 12, axis=(0, 1, 0))
-    welt_pts = [(x*.118 + .104*math.cos(2*math.pi*k/14), .068, .058 + .190*math.sin(2*math.pi*k/14)) for k in range(14)]
-    welt_pts.append(welt_pts[0])
-    tube("Leather", f"Boots/Welt_{label}", welt_pts, [.0055]*15, 8, (0, 1, 0))
-    stitch_dashes("BoneThread", f"Boots/WeltStitch_{label}", welt_pts[:-1], 12, r=0.0018, length=0.010)
-
-    # 2. Vamp & Stitched Toe Cap
-    ellipsoid("Leather", f"Boots/Vamp_{label}", (x*.118, .108, .082), (.090, .068, .138), 12, 22)
-    ellipsoid("Leather", f"Boots/ToeCap_{label}", (x*.118, .098, .168), (.086, .058, .072), 10, 18)
-    cap_st1 = [(x*.118 + .078, .090, .146), (x*.118 + .058, .114, .192), (x*.118, .128, .210), (x*.118 - .058, .114, .192), (x*.118 - .078, .090, .146)]
-    cap_st2 = [(x*.118 + .074, .096, .140), (x*.118 + .054, .120, .186), (x*.118, .134, .204), (x*.118 - .054, .120, .186), (x*.118 - .074, .096, .140)]
-    stitch_dashes("BoneThread", f"Boots/ToeCapStitch1_{label}", cap_st1, 8, r=0.0022, length=0.010)
-    stitch_dashes("BoneThread", f"Boots/ToeCapStitch2_{label}", cap_st2, 8, r=0.0020, length=0.009)
-
-    # 3. Heel Counter
-    thick_ring_shell("Leather", f"Boots/Counter_{label}",
-        [(lambda a, y=y, rx=rx, rz=rz, zc=zc: (y, rx, rz, zc)) for y, rx, rz, zc in
-         ((.070, .096, .098, -.010), (.140, .094, .096, -.008), (.210, .092, .094, -.006))],
-        thick=.006, sides=16, a0=math.pi - 1.15, a1=math.pi + 1.15,
-        rim_start=True, rim_end=False, center=(x*.118, 0, 0))
-    counter_st = [(x*.118 + .088*math.sin(math.pi - 1.10 + 2.20*k/6), .208, -.006 + .092*math.cos(math.pi - 1.10 + 2.20*k/6)) for k in range(7)]
-    stitch_dashes("BoneThread", f"Boots/CounterStitch_{label}", counter_st, 7, r=0.0022, length=0.010)
-
-    # 4. Continuous Boot Shaft from ankle (y=0.125) to knee (y=0.440)
-    def shaft_fold(i, s_idx, a, side=side):
-        return .0045 * math.sin(4*a + .7) * math.exp(-((i - 1.2)/0.6)**2)
-    shaft_pts = [(x*.118, .125, .016), (x*.117, .205, .012), (x*.116, .285, .008), (x*.116, .365, .005), (x*.117, .440, .002)]
-    thick_tube("Leather", f"Boots/Shaft_{label}", shaft_pts,
-        [(.082, .088), (.086, .092), (.096, .100), (.100, .106), (.106, .114)],
-        sides=22, thick=.007, fold=shaft_fold, rim_start=False, rim_end=True)
-
-    # 5. Rear Vertical Shaft Spine Seam + Saddle Stitching
-    rear_seam_pts = [(x*.118, .140, -.074), (x*.117, .220, -.078), (x*.116, .300, -.086), (x*.116, .380, -.095), (x*.117, .442, -.106)]
-    welt_seam("Leather", f"Boots/RearSeam_{label}", rear_seam_pts, radius=0.0035)
-    stitch_dashes("BoneThread", f"Boots/RearSeamStitch_{label}", rear_seam_pts, 8, r=0.0022, length=0.012)
-
-    # 6. Folded Top Cuff & Accent Lining
-    thick_tube("ClothAccent", f"Boots/CuffFold_{label}",
-        [(x*.117, .435, .004), (x*.118, .462, .002)],
-        [(.112, .120), (.109, .118)], sides=20, thick=.005, rim_start=False, rim_end=True)
-    thick_ring_shell("ClothAccent", f"Boots/CuffLining_{label}",
-        [(lambda a, y=y, rx=rx, rz=rz, zc=zc: (y, rx, rz, zc)) for y, rx, rz, zc in
-         ((.450, .101, .111, .002), (.458, .103, .113, .002))],
-        thick=.003, sides=16, a0=0.0, a1=2*math.pi, wrap=True,
-        rim_start=False, rim_end=True, center=(x*.118, 0, 0))
-
-    # 7. Back Pull Tab + Brass Rivet
-    strap_band("Leather", f"Boots/PullTab_{label}",
-        [(x*.116, .450, -.102), (x*.116, .476, -.114), (x*.116, .450, -.124)],
-        width=.016, thick=.0035, normal_fn=lambda p, t: (0, 0, -1.0))
-    rivet_cap("AgedBrass", f"Boots/PullTabRivet_{label}", (x*.116, .452, -.112), (0, 0, -1.0), radius=0.004)
-
-    # 8. Crossed Instep Straps + Buckles
-    strap_band("Leather", f"Boots/InstepStrapA_{label}",
-        [(x*.152, .155, .030), (x*.120, .128, .120), (x*.086, .150, .208)],
-        width=.015, thick=.0032, normal_fn=boot_normal(side))
-    strap_band("Leather", f"Boots/InstepStrapB_{label}",
-        [(x*.090, .128, .028), (x*.122, .102, .118), (x*.154, .126, .205)],
-        width=.015, thick=.0032, normal_fn=boot_normal(side))
-    stitch_dashes("BoneThread", f"Boots/InstepStitchA_{label}",
-        [(x*.150, .155, .032), (x*.120, .128, .120), (x*.088, .150, .206)], 5, r=0.0018, length=0.009)
-    stitch_dashes("BoneThread", f"Boots/InstepStitchB_{label}",
-        [(x*.092, .130, .030), (x*.122, .104, .118), (x*.152, .128, .203)], 5, r=0.0018, length=0.009)
-
-    bx, by, bz = x*.158, .158, .026
-    buckle_frame("AgedBrass", f"Boots/AnkleBuckle_{label}", (bx, by, bz), (x*1.0, 0.2, 0.2), up=(0, 1, 0), width=.020, height=.026, bar_r=.0026)
-
-    # 9. Upper Calf Strap + Miniature Buckle
-    calf_pts = [(x*.117 + .110*math.cos(2*math.pi*k/12), .412, .004 + .116*math.sin(2*math.pi*k/12)) for k in range(12)]
-    calf_pts.append(calf_pts[0])
-    strap_band("Leather", f"Boots/CalfStrap_{label}", calf_pts, width=.014, thick=.003, normal_fn=boot_normal(side), closed=True)
-    cbx, cby, cbz = x*(.117 + .112), .412, .004
-    buckle_frame("AgedBrass", f"Boots/CalfBuckle_{label}", (cbx, cby, cbz), (x*1.0, 0, 0), up=(0, 1, 0), width=.018, height=.022, bar_r=.0024)
-
-    # 10. Brass Eyelets / Speed Hooks along the vamp
-    for ei in range(3):
-        ey = .112 + .022 * ei
-        ez = .148 - .024 * ei
-        rivet_cap("AgedBrass", f"Boots/EyeletL_{label}_{ei+1}", (x*.118 + x*.038, ey, ez), (x*0.8, 0.3, 0.5), radius=0.0035, height=0.0025)
-        rivet_cap("AgedBrass", f"Boots/EyeletR_{label}_{ei+1}", (x*.118 - x*.038, ey, ez), (-x*0.8, 0.3, 0.5), radius=0.0035, height=0.0025)
 
 
 # =========================================================================
@@ -1955,6 +2155,18 @@ thick_ring_shell("Cloth", "UpperClothing/ShoulderMantle", mantle_rows,
     thick=.008, sides=34, a0=MANTLE_A0, a1=MANTLE_A1, rim_start=True, rim_end=True,
     fold=mantle_fold)
 
+def mantle_surf(t, a, out=0.0):
+    """World point on the mantle shell at row t, angle a.
+
+    mantle_row_fn returns a *row* (y, rx, rz, zc, a0, a1); the surface point has
+    to be built with shell_point - passing the row straight into a mesh call
+    silently places the part at (y, rx, rz) as if it were (x, y, z).
+    """
+    row = mantle_row_fn(t)(a)
+    p = shell_point(row[0], row[1], row[2], row[3], a, 0, 0, 0)
+    return vadd(p, vmul(norm((p[0], 0.0, p[2])), out)) if out else p
+
+
 mantle_hem = []
 for k in range(23):
     a = MANTLE_A0 + (MANTLE_A1 - MANTLE_A0)*k/22
@@ -1965,14 +2177,14 @@ tube("BoneThread", "Accessories/MantleHemPiping", mantle_hem, [.0034]*23, 6, (0,
 stitch_dashes("ClothAccent", "Accessories/MantleHemStitch", mantle_hem, 14, r=0.0022, length=0.012)
 
 for si, sa, label in ((1, MANTLE_A0 + 0.06, "R"), (2, 2*math.pi - MANTLE_A0 - 0.06, "L")):
-    p = mantle_row_fn(0.04)(sa)
-    clasp_c = (p[0], p[1] + 0.004, p[2] + 0.004)
-    button_disc("AgedBrass", f"Accessories/MantleClasp_{label}", clasp_c, (0, 0.8, 0.6), radius=.009, thick=.004, thread_mat=None)
+    p = mantle_surf(0.04, sa)
+    clasp_c = vadd(p, vmul(norm((p[0], 0.0, p[2])), 0.006))
+    button_disc("AgedBrass", f"Accessories/MantleClasp_{label}", clasp_c, (clasp_c[0], 0.8, clasp_c[2]), radius=.009, thick=.004, thread_mat=None)
     torus_arc("AgedBrass", f"Accessories/MantleClaspRing_{label}", clasp_c, .011, .0024, 6, 10, axis=(0, 1, 0))
 
 chain_pts = []
-p_clasp_R = mantle_row_fn(0.04)(MANTLE_A0 + 0.06)
-p_clasp_L = mantle_row_fn(0.04)(2*math.pi - MANTLE_A0 - 0.06)
+p_clasp_R = mantle_surf(0.04, MANTLE_A0 + 0.06)
+p_clasp_L = mantle_surf(0.04, 2*math.pi - MANTLE_A0 - 0.06)
 for k in range(11):
     t = k / 10.0
     cp = lerp(p_clasp_R, p_clasp_L, t)
@@ -2192,6 +2404,603 @@ torus_arc("AgedBrass", "Accessories/CompassLoop", vadd(drop_bot, (0, .004, 0)), 
 
 
 # =========================================================================
+# BOOTS: welted leather cavalry boots on anatomically fitted feet.
+#
+# The boot is authored ONCE in Tools/boot_rig.py's local frame (x = outboard,
+# y = 0 exactly at the floor, +z forward, foot centre line at x = 0) and
+# mirrored per side by _stamp(place=..., flip=...), which re-fixes the winding
+# from each solid's own signed volume - so left and right are exact mirrors and
+# can never come out inside-out.
+#
+# Construction follows how the real thing is made, in this order:
+#   1. full-length sole slab: ground contact faces exactly at y = 0 from the
+#      ball to the toe-break, the shank lifted off the floor between the heel
+#      breast and the ball, a toe spring over the last 25 mm, feathered ground
+#      edges and a measured outboard wear flat,
+#   2. three stacked heel laminations with shadow grooves between them,
+#   3. brass heel edge plate and nail heads,
+#   4. welt bead and welt stitching around the sole / upper junction,
+#   5. vamp lofted through the boot_rig foot sections, stitched toe cap,
+#      heel counter band and throat seam,
+#   6. shaft: closed ankle tube, laced upper with a real lacing slit, raised
+#      facings, tongue, brass eyelets and speed hooks, crossed leather laces,
+#   7. folded wine cuff with lining and a riveted rear pull tab,
+#   8. crossed instep strap + buckle over the vamp, calf strap + buckle.
+#
+# Every part is registered in RIG_PARTS with a rig chain id ("foot" -> ankle /
+# ball / toe, "shaft" -> ankle / knee); the vertex ranges are exported to
+# SM_Character_VeilboundWayfarer*.bootrig.json and Tools/verify_boots.py
+# refits the built mesh, poses idle / walk / run / dodge and checks the floor
+# contact contract defined in Tools/boot_rig.py.
+# =========================================================================
+
+Z_SOLE0, Z_SOLE1 = -0.0865, 0.1960      # sole slab extent (both caps included)
+SOLE_BACK_CAP, SOLE_FRONT_CAP = 0.0105, 0.0100
+HEEL_INSET = 0.0016                     # heel block sits inside the sole edge
+HEEL_LAYERS, HEEL_GAP = 3, 0.0007
+COUNTER_ZCUT = -0.004                   # counter wraps everything behind this
+TOE_CAP_OFF = 0.0016                    # toe cap panel offset over the vamp
+BOOT_TRIM = 0.0018                      # trim offset of stitching over leather
+
+
+def _sole_bot(z):
+    """Sole bottom line: 0 on both contact faces, lifted through the shank."""
+    tab = boot_rig.SOLE_BOTTOM
+    if z < tab[0][0]:
+        return tab[0][1]
+    if z > tab[-1][0]:
+        (z0, y0), (z1, y1) = tab[-2], tab[-1]
+        return y1 + (y1 - y0) / (z1 - z0) * (z - z1)
+    return boot_rig.sole_bottom(z)
+
+
+def _sole_half(z, inset=0.0, worn=True, floor=0.0045):
+    """Half width of the sole / heel footprint, caps rounded elliptically."""
+    w = boot_rig.sole_half_width(z, worn) - inset
+    if z < boot_rig.FOOT_BACK:
+        u = (boot_rig.FOOT_BACK - z) / SOLE_BACK_CAP
+    elif z > boot_rig.FOOT_TIP:
+        u = (z - boot_rig.FOOT_TIP) / SOLE_FRONT_CAP
+    else:
+        u = 0.0
+    if u > 0.0:
+        w *= math.sqrt(max(0.0, 1.0 - min(1.0, u) ** 2))
+    return max(floor, w)
+
+
+def _sole_top(z):
+    """Top of the sole slab (the leather line), kept at a usable thickness."""
+    zc = min(max(z, boot_rig.FOOT_BACK), boot_rig.FOOT_TIP)
+    return max(_sole_bot(z) + 0.0030, boot_rig.leather_bottom(zc))
+
+
+def _sole_loop(z0, z1, n, inset=0.0, worn=True):
+    """Closed (x, z) plan loop of the sole footprint, +x side first."""
+    zs = [z0 + (z1 - z0) * k / (n - 1.0) for k in range(n)]
+    return ([( _sole_half(z, inset, worn), z) for z in zs] +
+            [(-_sole_half(z, inset, worn), z) for z in reversed(zs)])
+
+
+def _offset_loop(loop, dist):
+    """Offset a closed (x, z) loop outward along its own plane normal."""
+    n = len(loop)
+    cx = sum(p[0] for p in loop) / n
+    cz = sum(p[1] for p in loop) / n
+    out = []
+    for i, p in enumerate(loop):
+        t = norm(((loop[(i + 1) % n][0] - loop[(i - 1) % n][0]), 0.0,
+                  (loop[(i + 1) % n][1] - loop[(i - 1) % n][1])))
+        nrm = (t[2], 0.0, -t[0])
+        if nrm[0] * (p[0] - cx) + nrm[2] * (p[1] - cz) < 0.0:
+            nrm = vmul(nrm, -1.0)
+        out.append((p[0] + nrm[0] * dist, p[1] + nrm[2] * dist))
+    return out
+
+
+def _loop_point(loop, t):
+    """Point at normalised position t in [0, 1) on a closed polyline."""
+    n = len(loop)
+    f = (t % 1.0) * n
+    i = int(f) % n
+    return lerp(loop[i], loop[(i + 1) % n], f - int(f))
+
+
+def _contour_arc(loop, z_cut, count):
+    """`count` points of a closed contour spanning z <= z_cut, around the back.
+
+    The contour is ordered front centre -> outboard -> back -> inboard, so the
+    run of vertices with z <= z_cut is a single arc through the heel. Samples
+    are placed by normalised position, so every ring of a lofted band has the
+    same point count (required by loft_shell).
+    """
+    n = len(loop)
+    flags = [p[2] <= z_cut for p in loop]
+    if not any(flags):
+        return None
+    if all(flags):
+        return [_loop_point(loop, k / float(count)) for k in range(count)]
+    i_a = flags.index(True) / float(n)
+    i_b = (n - 1 - flags[::-1].index(True)) / float(n)
+    span = i_b - i_a
+    return [_loop_point(loop, i_a + span * k / (count - 1.0)) for k in range(count)]
+
+
+def _slice_loop(loop, keep):
+    """Longest contiguous run (wrapping) of a closed loop satisfying `keep`."""
+    n = len(loop)
+    flags = [keep(p) for p in loop]
+    if not any(flags):
+        return []
+    if all(flags):
+        return list(loop)
+    i0 = flags.index(True)
+    rot = [loop[(i0 + k) % n] for k in range(n)]
+    fl = [keep(p) for p in rot]
+    runs, cur = [], [rot[0]]
+    for k in range(1, n):
+        if fl[k]:
+            cur.append(rot[k])
+        else:
+            runs.append(cur)
+            cur = []
+    if cur:
+        runs.append(cur)
+    if len(runs) > 1 and fl[-1]:
+        runs[0] = runs[-1] + runs[0]
+        runs.pop()
+    return max(runs, key=len)
+
+
+def _bead_profile(ru, rv, n=8):
+    """Round-ish bead cross-section (welt, rim wire) in (outward, vertical)."""
+    return [(ru * math.cos(2.0 * math.pi * k / n),
+             rv * math.sin(2.0 * math.pi * k / n)) for k in range(n)]
+
+
+def _merge(parts):
+    """Concatenate several (points, faces) solids into one buffer."""
+    pts, fs = [], []
+    for p, f in parts:
+        off = len(pts)
+        pts.extend(p)
+        fs.extend(tuple(i + off for i in face) for face in f)
+    return pts, fs
+
+
+def _tube_local(centers, radii, sides, preferred=(0, 0, 1)):
+    """(points, faces) of a capped tube through local centres."""
+    centers = [tuple(c) for c in centers]
+    if isinstance(radii, (int, float)):
+        radii = [float(radii)] * len(centers)
+    sides = _segs(sides, 4)
+    rings = []
+    for i, c in enumerate(centers):
+        t = norm(vsub(centers[min(i + 1, len(centers) - 1)], centers[max(0, i - 1)]))
+        hint = preferred
+        if abs(dot(hint, t)) > 0.9:
+            hint = (1.0, 0.0, 0.0)
+        b1 = norm(vsub(hint, vmul(t, dot(hint, t))))
+        b2 = norm(cross(t, b1))
+        rings.append([vadd(c, vadd(vmul(b1, radii[i] * math.cos(2.0 * math.pi * k / sides)),
+                                  vmul(b2, radii[i] * math.sin(2.0 * math.pi * k / sides))))
+                      for k in range(sides)])
+    rings = [[_ring_centre(rings[0])]] + rings + [[_ring_centre(rings[-1])]]
+    pts = [p for r in rings for p in r]
+    return pts, _connect_rings(pts, rings)
+
+
+def _dash_local(path, count, r, length):
+    """Merged saddle-stitch dashes along a local path -> (points, faces)."""
+    count = max(2, int(round(count * DETAIL)))
+    path = [tuple(p) for p in path]
+    segs = []
+    for k in range(count):
+        f = (k + 0.5) / count * (len(path) - 1)
+        i = min(int(f), len(path) - 2)
+        c = lerp(path[i], path[i + 1], f - i)
+        half = vmul(norm(vsub(path[i + 1], path[i])), length * 0.5)
+        segs.append(_tube_local((vsub(c, half), vadd(c, half)), (r, r), 6))
+    return _merge(segs)
+
+
+def _rivet_local(center, normal, radius, height):
+    """Domed stud (eyelet, nail head, rivet) in local space."""
+    nrm = norm(normal)
+    up = (0.0, 1.0, 0.0) if abs(nrm[1]) < 0.9 else (1.0, 0.0, 0.0)
+    b1 = norm(cross(nrm, up))
+    b2 = cross(nrm, b1)
+    rings = []
+    for u, h in ((1.0, 0.0), (0.86, 0.42), (0.52, 0.78)):
+        rings.append([vadd(vadd(center, vmul(nrm, height * h)),
+                           vadd(vmul(b1, radius * u * math.cos(2.0 * math.pi * k / 8)),
+                                vmul(b2, radius * u * math.sin(2.0 * math.pi * k / 8))))
+                      for k in range(8)])
+    rings = [[vadd(center, vmul(nrm, -0.0006))]] + rings + [[vadd(center, vmul(nrm, height))]]
+    pts = [p for r in rings for p in r]
+    return pts, _connect_rings(pts, rings)
+
+
+def _torus_local(center, R, r, axis, segs=10, sides=6):
+    """Torus ring (lace loop, speed hook, strap keeper) in local space."""
+    ax = norm(axis)
+    ref = vsub((0.0, 1.0, 0.0), vmul(ax, dot((0.0, 1.0, 0.0), ax)))
+    b1 = norm(ref) if dot(ref, ref) > 1e-8 else (1.0, 0.0, 0.0)
+    b2 = norm(cross(ax, b1))
+    n_seg, n_side = _segs(segs, 5), _segs(sides, 4)
+    rings = []
+    for s in range(n_seg):
+        a = 2.0 * math.pi * s / n_seg
+        c = vadd(center, vadd(vmul(b1, R * math.cos(a)), vmul(b2, R * math.sin(a))))
+        rad = norm(vadd(vmul(b1, math.cos(a)), vmul(b2, math.sin(a))))
+        rings.append([vadd(c, vadd(vmul(rad, r * math.cos(2.0 * math.pi * k / n_side)),
+                                   vmul(ax, r * math.sin(2.0 * math.pi * k / n_side))))
+                      for k in range(n_side)])
+    pts = [p for ring in rings for p in ring]
+    return pts, _connect_rings(pts, rings, closed=True)
+
+
+def _loop_tube_local(path, r, plane_normal, sides=6):
+    """Closed tube swept through a closed path lying in a plane."""
+    n = len(path)
+    hint = norm(plane_normal)
+    rings = []
+    for i, p in enumerate(path):
+        t = norm(vsub(path[(i + 1) % n], path[(i - 1) % n]))
+        b1 = vsub(hint, vmul(t, dot(hint, t)))
+        b1 = norm(b1) if dot(b1, b1) > 1e-10 else (1.0, 0.0, 0.0)
+        b2 = norm(cross(t, b1))
+        rings.append([vadd(p, vadd(vmul(b1, r * math.cos(2.0 * math.pi * k / sides)),
+                                   vmul(b2, r * math.sin(2.0 * math.pi * k / sides))))
+                      for k in range(sides)])
+    pts = [p for ring in rings for p in ring]
+    return pts, _connect_rings(pts, rings, closed=True)
+
+
+def _bow_loop_local(center, radius, elong, r, normal, up, squash):
+    """One tied-bow loop: a flattened oval tube plus its inboard twist."""
+    up_v = norm(vsub(up, vmul(normal, dot(up, normal))))
+    side_v = norm(cross(normal, up_v))
+    path = []
+    for k in range(14):
+        a = 2.0 * math.pi * k / 14
+        q = vadd(center, vadd(vmul(side_v, radius * math.cos(a)),
+                              vmul(up_v, radius * elong * math.sin(a))))
+        q = vadd(q, vmul(normal, -squash * (1.0 + math.cos(a)) * 0.5))
+        path.append(q)
+    return _loop_tube_local(path, r, normal, 6)
+
+
+def _band_local(path, normals, width, thick, closed=False, cap=True):
+    """Rectangular-section band (strap, tab, cuff bead) through local points."""
+    stations = []
+    n = len(path)
+    for i, p in enumerate(path):
+        t = norm(vsub(path[(i + 1) % n] if closed else path[min(n - 1, i + 1)],
+                     path[(i - 1) % n] if closed else path[max(0, i - 1)]))
+        nn = norm(normals[i])
+        side = norm(cross(nn, t))
+        stations.append([vadd(p, vadd(vmul(nn, thick * 0.5), vmul(side, width * 0.5))),
+                         vadd(p, vadd(vmul(nn, thick * 0.5), vmul(side, -width * 0.5))),
+                         vadd(p, vadd(vmul(nn, -thick * 0.5), vmul(side, -width * 0.5))),
+                         vadd(p, vadd(vmul(nn, -thick * 0.5), vmul(side, width * 0.5)))])
+    if not closed and cap:
+        stations = [[_ring_centre(stations[0])]] + stations + [[_ring_centre(stations[-1])]]
+    pts = [q for st in stations for q in st]
+    return pts, _connect_rings(pts, stations, closed=closed)
+
+
+def _buckle_local(center, normal, up, width, height, bar_r, prong=True):
+    """Small brass frame buckle (rectangular ring + spindle + prong)."""
+    nrm = norm(normal)
+    up_v = norm(vsub(up, vmul(nrm, dot(up, nrm))))
+    side_v = norm(cross(nrm, up_v))
+    hw, hh = width * 0.5, height * 0.5
+    c_out = vadd(center, vmul(nrm, bar_r * 0.9))
+    tl = vadd(vadd(c_out, vmul(up_v, hh)), vmul(side_v, -hw))
+    tr = vadd(vadd(c_out, vmul(up_v, hh)), vmul(side_v, hw))
+    br = vsub(vadd(c_out, vmul(side_v, hw)), vmul(up_v, hh))
+    bl = vsub(vadd(c_out, vmul(side_v, -hw)), vmul(up_v, hh))
+    parts = [_tube_local((a, b), (bar_r, bar_r), 6)
+             for a, b in ((tl, tr), (tr, br), (br, bl), (bl, tl))]
+    mid_l, mid_r = lerp(tl, bl, 0.5), lerp(tr, br, 0.5)
+    parts.append(_tube_local((mid_l, mid_r), (bar_r * 0.8, bar_r * 0.8), 6))
+    if prong:
+        base = lerp(mid_l, mid_r, 0.5)
+        tip = vadd(vadd(base, vmul(up_v, hh * 1.05)), vmul(nrm, bar_r * 1.1))
+        parts.append(_tube_local((base, tip), (bar_r * 0.7, bar_r * 0.45), 6))
+    return _merge(parts)
+
+
+def _panel_out_sign(grid, centre):
+    """+1 / -1 so panel_solid's outer face points away from `centre`."""
+    r0, c0 = len(grid) // 2, len(grid[0]) // 2
+    dr = vsub(grid[min(r0 + 1, len(grid) - 1)][c0], grid[max(r0 - 1, 0)][c0])
+    dc = vsub(grid[r0][min(c0 + 1, len(grid[0]) - 1)], grid[r0][max(c0 - 1, 0)])
+    return 1.0 if dot(cross(dr, dc), vsub(grid[r0][c0], centre)) >= 0.0 else -1.0
+
+
+def _foot_normal(z, s):
+    """Outward normal of the boot upper's surface at (station z, section s)."""
+    e = 0.004
+    p = boot_rig.foot_section_point(z, s)
+    dz = vsub(boot_rig.foot_section_point(z + e, s), boot_rig.foot_section_point(z - e, s))
+    ds = vsub(boot_rig.foot_section_point(z, min(1.0, s + 0.06)),
+              boot_rig.foot_section_point(z, max(-1.0, s - 0.06)))
+    nn = cross(ds, dz)
+    axis = (0.0, boot_rig.leather_bottom(z) + 0.015, z)
+    return norm(nn if dot(nn, vsub(p, axis)) >= 0.0 else vmul(nn, -1.0))
+
+
+def _shaft_axis(y):
+    """Point on the shaft's local centre line at height y."""
+    return (0.0, y, boot_rig.shaft_row(y)[3])
+
+
+def _shaft_arc(y, t0, t1, n, off):
+    """`n` sample points of the shaft surface between polar angles t0..t1."""
+    return [boot_rig.shaft_point(y, t0 + (t1 - t0) * k / (n - 1.0), off) for k in range(n)]
+
+
+def build_boot(side):
+    """Build one boot (side = +1 right / -1 left); `side` mirrors the local frame."""
+    label = "R" if side > 0 else "L"
+
+    def place(p):
+        return (side * (boot_rig.FOOT_X + p[0]), p[1], boot_rig.FOOT_Z + p[2])
+
+    flip = side < 0
+
+    def nm(name):
+        return f"Boots/{name}_{label}"
+
+    def stamp(mat, name, pts, fs, chain):
+        _stamp(mat, nm(name), pts, fs, place=place, flip=flip, orient=True,
+               part=(side, chain))
+
+    n_edge = _segs(4, 2)
+    n_col = _segs(24, 10)
+
+    # ---- 1. full-length sole slab ---------------------------------------
+    n_z = _segs(28, 12)
+    rings = []
+    for k in range(n_z):
+        z = Z_SOLE0 + (Z_SOLE1 - Z_SOLE0) * k / (n_z - 1.0)
+        rings.append(rect_ring(z, _sole_bot(z), _sole_top(z), _sole_half(z),
+                               taper=0.95, n_edge=n_edge))
+    loft_solid("BootSole", nm("Sole"), rings, place=place, flip=flip,
+               part=(side, "foot"))
+
+    # ---- 2. stacked heel laminations ------------------------------------
+    n_hz = _segs(11, 6)
+    h_layer = (boot_rig.HEEL_BLOCK_TOP - (HEEL_LAYERS - 1) * HEEL_GAP) / HEEL_LAYERS
+    for layer in range(HEEL_LAYERS):
+        y0 = layer * (h_layer + HEEL_GAP)
+        rings = []
+        for k in range(n_hz):
+            z = Z_SOLE0 + (boot_rig.HEEL_BREAST - Z_SOLE0) * k / (n_hz - 1.0)
+            half = _sole_half(z, HEEL_INSET, worn=False, floor=0.0040)
+            rings.append(rect_ring(z, y0, y0 + h_layer, half, taper=0.96, n_edge=n_edge))
+        loft_solid("BootSole", nm(f"Heel{layer + 1}"), rings, place=place, flip=flip,
+                   part=(side, "foot"))
+
+    # ---- 3. brass heel edge plate + nail heads --------------------------
+    heel_loop = _sole_loop(Z_SOLE0, boot_rig.HEEL_BREAST, _segs(24, 12),
+                           HEEL_INSET, worn=False)
+    plate = _slice_loop(heel_loop, lambda p: p[1] <= -0.0435)
+    sweep_loop("AgedBrass", nm("HeelPlate"), [(x, 0.0023, z) for (x, z) in plate],
+               _bead_profile(0.0018, 0.0018, 6), closed=False, place=place,
+               flip=flip, part=(side, "foot"))
+    i_back = min(range(len(plate)), key=lambda i: plate[i][1])
+    nails = []
+    for k in (-6, 0, 6):
+        x, z = plate[(i_back + k) % len(plate)]
+        nrm = norm((x, 0.0, z - sum(p[1] for p in plate) / len(plate)))
+        nails.append(_rivet_local((x, 0.0058, z + 0.0004), nrm, 0.0026, 0.0017))
+    stamp("AgedBrass", "HeelNails", *_merge(nails), "foot")
+
+    # ---- 4. welt bead + welt stitching ----------------------------------
+    arc = _slice_loop(_offset_loop(_sole_loop(boot_rig.FOOT_BACK, Z_SOLE1,
+                                              _segs(36, 15)), 0.0014),
+                      lambda p: p[1] >= boot_rig.HEEL_BREAST)
+    sweep_loop("Leather", nm("Welt"),
+               [(x, _sole_top(z) - 0.0012, z) for (x, z) in arc],
+               _bead_profile(0.0028, 0.0036), closed=False, place=place, flip=flip,
+               part=(side, "foot"))
+    stamp("BoneThread", "WeltStitch",
+          *_dash_local([(x, _sole_top(z) + 0.0026, z) for (x, z) in arc],
+                       30, 0.0016, 0.0075), "foot")
+
+    # ---- 5. vamp, toe cap, heel counter, throat seam --------------------
+    n_ring, n_flat = _segs(22, 8), _segs(5, 3)
+    vamp_z = _segs(24, 10)
+    rings = [boot_rig.foot_ring(boot_rig.FOOT_BACK
+                                + (boot_rig.FOOT_TIP - boot_rig.FOOT_BACK) * k / (vamp_z - 1.0),
+                                n_ring, n_flat) for k in range(vamp_z)]
+    loft_solid("Leather", nm("Vamp"), rings, place=place, flip=flip,
+               part=(side, "foot"))
+
+    rows, cols = _segs(9, 5), _segs(15, 7)
+    grid = []
+    for r in range(rows):
+        z = boot_rig.TOE_CAP_SEAM + (boot_rig.FOOT_TIP - boot_rig.TOE_CAP_SEAM) * \
+            (r / (rows - 1.0)) ** 0.92
+        grid.append([boot_rig.foot_section_point(z, -1.0 + 2.0 * c / (cols - 1.0),
+                                                 TOE_CAP_OFF) for c in range(cols)])
+    panel_solid("Leather", nm("ToeCap"), grid, 0.0024, place=place, flip=flip,
+                out_sign=_panel_out_sign(grid, (0.0, 0.024, boot_rig.TOE_CAP_SEAM)),
+                part=(side, "foot"))
+    for row_i, (dz, cnt) in enumerate(((0.0018, 13), (0.0086, 12))):
+        pts = [boot_rig.foot_section_point(boot_rig.TOE_CAP_SEAM - dz,
+                                           -0.97 + 1.94 * c / 12.0, 0.0028)
+               for c in range(13)]
+        stamp("BoneThread", f"ToeCapStitch{row_i + 1}",
+              *_dash_local(pts, cnt, 0.0017, 0.0080), "foot")
+
+    counter_ys = (0.0400, 0.0580, 0.0760, 0.0940)
+    counter_n = _segs(16, 8)
+    rings = [_contour_arc(boot_rig.foot_contour(y, _segs(48, 20), 0.0016),
+                          COUNTER_ZCUT, counter_n) for y in counter_ys]
+    rings = [r for r in rings if r]
+    loft_shell("Leather", nm("Counter"), rings, 0.0030, closed=False, place=place,
+               flip=flip, part=(side, "foot"))
+    stamp("BoneThread", "CounterStitch",
+          *_dash_local(_slice_loop(boot_rig.foot_contour(0.0880, _segs(36, 14), 0.0028),
+                                   lambda p: p[2] <= COUNTER_ZCUT + 0.004),
+                       16, 0.0016, 0.0070), "foot")
+    throat = boot_rig.foot_contour(0.1065, _segs(36, 14), 0.0018)
+    stamp("BoneThread", "ThroatSeam", *_dash_local(throat + [throat[0]], 18, 0.0016, 0.0070),
+          "foot")
+
+    # ---- 6. shaft: ankle tube, laced upper, facings, tongue, hardware ----
+    rings = [boot_rig.shaft_ring(y, n=n_col, gap=0.0)[0]
+             for y in (0.0950, 0.1000, 0.1060, 0.1120, 0.1180)]
+    loft_shell("Leather", nm("ShaftAnkle"), rings, boot_rig.SHAFT_THICK,
+               closed=True, place=place, flip=flip, part=(side, "shaft"))
+
+    ys_up = (0.1180, 0.1300, 0.1500, 0.1800, 0.2200, 0.2600, 0.3000, 0.3400,
+             0.3800, 0.4200, 0.4550)
+    rings = [boot_rig.shaft_ring(y, n=n_col)[0] for y in ys_up]
+    loft_shell("Leather", nm("Shaft"), rings, boot_rig.SHAFT_THICK, closed=False,
+               place=place, flip=flip, part=(side, "shaft"))
+
+    ys_f = (0.1220, 0.1600, 0.2000, 0.2400, 0.2800, 0.3200, 0.3600, 0.4000, 0.4400, 0.4550)
+    for sgn, tag in ((1.0, "Out"), (-1.0, "In")):
+        grid = []
+        for y in ys_f:
+            half_w = max(0.020, boot_rig.shaft_row(y)[1])
+            dgap = boot_rig.EYELET_FACING_W / half_w
+            gap = boot_rig.shaft_row(y)[4]
+            grid.append([boot_rig.shaft_point(y, sgn * (gap + dgap * k / 5.0), 0.0020)
+                         for k in range(6)])
+        panel_solid("Leather", nm(f"Facing{tag}"), grid, 0.0026, place=place, flip=flip,
+                    out_sign=_panel_out_sign(grid, _shaft_axis(grid[len(grid) // 2][0][1])),
+                    part=(side, "shaft"))
+
+    tongue_ys = (0.1220, 0.1700, 0.2200, 0.2700, 0.3180)
+    grid = [[boot_rig.shaft_point(y, -0.34 + 0.68 * k / 5.0, -0.0016) for k in range(6)]
+            for y in tongue_ys]
+    panel_solid("Leather", nm("Tongue"), grid, 0.0028, place=place, flip=flip,
+                out_sign=_panel_out_sign(grid, _shaft_axis(0.22)), part=(side, "shaft"))
+
+    for i, y in enumerate(boot_rig.EYELET_Y):
+        parts = []
+        for sgn in (1.0, -1.0):
+            t = sgn * (boot_rig.shaft_row(y)[4] + 0.0055)
+            parts.append(_rivet_local(boot_rig.shaft_point(y, t, 0.0032),
+                                      boot_rig.shaft_outer_normal(y, t), 0.0034, 0.0022))
+        stamp("AgedBrass", f"EyeletRow{i + 1}", *_merge(parts), "shaft")
+    for i, y in enumerate(boot_rig.HOOK_Y):
+        parts = []
+        for sgn in (1.0, -1.0):
+            t = sgn * (boot_rig.shaft_row(y)[4] + 0.0055)
+            p = boot_rig.shaft_point(y, t, 0.0030)
+            nrm = boot_rig.shaft_outer_normal(y, t)
+            parts.append(_rivet_local(p, nrm, 0.0030, 0.0020))
+            parts.append(_torus_local(vadd(p, vmul(nrm, 0.0026)), 0.0044, 0.0013, nrm, 9, 6))
+        stamp("AgedBrass", f"HookRow{i + 1}", *_merge(parts), "shaft")
+
+    lace_rows = tuple(boot_rig.EYELET_Y) + tuple(boot_rig.HOOK_Y)
+    segs = []
+    for g in range(len(lace_rows) - 1):
+        y0, y1 = lace_rows[g], lace_rows[g + 1]
+        for sgn in (1.0, -1.0):
+            pts = []
+            for k in range(5):
+                u = k / 4.0
+                y = y0 + (y1 - y0) * u
+                t = sgn * (boot_rig.shaft_row(y)[4] + 0.0060) * (1.0 - 2.0 * u)
+                pts.append(boot_rig.shaft_point(y, t,
+                                                0.0032 + 0.0022 * math.sin(math.pi * u)))
+            segs.append(_tube_local(pts, 0.0019, 5))
+    stamp("BoneThread", "Laces", *_merge(segs), "shaft")
+
+    yb = boot_rig.LACE_BOW_Y
+    bow = boot_rig.shaft_point(yb, 0.0, 0.0050)
+    bow_n = boot_rig.shaft_outer_normal(yb, 0.0)
+    up_v = norm(vsub((0.0, 1.0, 0.0), vmul(bow_n, dot((0.0, 1.0, 0.0), bow_n))))
+    side_v = norm(cross(bow_n, up_v))
+    # tied bow: a knot, two loops lying flat against the shaft and two loose
+    # lace ends hanging down the tongue
+    bow_parts = [_rivet_local(bow, bow_n, 0.0055, 0.0048)]
+    for sgn in (1.0, -1.0):
+        bow_parts.append(_bow_loop_local(
+            vadd(vadd(bow, vmul(side_v, sgn * 0.0126)), vmul(up_v, 0.0042)),
+            0.0112, 0.74, 0.0019, bow_n, up_v, 0.0032))
+        a = vadd(vadd(bow, vmul(side_v, sgn * 0.0052)), vmul(up_v, -0.0022))
+        b = vadd(vadd(vadd(bow, vmul(side_v, sgn * 0.0110)), vmul(up_v, -0.0120)),
+                 vmul(bow_n, 0.0022))
+        c = vadd(vadd(vadd(bow, vmul(side_v, sgn * 0.0086)), vmul(up_v, -0.0225)),
+                 vmul(bow_n, -0.0004))
+        d = vadd(vadd(vadd(bow, vmul(side_v, sgn * 0.0118)), vmul(up_v, -0.0305)),
+                 vmul(bow_n, 0.0014))
+        bow_parts.append(_tube_local((a, b, c, d), (0.0019, 0.0017, 0.0014, 0.0010), 5))
+    stamp("ClothAccent", "LaceBow", *_merge(bow_parts), "shaft")
+
+    # ---- 7. folded wine cuff, lining, pull tab --------------------------
+    rings = []
+    for y, off in ((0.4545, 0.0022), (0.4620, 0.0060), (0.4470, 0.0074), (0.4335, 0.0050)):
+        gap = boot_rig.shaft_row(y)[4]
+        rings.append([boot_rig.shaft_point(y, gap + (2.0 * math.pi - 2.0 * gap) * k / (n_col - 1.0), off)
+                      for k in range(n_col)])
+    loft_shell("ClothAccent", nm("CuffFold"), rings, 0.0026, closed=False, place=place,
+               flip=flip, part=(side, "shaft"))
+    rings = []
+    for y, off in ((0.4180, -0.0056), (0.4400, -0.0052), (0.4550, -0.0048)):
+        gap = boot_rig.shaft_row(y)[4]
+        rings.append([boot_rig.shaft_point(y, gap + (2.0 * math.pi - 2.0 * gap) * k / (n_col - 1.0), off)
+                      for k in range(n_col)])
+    loft_shell("ClothAccent", nm("CuffLining"), rings, 0.0014, closed=False, place=place,
+               flip=flip, part=(side, "shaft"))
+
+    tab_a = boot_rig.shaft_point(0.4430, math.pi, 0.0020)
+    tab_b = vadd(boot_rig.shaft_point(0.4650, math.pi, 0.0022), (0.0, 0.0, -0.0060))
+    tab_c = vadd(boot_rig.shaft_point(0.4520, math.pi, 0.0018), (0.0, 0.0, -0.0100))
+    stamp("Leather", "PullTab",
+          *_band_local([tab_a, tab_b, tab_c],
+                       [norm((0.0, 0.30, -1.0)), norm((0.0, 0.75, -1.0)),
+                        norm((0.0, -0.35, -1.0))], 0.015, 0.0032), "shaft")
+    stamp("AgedBrass", "PullTabRivet",
+          *_rivet_local(vadd(tab_a, (0.0, -0.0028, -0.0006)), norm((0.0, 0.15, -1.0)),
+                        0.0032, 0.0022), "shaft")
+
+    # ---- 8. instep strap, keepers, buckles, calf strap -------------------
+    z_s, n_s = boot_rig.INSTEP_STRAP_Y, 13
+    s_list = [-1.0 + 2.0 * k / (n_s - 1.0) for k in range(n_s)]
+    path = [boot_rig.foot_section_point(z_s, s, 0.0026) for s in s_list]
+    normals = [_foot_normal(z_s, s) for s in s_list]
+    stamp("Leather", "InstepStrap", *_band_local(path, normals, 0.016, 0.0030), "foot")
+    stamp("BoneThread", "InstepStrapStitch",
+          *_dash_local([vadd(p, vmul(nn, 0.0018)) for p, nn in zip(path, normals)],
+                       14, 0.0014, 0.0065), "foot")
+
+    s_b = 0.52                       # buckle rides the outboard crest of the instep
+    p_b = boot_rig.foot_section_point(z_s, s_b, 0.0026)
+    n_b = _foot_normal(z_s, s_b)
+    up_b = norm(vsub(boot_rig.foot_section_point(z_s, s_b + 0.12, 0.0026),
+                     boot_rig.foot_section_point(z_s, s_b - 0.12, 0.0026)))
+    stamp("AgedBrass", "InstepBuckle", *_buckle_local(p_b, n_b, up_b, 0.0125, 0.0190, 0.0022),
+          "foot")
+    p_k = boot_rig.foot_section_point(z_s, -0.52, 0.0032)
+    stamp("AgedBrass", "InstepKeeper",
+          *_torus_local(p_k, 0.0058, 0.0014, _foot_normal(z_s, -0.52), 9, 6), "foot")
+
+    y_c = boot_rig.CUFF_STRAP_Y
+    ts = [2.0 * math.pi * k / n_col for k in range(n_col)]
+    path = [boot_rig.shaft_point(y_c, t, 0.0026) for t in ts]
+    normals = [boot_rig.shaft_outer_normal(y_c, t) for t in ts]
+    stamp("Leather", "CuffStrap", *_band_local(path, normals, 0.015, 0.0030, closed=True),
+          "shaft")
+    p_cb = boot_rig.shaft_point(y_c, math.pi * 0.5, 0.0060)
+    stamp("AgedBrass", "CuffBuckle",
+          *_buckle_local(p_cb, boot_rig.shaft_outer_normal(y_c, math.pi * 0.5),
+                         (0.0, 1.0, 0.0), 0.0150, 0.0195, 0.0022), "shaft")
+
+
+for side in (1, -1):
+    build_boot(side)
+
+
+# =========================================================================
 # EXPORT BUFFERS IN STABLE ORDER
 # =========================================================================
 
@@ -2249,10 +3058,48 @@ rig = {
          "start": offsets[p["mat"]] + p["start"],
          "end": offsets[p["mat"]] + p["end"],
          "side": p["side"], "chain": p["chain"]}
-        for p in RIG_PARTS
+        for p in RIG_PARTS if p["name"].startswith("Hand/")
     ],
 }
 with open(rig_path, "w", encoding="utf-8") as f:
     json.dump(rig, f, indent=1)
+
+# --- boot rig sidecar: leg/boot joints + boot part ranges -----------------
+boot_path = os.path.join(OUT, f"SM_Character_VeilboundWayfarer{SUFFIX}.bootrig.json")
+boot_rig_data = {
+    "format": "vespershade.bootrig/1",
+    "mesh": os.path.basename(obj_path),
+    "units": "metres", "up": "Y", "character_faces": "+Z",
+    "bind_pose": "identity (mesh authored in bind pose; zero-rotation FK "
+                 "reproduces the OBJ exactly)",
+    "floor": {"contact_plane_y": 0.0,
+              "contact_patch_min_mm": 40.0,
+              "contact_patch_tol_mm": 1.5,
+              "note": "sole ground faces and the heel laminations are authored "
+                      "exactly at y = 0; the shank is lifted between the heel "
+                      "breast and the ball and the toe springs up over the last "
+                      "25 mm, so a planted boot always has a flat contact patch "
+                      "and never clips the floor"},
+    "default_bone": "Root (any vertex outside the parts list binds 100% to Root)",
+    "weights": "computed deterministically from vertex positions by "
+               "Tools/boot_rig.py:weights_for(side, chain, point)",
+    "bones": [
+        {"name": name, "parent": parent, "head": [round(c, 6) for c in head],
+         **(dict(axes={k: [round(c, 6) for c in v] for k, v in axes.items()},
+                 axis_convention="flex + = dorsiflexion / forward swing, "
+                                 "abd + = outboard, twist + = toes out")
+            if axes else {})}
+        for (name, parent, head, axes) in boot_rig.joint_list()
+    ],
+    "parts": [
+        {"name": p["name"], "mat": p["mat"],
+         "start": offsets[p["mat"]] + p["start"],
+         "end": offsets[p["mat"]] + p["end"],
+         "side": p["side"], "chain": p["chain"]}
+        for p in RIG_PARTS if p["name"].startswith("Boots/")
+    ],
+}
+with open(boot_path, "w", encoding="utf-8") as f:
+    json.dump(boot_rig_data, f, indent=1)
 
 print(f"Wrote {obj_path}: {sum(map(len, verts.values()))} vertices, {sum(map(len, faces.values()))} triangles, {len(MATERIALS)} material regions")

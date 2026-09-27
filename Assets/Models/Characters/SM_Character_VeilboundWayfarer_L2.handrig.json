@@ -1102,528 +1102,528 @@
   {
    "name": "Hand/Glove/Gauntlet_L",
    "mat": "Leather",
-   "start": 2877,
-   "end": 2919,
+   "start": 2839,
+   "end": 2881,
    "side": "L",
    "chain": "cuff"
   },
   {
    "name": "Hand/Glove/GauntletStitch_L",
    "mat": "BoneThread",
-   "start": 18747,
-   "end": 18777,
+   "start": 21601,
+   "end": 21631,
    "side": "L",
    "chain": "cuff"
   },
   {
    "name": "Hand/Skin/Palm_L",
    "mat": "Skin",
-   "start": 12542,
-   "end": 12664,
+   "start": 14820,
+   "end": 14942,
    "side": "L",
    "chain": "palm"
   },
   {
    "name": "Hand/Skin/Index_L",
    "mat": "Skin",
-   "start": 12664,
-   "end": 12726,
+   "start": 14942,
+   "end": 15004,
    "side": "L",
    "chain": "digit0"
   },
   {
    "name": "Hand/Skin/Middle_L",
    "mat": "Skin",
-   "start": 12726,
-   "end": 12788,
+   "start": 15004,
+   "end": 15066,
    "side": "L",
    "chain": "digit1"
   },
   {
    "name": "Hand/Skin/Ring_L",
    "mat": "Skin",
-   "start": 12788,
-   "end": 12850,
+   "start": 15066,
+   "end": 15128,
    "side": "L",
    "chain": "digit2"
   },
   {
    "name": "Hand/Skin/Little_L",
    "mat": "Skin",
-   "start": 12850,
-   "end": 12912,
+   "start": 15128,
+   "end": 15190,
    "side": "L",
    "chain": "digit3"
   },
   {
    "name": "Hand/Skin/Thumb_L",
    "mat": "Skin",
-   "start": 12912,
-   "end": 12968,
+   "start": 15190,
+   "end": 15246,
    "side": "L",
    "chain": "thumb"
   },
   {
    "name": "Hand/Glove/PalmStall_L",
    "mat": "Leather",
-   "start": 2919,
-   "end": 3041,
+   "start": 2881,
+   "end": 3003,
    "side": "L",
    "chain": "palm"
   },
   {
    "name": "Hand/Glove/IndexStall_L",
    "mat": "Leather",
-   "start": 3041,
-   "end": 3103,
+   "start": 3003,
+   "end": 3065,
    "side": "L",
    "chain": "digit0"
   },
   {
    "name": "Hand/Glove/MiddleStall_L",
    "mat": "Leather",
-   "start": 3103,
-   "end": 3165,
+   "start": 3065,
+   "end": 3127,
    "side": "L",
    "chain": "digit1"
   },
   {
    "name": "Hand/Glove/RingStall_L",
    "mat": "Leather",
-   "start": 3165,
-   "end": 3227,
+   "start": 3127,
+   "end": 3189,
    "side": "L",
    "chain": "digit2"
   },
   {
    "name": "Hand/Glove/LittleStall_L",
    "mat": "Leather",
-   "start": 3227,
-   "end": 3289,
+   "start": 3189,
+   "end": 3251,
    "side": "L",
    "chain": "digit3"
   },
   {
    "name": "Hand/Glove/ThumbStall_L",
    "mat": "Leather",
-   "start": 3289,
-   "end": 3345,
+   "start": 3251,
+   "end": 3307,
    "side": "L",
    "chain": "thumb"
   },
   {
    "name": "Hand/Glove/Bridge_L",
    "mat": "Leather",
-   "start": 3345,
-   "end": 3393,
+   "start": 3307,
+   "end": 3355,
    "side": "L",
    "chain": "bridge"
   },
   {
    "name": "Hand/Glove/IndexSeam_L",
    "mat": "Leather",
-   "start": 3393,
-   "end": 3411,
+   "start": 3355,
+   "end": 3373,
    "side": "L",
    "chain": "digit0"
   },
   {
    "name": "Hand/Glove/MiddleSeam_L",
    "mat": "Leather",
-   "start": 3411,
-   "end": 3429,
+   "start": 3373,
+   "end": 3391,
    "side": "L",
    "chain": "digit1"
   },
   {
    "name": "Hand/Glove/RingSeam_L",
    "mat": "Leather",
-   "start": 3429,
-   "end": 3447,
+   "start": 3391,
+   "end": 3409,
    "side": "L",
    "chain": "digit2"
   },
   {
    "name": "Hand/Glove/LittleSeam_L",
    "mat": "Leather",
-   "start": 3447,
-   "end": 3465,
+   "start": 3409,
+   "end": 3427,
    "side": "L",
    "chain": "digit3"
   },
   {
    "name": "Hand/Glove/ThumbSeam_L",
    "mat": "Leather",
-   "start": 3465,
-   "end": 3479,
+   "start": 3427,
+   "end": 3441,
    "side": "L",
    "chain": "thumb"
   },
   {
    "name": "Hand/Glove/Web0_L",
    "mat": "Leather",
-   "start": 3479,
-   "end": 3493,
+   "start": 3441,
+   "end": 3455,
    "side": "L",
    "chain": "web0"
   },
   {
    "name": "Hand/Glove/Web1_L",
    "mat": "Leather",
-   "start": 3493,
-   "end": 3507,
+   "start": 3455,
+   "end": 3469,
    "side": "L",
    "chain": "web1"
   },
   {
    "name": "Hand/Glove/Web2_L",
    "mat": "Leather",
-   "start": 3507,
-   "end": 3521,
+   "start": 3469,
+   "end": 3483,
    "side": "L",
    "chain": "web2"
   },
   {
    "name": "Hand/Glove/ThumbWeb_L",
    "mat": "Leather",
-   "start": 3521,
-   "end": 3535,
+   "start": 3483,
+   "end": 3497,
    "side": "L",
    "chain": "webT"
   },
   {
    "name": "Hand/Glove/KnuckleGuard_L",
    "mat": "Leather",
-   "start": 3535,
-   "end": 3571,
+   "start": 3497,
+   "end": 3533,
    "side": "L",
    "chain": "guard"
   },
   {
    "name": "Hand/Glove/KnuckleGuardStitch_L",
    "mat": "BoneThread",
-   "start": 18777,
-   "end": 18797,
+   "start": 21631,
+   "end": 21651,
    "side": "L",
    "chain": "guard"
   },
   {
    "name": "Hand/Glove/KnuckleGuardStitch_L",
    "mat": "BoneThread",
-   "start": 18797,
-   "end": 18817,
+   "start": 21651,
+   "end": 21671,
    "side": "L",
    "chain": "guard"
   },
   {
    "name": "Hand/Glove/KnuckleRidge_Index_L",
    "mat": "Leather",
-   "start": 3571,
-   "end": 3585,
+   "start": 3533,
+   "end": 3547,
    "side": "L",
    "chain": "guard"
   },
   {
    "name": "Hand/Glove/KnuckleRidge_Middle_L",
    "mat": "Leather",
-   "start": 3585,
-   "end": 3599,
+   "start": 3547,
+   "end": 3561,
    "side": "L",
    "chain": "guard"
   },
   {
    "name": "Hand/Glove/KnuckleRidge_Ring_L",
    "mat": "Leather",
-   "start": 3599,
-   "end": 3613,
+   "start": 3561,
+   "end": 3575,
    "side": "L",
    "chain": "guard"
   },
   {
    "name": "Hand/Glove/KnuckleRidge_Little_L",
    "mat": "Leather",
-   "start": 3613,
-   "end": 3627,
+   "start": 3575,
+   "end": 3589,
    "side": "L",
    "chain": "guard"
   },
   {
    "name": "Hand/Glove/WristStrap_L",
    "mat": "Leather",
-   "start": 3627,
-   "end": 3679,
+   "start": 3589,
+   "end": 3641,
    "side": "L",
    "chain": "cuff"
   },
   {
    "name": "Hand/Glove/WristButton_L",
    "mat": "AgedBrass",
-   "start": 16311,
-   "end": 16359,
+   "start": 17869,
+   "end": 17917,
    "side": "L",
    "chain": "cuff"
   },
   {
    "name": "Hand/Glove/Gauntlet_R",
    "mat": "Leather",
-   "start": 3679,
-   "end": 3721,
+   "start": 3641,
+   "end": 3683,
    "side": "R",
    "chain": "cuff"
   },
   {
    "name": "Hand/Glove/GauntletStitch_R",
    "mat": "BoneThread",
-   "start": 18889,
-   "end": 18919,
+   "start": 21743,
+   "end": 21773,
    "side": "R",
    "chain": "cuff"
   },
   {
    "name": "Hand/Skin/Palm_R",
    "mat": "Skin",
-   "start": 12968,
-   "end": 13090,
+   "start": 15246,
+   "end": 15368,
    "side": "R",
    "chain": "palm"
   },
   {
    "name": "Hand/Skin/Index_R",
    "mat": "Skin",
-   "start": 13090,
-   "end": 13152,
+   "start": 15368,
+   "end": 15430,
    "side": "R",
    "chain": "digit0"
   },
   {
    "name": "Hand/Skin/Middle_R",
    "mat": "Skin",
-   "start": 13152,
-   "end": 13214,
+   "start": 15430,
+   "end": 15492,
    "side": "R",
    "chain": "digit1"
   },
   {
    "name": "Hand/Skin/Ring_R",
    "mat": "Skin",
-   "start": 13214,
-   "end": 13276,
+   "start": 15492,
+   "end": 15554,
    "side": "R",
    "chain": "digit2"
   },
   {
    "name": "Hand/Skin/Little_R",
    "mat": "Skin",
-   "start": 13276,
-   "end": 13338,
+   "start": 15554,
+   "end": 15616,
    "side": "R",
    "chain": "digit3"
   },
   {
    "name": "Hand/Skin/Thumb_R",
    "mat": "Skin",
-   "start": 13338,
-   "end": 13394,
+   "start": 15616,
+   "end": 15672,
    "side": "R",
    "chain": "thumb"
   },
   {
    "name": "Hand/Glove/PalmStall_R",
    "mat": "Leather",
-   "start": 3721,
-   "end": 3843,
+   "start": 3683,
+   "end": 3805,
    "side": "R",
    "chain": "palm"
   },
   {
    "name": "Hand/Glove/IndexStall_R",
    "mat": "Leather",
-   "start": 3843,
-   "end": 3905,
+   "start": 3805,
+   "end": 3867,
    "side": "R",
    "chain": "digit0"
   },
   {
    "name": "Hand/Glove/MiddleStall_R",
    "mat": "Leather",
-   "start": 3905,
-   "end": 3967,
+   "start": 3867,
+   "end": 3929,
    "side": "R",
    "chain": "digit1"
   },
   {
    "name": "Hand/Glove/RingStall_R",
    "mat": "Leather",
-   "start": 3967,
-   "end": 4029,
+   "start": 3929,
+   "end": 3991,
    "side": "R",
    "chain": "digit2"
   },
   {
    "name": "Hand/Glove/LittleStall_R",
    "mat": "Leather",
-   "start": 4029,
-   "end": 4091,
+   "start": 3991,
+   "end": 4053,
    "side": "R",
    "chain": "digit3"
   },
   {
    "name": "Hand/Glove/ThumbStall_R",
    "mat": "Leather",
-   "start": 4091,
-   "end": 4147,
+   "start": 4053,
+   "end": 4109,
    "side": "R",
    "chain": "thumb"
   },
   {
    "name": "Hand/Glove/Bridge_R",
    "mat": "Leather",
-   "start": 4147,
-   "end": 4195,
+   "start": 4109,
+   "end": 4157,
    "side": "R",
    "chain": "bridge"
   },
   {
    "name": "Hand/Glove/IndexSeam_R",
    "mat": "Leather",
-   "start": 4195,
-   "end": 4213,
+   "start": 4157,
+   "end": 4175,
    "side": "R",
    "chain": "digit0"
   },
   {
    "name": "Hand/Glove/MiddleSeam_R",
    "mat": "Leather",
-   "start": 4213,
-   "end": 4231,
+   "start": 4175,
+   "end": 4193,
    "side": "R",
    "chain": "digit1"
   },
   {
    "name": "Hand/Glove/RingSeam_R",
    "mat": "Leather",
-   "start": 4231,
-   "end": 4249,
+   "start": 4193,
+   "end": 4211,
    "side": "R",
    "chain": "digit2"
   },
   {
    "name": "Hand/Glove/LittleSeam_R",
    "mat": "Leather",
-   "start": 4249,
-   "end": 4267,
+   "start": 4211,
+   "end": 4229,
    "side": "R",
    "chain": "digit3"
   },
   {
    "name": "Hand/Glove/ThumbSeam_R",
    "mat": "Leather",
-   "start": 4267,
-   "end": 4281,
+   "start": 4229,
+   "end": 4243,
    "side": "R",
    "chain": "thumb"
   },
   {
    "name": "Hand/Glove/Web0_R",
    "mat": "Leather",
-   "start": 4281,
-   "end": 4295,
+   "start": 4243,
+   "end": 4257,
    "side": "R",
    "chain": "web0"
   },
   {
    "name": "Hand/Glove/Web1_R",
    "mat": "Leather",
-   "start": 4295,
-   "end": 4309,
+   "start": 4257,
+   "end": 4271,
    "side": "R",
    "chain": "web1"
   },
   {
    "name": "Hand/Glove/Web2_R",
    "mat": "Leather",
-   "start": 4309,
-   "end": 4323,
+   "start": 4271,
+   "end": 4285,
    "side": "R",
    "chain": "web2"
   },
   {
    "name": "Hand/Glove/ThumbWeb_R",
    "mat": "Leather",
-   "start": 4323,
-   "end": 4337,
+   "start": 4285,
+   "end": 4299,
    "side": "R",
    "chain": "webT"
   },
   {
    "name": "Hand/Glove/KnuckleGuard_R",
    "mat": "Leather",
-   "start": 4337,
-   "end": 4373,
+   "start": 4299,
+   "end": 4335,
    "side": "R",
    "chain": "guard"
   },
   {
    "name": "Hand/Glove/KnuckleGuardStitch_R",
    "mat": "BoneThread",
-   "start": 18919,
-   "end": 18939,
+   "start": 21773,
+   "end": 21793,
    "side": "R",
    "chain": "guard"
   },
   {
    "name": "Hand/Glove/KnuckleGuardStitch_R",
    "mat": "BoneThread",
-   "start": 18939,
-   "end": 18959,
+   "start": 21793,
+   "end": 21813,
    "side": "R",
    "chain": "guard"
   },
   {
    "name": "Hand/Glove/KnuckleRidge_Index_R",
    "mat": "Leather",
-   "start": 4373,
-   "end": 4387,
+   "start": 4335,
+   "end": 4349,
    "side": "R",
    "chain": "guard"
   },
   {
    "name": "Hand/Glove/KnuckleRidge_Middle_R",
    "mat": "Leather",
-   "start": 4387,
-   "end": 4401,
+   "start": 4349,
+   "end": 4363,
    "side": "R",
    "chain": "guard"
   },
   {
    "name": "Hand/Glove/KnuckleRidge_Ring_R",
    "mat": "Leather",
-   "start": 4401,
-   "end": 4415,
+   "start": 4363,
+   "end": 4377,
    "side": "R",
    "chain": "guard"
   },
   {
    "name": "Hand/Glove/KnuckleRidge_Little_R",
    "mat": "Leather",
-   "start": 4415,
-   "end": 4429,
+   "start": 4377,
+   "end": 4391,
    "side": "R",
    "chain": "guard"
   },
   {
    "name": "Hand/Glove/WristStrap_R",
    "mat": "Leather",
-   "start": 4429,
-   "end": 4481,
+   "start": 4391,
+   "end": 4443,
    "side": "R",
    "chain": "cuff"
   },
   {
    "name": "Hand/Glove/WristBuckle_R",
    "mat": "AgedBrass",
-   "start": 16503,
-   "end": 16563,
+   "start": 18061,
+   "end": 18121,
    "side": "R",
    "chain": "cuff"
   }
