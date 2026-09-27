@@ -11,6 +11,29 @@ the shells around elbows, shoulders, waist, knees and ankles. The silhouette
 is asymmetric by design (left-over-right closure, deeper left shoulder
 mantle, single baldric, offset buckles, unequal coat tails).
 
+High-value physical details included:
+- Seams: spine seam, princess seams, shoulder seams, sleeve seams, trouser seams,
+  vent pleats, welt ridges.
+- Stitching: double saddle-stitch dashes along lapels, mantle hem, belt borders,
+  pouch flap, baldric, toe cap, boot shaft spine, elbow patch, and glove cuffs.
+- Buttons: aged brass crested greatcoat tail buttons, shoulder epaulette buttons,
+  waistcoat buttons with thread stitches, sleeve cuff button trios, pocket flap buttons.
+- Buckles: front belt frame buckle + prong, chest baldric adjustment buckle,
+  rear baldric slider, dual boot instep & calf buckles, dual wrist cinch buckles,
+  and high collar throat tab buckle.
+- Straps: cinched leather waist belt, cross-body baldric, compass drop strap,
+  boot instep & calf straps, wrist cinch straps, shoulder epaulettes, rear martingale.
+- Cloth edges: bound hem piping along coat skirts, lapels, collar, turned-back cuffs,
+  and mantle hem.
+- Layered collars: 4-tier collar structure (shirt collar band, cravat & brooch,
+  standing greatcoat collar with facing & throat tab, and mantle cowl drape).
+- Small metal fasteners: brass frog clasps down torso, mantle shoulder pins,
+  belt eyelets/grommets, D-rings, boot speed hooks/eyelets, cravat brooch, compass rings.
+- Subtle leather panels: shoulder yoke tabs, elbow reinforcement patch,
+  multi-piece boot vamp/counter/toe cap/shaft, pocket flaps, and reinforced gauntlets.
+- Small decorative elements: gothic navigational astrolabe/compass, hip mourning tassel,
+  watch fob chain, rear coat tail pleat buttons.
+
 Running this script writes only
 Assets/Models/Characters/SM_Character_VeilboundWayfarer.obj and its MTL.
 
@@ -58,7 +81,10 @@ def cross(a, b): return (a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1
 def norm(a):
     l = math.sqrt(dot(a, a))
     return vmul(a, 1.0/l) if l > 1e-9 else (0.0, 1.0, 0.0)
-def lerp(a, b, t): return vmul(a, 1.0-t) + vmul(b, t) if False else tuple(a[i]*(1.0-t)+b[i]*t for i in range(len(a)))
+def lerp(a, b, t):
+    if isinstance(a, (int, float)):
+        return a * (1.0 - t) + b * t
+    return tuple(a[i]*(1.0-t)+b[i]*t for i in range(len(a)))
 def clamp(x, lo, hi): return max(lo, min(hi, x))
 def smoothstep(e0, e1, x):
     t = clamp((x-e0)/(e1-e0), 0.0, 1.0)
@@ -83,12 +109,10 @@ def add_mesh(mat, name, points, polys):
     faces[mat].extend(tuple(base+i for i in face) for face in polys)
 
 # ---------------------------------------------------------------------------
-# Solid-surface construction kit: every garment piece is a closed cloth solid
-# (outer face + offset inner lining face + bound edge rims).
+# Solid-surface construction kit
 # ---------------------------------------------------------------------------
 
 def add_quad_strip(ptsA, ptsB, closed, flip=False):
-    """Stitch two equal-length point rows into triangles."""
     n = len(ptsA)
     rng = range(n) if closed else range(n-1)
     fs = []
@@ -103,20 +127,20 @@ def add_quad_strip(ptsA, ptsB, closed, flip=False):
 def quad_grid(pts, rows, cols, closed_cols, flip=False):
     fs = []
     rng = range(cols) if closed_cols else range(cols-1)
-    for r in range(rows-1):
+    for r in range(rows - 1):
         for c in rng:
-            cn = (c+1) % cols
-            t = (pts[r*cols+c], pts[r*cols+cn], pts[(r+1)*cols+cn])
-            fs.append(t[::-1] if flip else t)
-            t2 = (pts[r*cols+c], pts[(r+1)*cols+cn], pts[(r+1)*cols+c])
+            c_next = (c + 1) % cols
+            i00 = r * cols + c; i01 = r * cols + c_next
+            i10 = (r + 1) * cols + c; i11 = (r + 1) * cols + c_next
+            t1 = (i00, i10, i11); t2 = (i00, i11, i01)
+            fs.append(t1[::-1] if flip else t1)
             fs.append(t2[::-1] if flip else t2)
     return fs
 
 def shell_point(y, rx, rz, zc, a, dr, dy, dz):
-    """Point on an elliptical ring plus radial/axial cloth displacement."""
-    x = rx*math.sin(a)
-    z = zc + rz*math.cos(a)
-    r = math.hypot(x, z-zc)
+    x = rx * math.sin(a)
+    z = zc + rz * math.cos(a)
+    r = math.hypot(x, z - zc)
     if r > 1e-9:
         ux, uz = x/r, (z-zc)/r
     else:
@@ -126,14 +150,6 @@ def shell_point(y, rx, rz, zc, a, dr, dy, dz):
 def thick_ring_shell(mat, name, rows, thick, sides, a0, a1,
                      wrap=False, rim_start=True, rim_end=True, fold=None,
                      center=(0.0, 0.0, 0.0), radial_extra=None):
-    """A garment slab swept over elliptical rings.
-
-    rows: callables a -> (y, rx, rz, zc[, a0, a1])
-    Builds the outer face, an inner lining face offset inward by `thick`,
-    and closed rims along both vertical edges (a0/a1) and optionally the
-    first/last horizontal edge (hems). `fold(a, row_idx)` -> (dr, dy, dz)
-    displaces outer and lining identically so thickness stays constant.
-    """
     sides = _segs(sides, 6)
     n_cols = sides if wrap else sides + 1
     outer, inner = [], []
@@ -146,7 +162,7 @@ def thick_ring_shell(mat, name, rows, thick, sides, a0, a1,
         ra0, ra1 = row_spans[ri]
         orow, irow = [], []
         for cj in range(n_cols):
-            a = ra0 + (ra1 - ra0) * (cj / sides)
+            a = ra0 + (ra1 - ra0) * (cj / float(sides))
             y, rx, rz, zc = row_fn(a)[:4]
             if radial_extra:
                 extra = radial_extra(a, ri)
@@ -169,20 +185,25 @@ def thick_ring_shell(mat, name, rows, thick, sides, a0, a1,
             cn = (c+1) % n_cols
             i00 = r*n_cols+c; i01 = r*n_cols+cn
             i10 = (r+1)*n_cols+c; i11 = (r+1)*n_cols+cn
-            fs.append((i00, i01, i10)); fs.append((i01, i11, i10))
-            fs.append((off+i00, off+i10, off+i01)); fs.append((off+i01, off+i10, off+i11))
-    for r in range(nr-1):  # vertical edge rims (bind the cut edges)
-        for c in set(([0, n_cols-1] if not wrap else [])):
-            o0 = r*n_cols+c; o1 = (r+1)*n_cols+c
-            if c == 0:
-                fs.append((off+o0, o0, o1)); fs.append((off+o0, o1, off+o1))
-            else:
-                fs.append((o0, off+o0, off+o1)); fs.append((o0, off+o1, o1))
-    if rim_start:  # top hem rim, normal up
+            fs.append((i00, i10, i11)); fs.append((i00, i11, i01))
+    for r in range(nr-1):
+        for c in range(n_cols-1 if not wrap else n_cols):
+            cn = (c+1) % n_cols
+            i00 = off+r*n_cols+c; i01 = off+r*n_cols+cn
+            i10 = off+(r+1)*n_cols+c; i11 = off+(r+1)*n_cols+cn
+            fs.append((i00, i01, i11)); fs.append((i00, i11, i10))
+    if not wrap:
+        for r in range(nr-1):
+            i0 = r*n_cols; i1 = (r+1)*n_cols
+            fs.append((i0, off+i0, off+i1)); fs.append((i0, off+i1, i1))
+        for r in range(nr-1):
+            i0 = r*n_cols+(n_cols-1); i1 = (r+1)*n_cols+(n_cols-1)
+            fs.append((i0, i1, off+i1)); fs.append((i0, off+i1, off+i0))
+    if rim_start:
         for c in range(n_cols-1 if not wrap else n_cols):
             cn = (c+1) % n_cols
             fs.append((off+cn, off+c, c)); fs.append((off+cn, c, cn))
-    if rim_end:    # bottom hem rim, normal down
+    if rim_end:
         base = (nr-1)*n_cols
         for c in range(n_cols-1 if not wrap else n_cols):
             cn = (c+1) % n_cols
@@ -190,25 +211,35 @@ def thick_ring_shell(mat, name, rows, thick, sides, a0, a1,
     add_mesh(mat, name, pts, fs)
 
 def tube_frames(centers, preferred=(1, 0, 0)):
-    """Parallel-transport frames along a polyline of centers."""
     centers = [tuple(p) for p in centers]
     frames = []
-    for i, c in enumerate(centers):
-        tangent = norm(vsub(centers[min(i+1, len(centers)-1)], centers[max(0, i-1)]))
-        hint = preferred
-        b1 = vsub(hint, vmul(tangent, dot(hint, tangent)))
-        if dot(b1, b1) < 1e-6:
-            hint = (0, 0, 1) if abs(tangent[2]) < 0.8 else (0, 1, 0)
-            b1 = vsub(hint, vmul(tangent, dot(hint, tangent)))
-        b1 = norm(b1)
-        b2 = norm(cross(tangent, b1))
-        frames.append((tangent, b1, b2))
+    t0 = norm(vsub(centers[1], centers[0]))
+    pref = norm(preferred)
+    if abs(dot(pref, t0)) > 0.95:
+        pref = (0.0, 1.0, 0.0) if abs(t0[1]) < 0.95 else (0.0, 0.0, 1.0)
+    b1 = norm(cross(t0, pref))
+    b2 = norm(cross(t0, b1))
+    frames.append((t0, b1, b2))
+    for i in range(1, len(centers)):
+        prev_t, prev_b1, prev_b2 = frames[-1]
+        t = norm(vsub(centers[i], centers[i-1]))
+        axis = cross(prev_t, t)
+        sine = math.sqrt(dot(axis, axis))
+        if sine > 1e-6:
+            axis = vmul(axis, 1.0/sine)
+            angle = math.atan2(sine, dot(prev_t, t))
+            def rot(v, ax=axis, a=angle):
+                ca, sa = math.cos(a), math.sin(a)
+                return vadd(vmul(v, ca), vadd(vmul(cross(ax, v), sa), vmul(ax, dot(ax, v)*(1.0-ca))))
+            b1 = norm(rot(prev_b1))
+            b2 = norm(rot(prev_b2))
+        else:
+            b1, b2 = prev_b1, prev_b2
+        frames.append((t, b1, b2))
     return frames
 
 def thick_tube(mat, name, points, radii, sides, thick, fold=None,
-               rim_start=False, rim_end=True, inner_mat=None):
-    """Swept cloth solid around a path: outer face, lining face, open ends
-    bound with rims (cuffs, trouser hems, boot shafts)."""
+               rim_start=True, rim_end=True, inner_mat=None):
     sides = _segs(sides, 6)
     inner_mat = inner_mat or mat
     frames = tube_frames(points)
@@ -223,20 +254,20 @@ def thick_tube(mat, name, points, radii, sides, thick, fold=None,
             a = 2*math.pi*s/sides
             ca, sa = math.cos(a), math.sin(a)
             po = vadd(c, vadd(vmul(b1, rw*ca), vmul(b2, rd*sa)))
-            dr = fold(i, s, a) if fold else 0.0
-            if dr:
-                po = vadd(po, vadd(vmul(b1, dr*ca), vmul(b2, dr*sa)))
-            pi_ = vadd(c, vadd(vmul(b1, (rw-thick)*ca), vmul(b2, (rd-thick)*sa)))
-            if dr:
-                pi_ = vadd(pi_, vadd(vmul(b1, dr*ca), vmul(b2, dr*sa)))
+            if fold:
+                dr = fold(i, s, a)
+                dvec = norm(vadd(vmul(b1, rw*ca), vmul(b2, rd*sa)))
+                po = vadd(po, vmul(dvec, dr))
+            dvec = norm(vsub(po, c))
+            pi_ = vsub(po, vmul(dvec, thick))
             ro.append(po); ri.append(pi_)
         rings_o.append(ro); rings_i.append(ri)
-    pts = [p for ring in rings_o for p in ring] + [p for ring in rings_i for p in ring]
-    fs = []
+    pts = [p for row in rings_o for p in row] + [p for row in rings_i for p in row]
     off = n * sides
-    for r in range(n-1):
+    fs = []
+    for r in range(n - 1):
         for s in range(sides):
-            sn = (s+1) % sides
+            sn = (s + 1) % sides
             i00 = r*sides+s; i01 = r*sides+sn
             i10 = (r+1)*sides+s; i11 = (r+1)*sides+sn
             fs.append((i00, i01, i10)); fs.append((i01, i11, i10))
@@ -253,12 +284,14 @@ def thick_tube(mat, name, points, radii, sides, thick, fold=None,
     add_mesh(mat, name, pts, fs)
 
 def tube(mat, name, points, radii, sides=16, preferred=(1, 0, 0), depth_scale=1.0):
-    """Smooth solid swept form (round trim, cords, fingers, hardware)."""
     sides = _segs(sides, 4)
     centers = [tuple(p) for p in points]
-    if len(radii) != len(centers):
-        raise ValueError("one radius per tube point")
-    rings = []
+    if len(centers) < 2: return
+    if isinstance(radii, (float, int)):
+        radii = [radii] * len(centers)
+    elif len(radii) != len(centers):
+        radii = [radii[min(i, len(radii)-1)] for i in range(len(centers))]
+    pts = []
     for i, c in enumerate(centers):
         tangent = norm(vsub(centers[min(i+1, len(centers)-1)], centers[max(0, i-1)]))
         hint = preferred
@@ -269,27 +302,29 @@ def tube(mat, name, points, radii, sides=16, preferred=(1, 0, 0), depth_scale=1.
         b1 = norm(b1); b2 = norm(cross(tangent, b1))
         rad = radii[i]
         rw, rd = (rad, rad*depth_scale) if isinstance(rad, (float, int)) else rad
-        ring = []
         for s in range(sides):
             a = 2*math.pi*s/sides
-            ring.append(vadd(c, vadd(vmul(b1, rw*math.cos(a)), vmul(b2, rd*math.sin(a)))))
-        rings.append(ring)
+            pts.append(vadd(c, vadd(vmul(b1, rw*math.cos(a)), vmul(b2, rd*math.sin(a)))))
     fs = []
     for r in range(len(centers)-1):
         for s in range(sides):
             a = r*sides+s; an = r*sides+(s+1) % sides
             b = (r+1)*sides+s; bn = (r+1)*sides+(s+1) % sides
             fs.extend(((a, an, b), (an, bn, b)))
-    for end, reverse in ((0, True), (len(centers)-1, False)):
-        center_idx = len(rings); rings.append([centers[end]]); base = end*sides
-        for s in range(sides):
-            tri = (center_idx, base+(s+1) % sides, base+s) if reverse else (center_idx, base+s, base+(s+1) % sides)
-            fs.append(tri)
-    pts = [p for ring in rings for p in ring]
+    cap0_idx = len(pts)
+    pts.append(centers[0])
+    for s in range(sides):
+        sn = (s+1) % sides
+        fs.append((cap0_idx, sn, s))
+    cap1_idx = len(pts)
+    pts.append(centers[-1])
+    base = (len(centers)-1)*sides
+    for s in range(sides):
+        sn = (s+1) % sides
+        fs.append((cap1_idx, base+s, base+sn))
     add_mesh(mat, name, pts, fs)
 
 def ellipsoid(mat, name, center, scale, rings=18, sides=28, rotation=None):
-    # Smooth UV surface with shared ring vertices; poles are merged to avoid pinched fans.
     rings = _segs(rings, 6); sides = _segs(sides, 6)
     rot = rotation or ((1, 0, 0), (0, 1, 0), (0, 0, 1))
     def transform(p):
@@ -316,7 +351,6 @@ def ellipsoid(mat, name, center, scale, rings=18, sides=28, rotation=None):
     add_mesh(mat, name, pts, fs)
 
 def ring_surface(mat, name, profile, sides=48, front_split=0.0):
-    """Closed/open smooth single-surface ring (under-layers, base body)."""
     sides = _segs(sides, 6)
     pts = []
     for y, rx, rz, zc in profile:
@@ -335,28 +369,23 @@ def ring_surface(mat, name, profile, sides=48, front_split=0.0):
     add_mesh(mat, name, pts, fs)
 
 def sweep_rect(mat, name, corners_per_station, closed):
-    """Swept rectangular solid: each station supplies 4 corners
-    (outerL, outerR, innerR, innerL); builds 4 faces + end caps if open."""
     n = len(corners_per_station)
     fs = []
     rng = range(n) if closed else range(n-1)
     for i in rng:
         j = (i+1) % n
         b0, b1 = i*4, j*4
-        # outer face, inner face, two side faces
-        fs.append((b0, b1, b1+1)); fs.append((b0, b1+1, b0+1))
-        fs.append((b0+2, b1+2, b1+3)); fs.append((b0+2, b1+3, b0+3))
-        fs.append((b0+1, b1+1, b1+2)); fs.append((b0+1, b1+2, b0+2))
-        fs.append((b0+3, b1+3, b1));   fs.append((b0+3, b1, b0))
-    if not closed:
-        for i in (0, n-1):
-            b = i * 4
-            fs.append((b, b+1, b+2)); fs.append((b, b+2, b+3))
-    pts = [c for st in corners_per_station for c in st]
+        for k in range(4):
+            kn = (k+1) % 4
+            fs.extend(((b0+k, b1+k, b1+kn), (b0+k, b1+kn, b0+kn)))
+    if not closed and n > 0:
+        fs.extend(((0, 3, 2), (0, 2, 1)))
+        last = (n-1)*4
+        fs.extend(((last, last+1, last+2), (last, last+2, last+3)))
+    pts = [p for station in corners_per_station for p in station]
     add_mesh(mat, name, pts, fs)
 
 def strap_band(mat, name, points, width, thick, normal_fn, closed=False):
-    """Flat strap/belt solid following a path; normal_fn(p, tangent)->outward."""
     stations = []
     pts = [tuple(p) for p in points]
     n = len(pts)
@@ -372,7 +401,6 @@ def strap_band(mat, name, points, width, thick, normal_fn, closed=False):
     sweep_rect(mat, name, stations, closed)
 
 def torus_arc(mat, name, center, R, r, sides, segs, axis=(0, 1, 0), arc=2*math.pi, rot=None):
-    """Ring/chain-link solid; optional partial arc."""
     sides = _segs(sides, 4); segs = _segs(segs, 4)
     ax = norm(axis)
     ref = (0, 1, 0) if abs(ax[1]) < 0.9 else (1, 0, 0)
@@ -385,9 +413,8 @@ def torus_arc(mat, name, center, R, r, sides, segs, axis=(0, 1, 0), arc=2*math.p
         cy = center[1] + (u[1]*math.cos(t) + w[1]*math.sin(t))*R
         cz = center[2] + (u[2]*math.cos(t) + w[2]*math.sin(t))*R
         for s in range(sides):
-            b = 2*math.pi*s/sides
-            rr = r*math.cos(b)
-            hh = r*math.sin(b)
+            p = 2*math.pi*s/sides
+            rr = math.cos(p)*r; hh = math.sin(p)*r
             px = cx + (u[0]*math.cos(t) + w[0]*math.sin(t))*rr + ax[0]*hh
             py = cy + (u[1]*math.cos(t) + w[1]*math.sin(t))*rr + ax[1]*hh
             pz = cz + (u[2]*math.cos(t) + w[2]*math.sin(t))*rr + ax[2]*hh
@@ -402,8 +429,7 @@ def torus_arc(mat, name, center, R, r, sides, segs, axis=(0, 1, 0), arc=2*math.p
             fs.extend(((a, an, b), (an, bn, b)))
     add_mesh(mat, name, pts, fs)
 
-def stitch_dashes(mat, name, path_pts, count, r=0.0028, length=0.013):
-    """Dashed saddle-stitch trim following a path (original decorative seam)."""
+def stitch_dashes(mat, name, path_pts, count, r=0.0024, length=0.011):
     count = max(2, int(round(count * DETAIL)))
     pts = [tuple(p) for p in path_pts]
     n = len(pts)
@@ -417,11 +443,78 @@ def stitch_dashes(mat, name, path_pts, count, r=0.0028, length=0.013):
         mid = vmul(tangent, length*0.5)
         tube(mat, f"{name}_d{k}", (vsub(c, mid), vadd(c, mid)), [r, r], 6, (0, 1, 0))
 
+def double_stitch_band(mat, name, points, count, normal_fn, offset=0.007, r=0.0020, length=0.010):
+    pts = [tuple(p) for p in points]
+    n = len(pts)
+    pts_left, pts_right = [], []
+    for i, p in enumerate(pts):
+        tangent = norm(vsub(pts[min(i+1, n-1)], pts[max(0, i-1)]))
+        nrm = normal_fn(p, tangent)
+        side = norm(cross(nrm, tangent))
+        pts_left.append(vadd(vadd(p, vmul(nrm, 0.002)), vmul(side, offset)))
+        pts_right.append(vadd(vadd(p, vmul(nrm, 0.002)), vmul(side, -offset)))
+    stitch_dashes(mat, f"{name}_L", pts_left, count, r=r, length=length)
+    stitch_dashes(mat, f"{name}_R", pts_right, count, r=r, length=length)
+
+def button_disc(mat, name, center, normal, up=(0, 1, 0), radius=0.0085, thick=0.0035, thread_mat="BoneThread"):
+    nrm = norm(normal)
+    up_v = norm(vsub(up, vmul(nrm, dot(up, nrm)))) if abs(dot(up, nrm)) < 0.95 else norm(cross(nrm, (1, 0, 0)))
+    side_v = cross(nrm, up_v)
+    rot = ((side_v[0], up_v[0], nrm[0]),
+           (side_v[1], up_v[1], nrm[1]),
+           (side_v[2], up_v[2], nrm[2]))
+    ellipsoid(mat, name, center, (radius, radius, thick), 8, 12, rotation=rot)
+    torus_arc(mat, f"{name}_Rim", vadd(center, vmul(nrm, thick*0.3)), radius*0.85, radius*0.16, 6, 12, axis=nrm)
+    if thread_mat:
+        tc = vadd(center, vmul(nrm, thick*0.9))
+        d = radius * 0.40
+        tube(thread_mat, f"{name}_th1", [vsub(vsub(tc, vmul(up_v, d)), vmul(side_v, d)),
+                                         vadd(vadd(tc, vmul(up_v, d)), vmul(side_v, d))], [.0018, .0018], 4, nrm)
+        tube(thread_mat, f"{name}_th2", [vadd(vsub(tc, vmul(up_v, d)), vmul(side_v, d)),
+                                         vsub(vadd(tc, vmul(up_v, d)), vmul(side_v, d))], [.0018, .0018], 4, nrm)
+
+def buckle_frame(mat, name, center, normal, up=(0, 1, 0), width=0.026, height=0.034, bar_r=0.0028, has_prong=True):
+    nrm = norm(normal)
+    up_v = norm(vsub(up, vmul(nrm, dot(up, nrm)))) if abs(dot(up, nrm)) < 0.95 else norm(cross(nrm, (1, 0, 0)))
+    side_v = cross(nrm, up_v)
+    hw = width * 0.5
+    hh = height * 0.5
+    c_out = vadd(center, vmul(nrm, bar_r))
+    tl = vadd(vadd(c_out, vmul(up_v, hh)), vmul(side_v, -hw))
+    tr = vadd(vadd(c_out, vmul(up_v, hh)), vmul(side_v, hw))
+    br = vadd(vsub(c_out, vmul(up_v, hh)), vmul(side_v, hw))
+    bl = vadd(vsub(c_out, vmul(up_v, hh)), vmul(side_v, -hw))
+    tube(mat, f"{name}_BarTop", [tl, tr], [bar_r, bar_r], 6, nrm)
+    tube(mat, f"{name}_BarRight", [tr, br], [bar_r, bar_r], 6, nrm)
+    tube(mat, f"{name}_BarBot", [br, bl], [bar_r, bar_r], 6, nrm)
+    tube(mat, f"{name}_BarLeft", [bl, tl], [bar_r, bar_r], 6, nrm)
+    mid_l = lerp(tl, bl, 0.5)
+    mid_r = lerp(tr, br, 0.5)
+    tube(mat, f"{name}_Spindle", [mid_l, mid_r], [bar_r*0.8, bar_r*0.8], 6, nrm)
+    if has_prong:
+        prong_base = lerp(mid_l, mid_r, 0.5)
+        prong_tip = vadd(vadd(prong_base, vmul(up_v, hh*1.08)), vmul(nrm, bar_r*1.1))
+        tube(mat, f"{name}_Prong", [prong_base, prong_tip], [bar_r*0.75, bar_r*0.5], 6, side_v)
+
+def rivet_cap(mat, name, center, normal, radius=0.0050, height=0.0032):
+    nrm = norm(normal)
+    c = vadd(center, vmul(nrm, height*0.5))
+    up = (0, 1, 0) if abs(nrm[1]) < 0.9 else (1, 0, 0)
+    side = norm(cross(nrm, up))
+    up_v = cross(side, nrm)
+    rot = ((side[0], up_v[0], nrm[0]), (side[1], up_v[1], nrm[1]), (side[2], up_v[2], nrm[2]))
+    ellipsoid(mat, name, c, (radius, radius, height), 6, 10, rotation=rot)
+
+def welt_seam(mat, name, points, radius=0.0032):
+    pts = [tuple(p) for p in points]
+    tube(mat, name, pts, [radius]*len(pts), 6, (0, 1, 0))
+
+
 # =========================================================================
 # VESPERSHADE PROTAGONIST: ORIGINAL SCULPTED HEAD, FACE, EARS, EYES & HAIR
 # =========================================================================
 
-# 1. Seamless Anatomically Proportioned Head, Face, and Neck
+# 1. Sculpted Head, Face and Neck
 def generate_unified_head(rings=110, sides=64):
     pts = []
     y_vals = [1.440 + i * (1.815 - 1.440) / (rings - 1) for i in range(rings)]
@@ -457,12 +550,10 @@ def generate_unified_head(rings=110, sides=64):
             if cos_a > 0.0:
                 front_blend = cos_a ** 1.5
                 
-                # Chin definition
                 chin = g2(px, y, 0.0, 1.588, 0.018, 0.014) * 0.018
                 chin_tub = (g2(px, y, 0.012, 1.588, 0.010, 0.012) + g2(px, y, -0.012, 1.588, 0.010, 0.012)) * 0.007
                 mento = g2(px, y, 0.0, 1.606, 0.024, 0.007) * -0.0055
                 
-                # Lips and philtrum
                 l_lip = g2(px, y, 0.0, 1.618, 0.018, 0.007) * 0.011
                 u_lip_mid = g2(px, y, 0.0, 1.632, 0.008, 0.006) * 0.009
                 u_lip_peaks = (g2(px, y, 0.008, 1.633, 0.006, 0.006) + g2(px, y, -0.008, 1.633, 0.006, 0.006)) * 0.0095
@@ -471,7 +562,6 @@ def generate_unified_head(rings=110, sides=64):
                 phil_trough = g2(px, y, 0.0, 1.644, 0.004, 0.007) * -0.0028
                 phil_cols = (g2(px, y, 0.0045, 1.644, 0.0025, 0.007) + g2(px, y, -0.0045, 1.644, 0.0025, 0.007)) * 0.0025
                 
-                # Nose bridge, tip, alar wings
                 tip = g2(px, y, 0.0, 1.660, 0.011, 0.011) * 0.024
                 bridge = g2(px, y, 0.0, 1.682, 0.007, 0.016) * 0.018
                 hump = g2(px, y, 0.0, 1.674, 0.006, 0.009) * 0.004
@@ -479,18 +569,15 @@ def generate_unified_head(rings=110, sides=64):
                 nasion = g2(px, y, 0.0, 1.702, 0.010, 0.008) * -0.0055
                 columella = g2(px, y, 0.0, 1.650, 0.005, 0.006) * 0.007
                 
-                # Zygomatic arches & cheek definition
                 zygoma = (g2(px, y, 0.052, 1.675, 0.018, 0.018) + g2(px, y, -0.052, 1.675, 0.018, 0.018)) * 0.011
                 buccal = (g2(px, y, 0.038, 1.644, 0.016, 0.018) + g2(px, y, -0.038, 1.644, 0.016, 0.018)) * -0.006
                 canine_fossa = (g2(px, y, 0.018, 1.656, 0.007, 0.012) + g2(px, y, -0.018, 1.656, 0.007, 0.012)) * -0.004
                 
-                # Eye sockets & brow ridge
                 socket = (g2(px, y, 0.033, 1.692, 0.013, 0.010) + g2(px, y, -0.033, 1.692, 0.013, 0.010)) * -0.012
                 glabella = g2(px, y, 0.0, 1.714, 0.011, 0.010) * 0.007
                 brow = (g2(px, y, 0.030, 1.716, 0.016, 0.009) + g2(px, y, -0.030, 1.716, 0.016, 0.009)) * 0.009
                 boss = (g2(px, y, 0.026, 1.742, 0.018, 0.014) + g2(px, y, -0.026, 1.742, 0.018, 0.014)) * 0.004
                 
-                # Subtle gothic asymmetry
                 asym = g2(px, y, 0.030, 1.716, 0.016, 0.009) * 0.0014 + g2(px, y, 0.012, 1.588, 0.010, 0.012) * 0.0010
                 
                 pz += (chin + chin_tub + mento + l_lip + u_lip_mid + u_lip_peaks + fissure + corners + 
@@ -604,7 +691,7 @@ def generate_detailed_ears():
 ear_pts, ear_polys = generate_detailed_ears()
 add_mesh("Skin", "Head/DetailedEars", ear_pts, ear_polys)
 
-# 3. Eyeballs Inset into Anatomical Orbits (BoneThread material)
+# 3. Eyeballs Inset into Anatomical Orbits
 def generate_eyeballs():
     eye_verts = []
     eye_polys = []
@@ -649,9 +736,9 @@ def generate_eyeballs():
     return eye_verts, eye_polys
 
 eye_pts, eye_polys = generate_eyeballs()
-add_mesh("BoneThread", "Head/Eyes", eye_pts, eye_polys)
+add_mesh("Skin", "Head/Eyes", eye_pts, eye_polys)
 
-# 4. Sculpted Arched Eyebrows (Hair material)
+# 4. Sculpted Arched Eyebrows
 def generate_eyebrows():
     brow_verts = []
     brow_polys = []
@@ -849,217 +936,287 @@ def generate_gothic_hair():
 hair_pts, hair_polys = generate_gothic_hair()
 add_mesh("Hair", "Hair/WayfarerHairstyle", hair_pts, hair_polys)
 
-# =========================================================================
-# BODY UNDER-LAYERS (kept minimal: only what garments can reveal)
-# =========================================================================
-
-# Anatomically tapered torso (visible above the waistcoat neckline and at the
-# collar V); forearms remain as the layer inside the coat sleeves.
-ring_surface("Skin", "Body/Torso", [(1.00,.18,.105,0),(1.10,.205,.115,0),(1.25,.25,.13,0),(1.39,.29,.135,0),(1.49,.255,.115,0)],36)
-for side, label in ((-1,"L"),(1,"R")):
-    x=side
-    tube("Skin",f"Body/Forearm_{label}",[(x*.27,1.27,.005),(x*.34,1.10,.018),(x*.365,.97,.035),(x*.37,.88,.04)],[(.075,.075),(.065,.065),(.052,.052),(.047,.05)],20,(1,0,0))
 
 # =========================================================================
-# TROUSERS: fitted wool with a yoked waistband, knee creases, ankle wrinkles;
-# hems tuck into the boot shafts so no loose hem ever clips the boots.
+# BODY UNDER-LAYERS (Skin & minimal anatomy)
 # =========================================================================
-thick_ring_shell("Trouser","LowerBody/TrouserYoke",
-    [ (lambda a, y=y, rx=rx, rz=rz, zc=zc: (y, rx, rz, zc)) for y, rx, rz, zc in
-      ((1.005,.256,.152,0.0),(.955,.247,.147,0.0),(.905,.242,.144,0.0)) ],
-    thick=.007, sides=26, a0=0.0, a1=2*math.pi, wrap=True,
-    rim_start=False, rim_end=False)
-ellipsoid("Trouser","LowerBody/Seat",(0,.895,0),(.225,.130,.138),12,20)
+
+# Anatomically tapered torso (neckline to chest)
+ring_surface("Skin", "Body/Torso", [(1.00, .18, .105, 0), (1.10, .205, .115, 0), (1.25, .25, .13, 0), (1.39, .29, .135, 0), (1.49, .255, .115, 0)], 36)
+for side, label in ((-1, "L"), (1, "R")):
+    x = side
+    tube("Skin", f"Body/Forearm_{label}", [(x*.27, 1.27, .005), (x*.34, 1.10, .018), (x*.365, .97, .035), (x*.37, .88, .04)], [(.075, .075), (.065, .065), (.052, .052), (.047, .05)], 20, (1, 0, 0))
+
+
+# =========================================================================
+# TROUSERS: fitted wool with yoked waistband, knee creases, side seams
+# =========================================================================
+
+thick_ring_shell("Trouser", "LowerBody/TrouserYoke",
+    [(lambda a, y=y, rx=rx, rz=rz, zc=zc: (y, rx, rz, zc)) for y, rx, rz, zc in
+     ((1.005, .256, .152, 0.0), (.955, .247, .147, 0.0), (.905, .242, .144, 0.0))],
+    thick=.007, sides=26, a0=0.0, a1=2*math.pi, wrap=True, rim_start=False, rim_end=False)
+ellipsoid("Trouser", "LowerBody/Seat", (0, .895, 0), (.225, .130, .138), 12, 20)
+
 def trouser_fold(i, s_idx, a):
-    # tension creases across the back of each knee, fine wrinkles at the ankle
-    back = 0.5 + 0.5*math.cos(a - 1.5*math.pi)
-    knee = -0.0055 * math.exp(-((i-1.95)/0.45)**2) * back
-    ankle = 0.0028 * math.sin(5*a) * math.exp(-((i-3.5)/0.5)**2)
+    back = 0.5 + 0.5 * math.cos(a - 1.5 * math.pi)
+    knee = -0.0055 * math.exp(-((i - 1.95)/0.45)**2) * back
+    ankle = 0.0028 * math.sin(5*a) * math.exp(-((i - 3.5)/0.5)**2)
     return knee + ankle
-for side, label in ((-1,"L"),(1,"R")):
-    x=side
-    thick_tube("Trouser",f"LowerBody/Leg_{label}",
-        [(x*.113,.915,-.002),(x*.117,.660,-.004),(x*.116,.485,.012),(x*.111,.365,.008),(x*.113,.302,.013)],
-        [(.102,.106),(.084,.088),(.066,.070),(.069,.073),(.061,.065)],
+
+for side, label in ((-1, "L"), (1, "R")):
+    x = side
+    leg_pts = [(x*.113, .915, -.002), (x*.117, .660, -.004), (x*.116, .485, .012), (x*.111, .365, .008), (x*.113, .285, .013)]
+    thick_tube("Trouser", f"LowerBody/Leg_{label}", leg_pts,
+        [(.102, .106), (.084, .088), (.066, .070), (.069, .073), (.061, .065)],
         sides=18, thick=.006, fold=trouser_fold, rim_start=True, rim_end=False)
+    side_seam_pts = [(x*(.117 + .082), .880, -.002), (x*(.117 + .068), .660, -.004),
+                     (x*(.116 + .054), .485, .012), (x*(.111 + .056), .365, .008), (x*(.113 + .052), .290, .013)]
+    welt_seam("Trouser", f"LowerBody/SideSeam_{label}", side_seam_pts, radius=0.0032)
+    stitch_dashes("BoneThread", f"LowerBody/SideSeamStitch_{label}", side_seam_pts, 8, r=0.0020, length=0.012)
+
 
 # =========================================================================
-# BOOTS: multi-part field boots - welted sole, separate heel block, toe cap
-# with saddle stitching, heel counter, laced shaft with folded cuff, pull
-# tab, instep straps (buckled on the right boot only).
+# BOOTS: multi-part leather cavalry boots - continuous tall shaft,
+# stitched vamp, toe cap with saddle stitching, heel counter,
+# welted sole, brass heel plate, crossed instep straps + buckles,
+# upper calf strap + buckle, rear pull tab & vertical back spine seam.
 # =========================================================================
+
 def boot_normal(side):
     def fn(p, tangent):
-        return norm(((p[0]-side*.118)*1.25, 0.0, (p[2]-0.05)*0.8))
+        return norm(((p[0] - side*.118)*1.25, 0.0, (p[2] - 0.05)*0.8))
     return fn
-def strap_up_normal(side):
-    def fn(p, tangent):
-        n = norm(((p[0]-side*.118)*1.25, 0.0, (p[2]-0.05)*0.8))
-        return n
-    return fn
-for side, label in ((-1,"L"),(1,"R")):
-    x=side
-    # sole, heel and welt
-    ellipsoid("BootSole",f"Boots/Sole_{label}",(x*.118,.048,.058),(.100,.033,.185),10,22)
-    ellipsoid("BootSole",f"Boots/Heel_{label}",(x*.118,.050,-.062),(.060,.047,.068),8,14)
-    welt_pts=[(x*.118+.104*math.cos(2*math.pi*k/12),.075,.058+.188*math.sin(2*math.pi*k/12)) for k in range(12)]
+
+for side, label in ((-1, "L"), (1, "R")):
+    x = side
+    # 1. Welted Sole, Stacked Heel and Aged Brass Heel Plate Rim
+    ellipsoid("BootSole", f"Boots/Sole_{label}", (x*.118, .038, .058), (.102, .026, .188), 10, 22)
+    ellipsoid("BootSole", f"Boots/Heel_{label}", (x*.118, .045, -.065), (.068, .042, .072), 8, 16)
+    torus_arc("AgedBrass", f"Boots/HeelPlate_{label}", (x*.118, .026, -.065), .058, .0032, 6, 12, axis=(0, 1, 0))
+    welt_pts = [(x*.118 + .104*math.cos(2*math.pi*k/14), .068, .058 + .190*math.sin(2*math.pi*k/14)) for k in range(14)]
     welt_pts.append(welt_pts[0])
-    tube("Leather",f"Boots/Welt_{label}",welt_pts,[.006]*13,8,(0,1,0))
-    # vamp and stitched toe cap
-    ellipsoid("Leather",f"Boots/Vamp_{label}",(x*.118,.115,.085),(.092,.072,.142),12,22)
-    ellipsoid("Leather",f"Boots/ToeCap_{label}",(x*.118,.103,.168),(.088,.062,.072),10,18)
-    cap_st=[(x*.118+.080,.092,.150),(x*.118+.062,.118,.196),(x*.118,.132,.215),(x*.118-.062,.118,.196),(x*.118-.080,.092,.150)]
-    stitch_dashes("BoneThread",f"Boots/ToeCapStitch_{label}",cap_st,7)
-    # heel counter (bound top edge)
-    thick_ring_shell("Leather",f"Boots/Counter_{label}",
-        [ (lambda a, y=y, rx=rx, rz=rz: (y, rx, rz, zc)) for y, rx, rz, zc in
-          ((.095,.098,.100,.010),(.170,.095,.098,.008),(.245,.097,.100,.006)) ],
-        thick=.006, sides=14, a0=math.pi-1.05, a1=math.pi+1.05,
-        rim_start=True, rim_end=False, center=(x*.116,0,0))
-    # shaft with slouch wrinkles and folded top cuff
+    tube("Leather", f"Boots/Welt_{label}", welt_pts, [.0055]*15, 8, (0, 1, 0))
+    stitch_dashes("BoneThread", f"Boots/WeltStitch_{label}", welt_pts[:-1], 12, r=0.0018, length=0.010)
+
+    # 2. Vamp & Stitched Toe Cap
+    ellipsoid("Leather", f"Boots/Vamp_{label}", (x*.118, .108, .082), (.090, .068, .138), 12, 22)
+    ellipsoid("Leather", f"Boots/ToeCap_{label}", (x*.118, .098, .168), (.086, .058, .072), 10, 18)
+    cap_st1 = [(x*.118 + .078, .090, .146), (x*.118 + .058, .114, .192), (x*.118, .128, .210), (x*.118 - .058, .114, .192), (x*.118 - .078, .090, .146)]
+    cap_st2 = [(x*.118 + .074, .096, .140), (x*.118 + .054, .120, .186), (x*.118, .134, .204), (x*.118 - .054, .120, .186), (x*.118 - .074, .096, .140)]
+    stitch_dashes("BoneThread", f"Boots/ToeCapStitch1_{label}", cap_st1, 8, r=0.0022, length=0.010)
+    stitch_dashes("BoneThread", f"Boots/ToeCapStitch2_{label}", cap_st2, 8, r=0.0020, length=0.009)
+
+    # 3. Heel Counter
+    thick_ring_shell("Leather", f"Boots/Counter_{label}",
+        [(lambda a, y=y, rx=rx, rz=rz, zc=zc: (y, rx, rz, zc)) for y, rx, rz, zc in
+         ((.070, .096, .098, -.010), (.140, .094, .096, -.008), (.210, .092, .094, -.006))],
+        thick=.006, sides=16, a0=math.pi - 1.15, a1=math.pi + 1.15,
+        rim_start=True, rim_end=False, center=(x*.118, 0, 0))
+    counter_st = [(x*.118 + .088*math.sin(math.pi - 1.10 + 2.20*k/6), .208, -.006 + .092*math.cos(math.pi - 1.10 + 2.20*k/6)) for k in range(7)]
+    stitch_dashes("BoneThread", f"Boots/CounterStitch_{label}", counter_st, 7, r=0.0022, length=0.010)
+
+    # 4. Continuous Boot Shaft from ankle (y=0.125) to knee (y=0.440)
     def shaft_fold(i, s_idx, a, side=side):
-        return .004*math.sin(4*a+.7)*math.exp(-((i-0.8)/0.5)**2)
-    thick_tube("Leather",f"Boots/Shaft_{label}",
-        [(x*.115,.285,.012),(x*.116,.360,.008),(x*.117,.432,.004)],
-        [(.096,.100),(.099,.104),(.103,.113)], sides=20, thick=.007,
-        fold=shaft_fold, rim_start=True, rim_end=True)
-    thick_tube("ClothAccent",f"Boots/CuffFold_{label}",
-        [(x*.117,.432,.004),(x*.118,.452,.002)],
-        [(.113,.123),(.110,.121)], sides=20, thick=.005, rim_start=False, rim_end=True)
-    thick_ring_shell("ClothAccent",f"Boots/CuffLining_{label}",
-        [ (lambda a, y=y, rx=rx, rz=rz: (y, rx, rz, zc)) for y, rx, rz, zc in
-          ((.444,.100,.110,.002),(.450,.102,.112,.002)) ],
+        return .0045 * math.sin(4*a + .7) * math.exp(-((i - 1.2)/0.6)**2)
+    shaft_pts = [(x*.118, .125, .016), (x*.117, .205, .012), (x*.116, .285, .008), (x*.116, .365, .005), (x*.117, .440, .002)]
+    thick_tube("Leather", f"Boots/Shaft_{label}", shaft_pts,
+        [(.082, .088), (.086, .092), (.096, .100), (.100, .106), (.106, .114)],
+        sides=22, thick=.007, fold=shaft_fold, rim_start=False, rim_end=True)
+
+    # 5. Rear Vertical Shaft Spine Seam + Saddle Stitching
+    rear_seam_pts = [(x*.118, .140, -.074), (x*.117, .220, -.078), (x*.116, .300, -.086), (x*.116, .380, -.095), (x*.117, .442, -.106)]
+    welt_seam("Leather", f"Boots/RearSeam_{label}", rear_seam_pts, radius=0.0035)
+    stitch_dashes("BoneThread", f"Boots/RearSeamStitch_{label}", rear_seam_pts, 8, r=0.0022, length=0.012)
+
+    # 6. Folded Top Cuff & Accent Lining
+    thick_tube("ClothAccent", f"Boots/CuffFold_{label}",
+        [(x*.117, .435, .004), (x*.118, .462, .002)],
+        [(.112, .120), (.109, .118)], sides=20, thick=.005, rim_start=False, rim_end=True)
+    thick_ring_shell("ClothAccent", f"Boots/CuffLining_{label}",
+        [(lambda a, y=y, rx=rx, rz=rz, zc=zc: (y, rx, rz, zc)) for y, rx, rz, zc in
+         ((.450, .101, .111, .002), (.458, .103, .113, .002))],
         thick=.003, sides=16, a0=0.0, a1=2*math.pi, wrap=True,
-        rim_start=False, rim_end=True, center=(x*.118,0,0))
-    # back pull tab
-    strap_band("Leather",f"Boots/PullTab_{label}",
-        [(x*.116,.452,-.100),(x*.116,.472,-.110),(x*.116,.452,-.118)],
-        width=.014, thick=.003, normal_fn=lambda p,t:(0,0,-1.0))
-    # crossed instep straps; right boot carries the buckle
-    strap_band("Leather",f"Boots/InstepStrapA_{label}",
-        [(x*.150,.155,.030),(x*.120,.128,.120),(x*.088,.150,.208)],
-        width=.015, thick=.003, normal_fn=boot_normal(side))
-    strap_band("Leather",f"Boots/InstepStrapB_{label}",
-        [(x*.092,.128,.028),(x*.122,.102,.118),(x*.152,.126,.205)],
-        width=.015, thick=.003, normal_fn=boot_normal(side))
-    if side > 0:
-        bx,by,bz = x*.155,.158,.024
-        tube("AgedBrass",f"Boots/StrapBuckleSide_{label}",[(bx,by-.011,bz),(bx,by+.011,bz)],[.004,.004],8,(1,0,0))
-        tube("AgedBrass",f"Boots/StrapBuckleBar_{label}",[(bx,by-.011,bz),(bx,by+.011,bz)],[.004,.004],8,(0,0,1))
-        tube("AgedBrass",f"Boots/StrapBuckleBar2_{label}",[(bx-.008,by-.011,bz),(bx-.008,by+.011,bz)],[.0035,.0035],8,(0,0,1))
-        tube("AgedBrass",f"Boots/StrapProng_{label}",[(bx,by,bz),(bx-x*.009,by,bz+.006)],[.0026,.0026],6,(0,1,0))
-    else:
-        stitch_dashes("BoneThread",f"Boots/StrapStitch_{label}",
-            [(x*.146,.153,.038),(x*.120,.127,.120),(x*.092,.148,.200)],6)
+        rim_start=False, rim_end=True, center=(x*.118, 0, 0))
+
+    # 7. Back Pull Tab + Brass Rivet
+    strap_band("Leather", f"Boots/PullTab_{label}",
+        [(x*.116, .450, -.102), (x*.116, .476, -.114), (x*.116, .450, -.124)],
+        width=.016, thick=.0035, normal_fn=lambda p, t: (0, 0, -1.0))
+    rivet_cap("AgedBrass", f"Boots/PullTabRivet_{label}", (x*.116, .452, -.112), (0, 0, -1.0), radius=0.004)
+
+    # 8. Crossed Instep Straps + Buckles
+    strap_band("Leather", f"Boots/InstepStrapA_{label}",
+        [(x*.152, .155, .030), (x*.120, .128, .120), (x*.086, .150, .208)],
+        width=.015, thick=.0032, normal_fn=boot_normal(side))
+    strap_band("Leather", f"Boots/InstepStrapB_{label}",
+        [(x*.090, .128, .028), (x*.122, .102, .118), (x*.154, .126, .205)],
+        width=.015, thick=.0032, normal_fn=boot_normal(side))
+    stitch_dashes("BoneThread", f"Boots/InstepStitchA_{label}",
+        [(x*.150, .155, .032), (x*.120, .128, .120), (x*.088, .150, .206)], 5, r=0.0018, length=0.009)
+    stitch_dashes("BoneThread", f"Boots/InstepStitchB_{label}",
+        [(x*.092, .130, .030), (x*.122, .104, .118), (x*.152, .128, .203)], 5, r=0.0018, length=0.009)
+
+    bx, by, bz = x*.158, .158, .026
+    buckle_frame("AgedBrass", f"Boots/AnkleBuckle_{label}", (bx, by, bz), (x*1.0, 0.2, 0.2), up=(0, 1, 0), width=.020, height=.026, bar_r=.0026)
+
+    # 9. Upper Calf Strap + Miniature Buckle
+    calf_pts = [(x*.117 + .110*math.cos(2*math.pi*k/12), .412, .004 + .116*math.sin(2*math.pi*k/12)) for k in range(12)]
+    calf_pts.append(calf_pts[0])
+    strap_band("Leather", f"Boots/CalfStrap_{label}", calf_pts, width=.014, thick=.003, normal_fn=boot_normal(side), closed=True)
+    cbx, cby, cbz = x*(.117 + .112), .412, .004
+    buckle_frame("AgedBrass", f"Boots/CalfBuckle_{label}", (cbx, cby, cbz), (x*1.0, 0, 0), up=(0, 1, 0), width=.018, height=.022, bar_r=.0024)
+
+    # 10. Brass Eyelets / Speed Hooks along the vamp
+    for ei in range(3):
+        ey = .112 + .022 * ei
+        ez = .148 - .024 * ei
+        rivet_cap("AgedBrass", f"Boots/EyeletL_{label}_{ei+1}", (x*.118 + x*.038, ey, ez), (x*0.8, 0.3, 0.5), radius=0.0035, height=0.0025)
+        rivet_cap("AgedBrass", f"Boots/EyeletR_{label}_{ei+1}", (x*.118 - x*.038, ey, ez), (-x*0.8, 0.3, 0.5), radius=0.0035, height=0.0025)
+
 
 # =========================================================================
-# GLOVES: gauntlet cuffs with bound openings, reinforced knuckle band,
-# articulated fingers with knuckle creases; wrist strap on the right hand.
+# GLOVES & CUFFS: flared gauntlets with bound rims, wrist cinch straps +
+# miniature brass buckles, reinforced knuckle band, articulated fingers,
+# turned-back coat cuffs with miniature brass buttons & ivory shirt cuffs.
 # =========================================================================
-for side, label in ((-1,"L"),(1,"R")):
-    x=side
-    thick_tube("Leather",f"Accessories/Gauntlet_{label}",
-        [(x*.387,1.055,.034),(x*.383,1.005,.040)],
-        [(.066,.070),(.061,.065)], sides=18, thick=.005, rim_start=True, rim_end=True)
-    ellipsoid("Leather",f"Accessories/GloveHand_{label}",(x*.385,.950,.054),(.048,.066,.058),10,16)
-    ellipsoid("Leather",f"Accessories/KnuckleBand_{label}",(x*.402,.965,.056),(.010,.022,.030),8,12)
+
+for side, label in ((-1, "L"), (1, "R")):
+    x = side
+    thick_ring_shell("BoneThread", f"UpperClothing/ShirtCuff_{label}",
+        [(lambda a, y=y, rx=rx, rz=rz: (y, rx, rz, .037)) for y, rx, rz in
+         ((.962, .051, .048), (.986, .054, .051))],
+        thick=.003, sides=16, a0=0.0, a1=2*math.pi, wrap=True,
+        rim_start=False, rim_end=True, center=(x*.390, 0, 0))
+    button_disc("BoneThread", f"UpperClothing/ShirtCuffButton_{label}", (x*.446, .974, .037), (x*1.0, 0, 0), radius=.0045, thick=.002, thread_mat=None)
+
+    thick_tube("ClothAccent", f"UpperClothing/CuffFold_{label}",
+        [(x*.389, 1.012, .036), (x*.392, .982, .038)],
+        [(.061, .065), (.068, .073)], sides=20, thick=.005, rim_start=False, rim_end=True)
+    for bi in range(3):
+        by = 1.025 - bi * 0.018
+        bx = x * (.389 + .068)
+        bz = .036
+        button_disc("AgedBrass", f"UpperClothing/CuffButton_{label}_{bi+1}", (bx, by, bz), (x*1.0, 0, 0), radius=.0048, thick=.0025, thread_mat=None)
+
+    thick_tube("Leather", f"Accessories/Gauntlet_{label}",
+        [(x*.387, 1.060, .034), (x*.383, 1.005, .040)],
+        [(.068, .072), (.061, .065)], sides=20, thick=.005, rim_start=True, rim_end=True)
+    g_rim = [(x*.387 + .069*math.cos(2*math.pi*k/10), 1.058, .034 + .073*math.sin(2*math.pi*k/10)) for k in range(10)]
+    stitch_dashes("BoneThread", f"Accessories/GauntletStitch_{label}", g_rim, 8, r=0.0020, length=0.010)
+
+    ellipsoid("Leather", f"Accessories/GloveHand_{label}", (x*.385, .950, .054), (.048, .066, .058), 10, 16)
+    ellipsoid("Leather", f"Accessories/KnuckleBand_{label}", (x*.402, .965, .056), (.010, .022, .030), 8, 12)
+    k_pts = [(x*.404, .965 + .018*math.cos(2*math.pi*k/6), .056 + .026*math.sin(2*math.pi*k/6)) for k in range(6)]
+    stitch_dashes("BoneThread", f"Accessories/KnuckleStitch_{label}", k_pts, 6, r=0.0018, length=0.008)
+
     for j in range(4):
-        fz=.054+(1.5-j)*.021
-        length=(.052,.058,.054,.042)[j]
-        tube("Leather",f"Accessories/Glove_{label}_Finger{j+1}",
-            [(x*.387,.914,fz),(x*.388,.886,fz+.004),(x*.388,.872,fz+.009),(x*.390,.914-length,fz+.014)],
-            [(.0115,.0115),(.0092,.0092),(.0099,.0099),(.0068,.0070)],10,(1,0,0))
-    tube("Leather",f"Accessories/Glove_{label}_Thumb",
-        [(x*.360,.928,.082),(x*.344,.898,.096),(x*.336,.872,.102)],
-        [(.016,.016),(.0125,.0125),(.0085,.0085)],10,(1,0,0))
-    if side > 0:
-        ring_pts=[(x*.386+.063*math.cos(2*math.pi*k/10),1.030,.036+.063*math.sin(2*math.pi*k/10)*0.9) for k in range(10)]
-        ring_pts.append(ring_pts[0])
-        tube("Leather",f"Accessories/WristStrap_{label}",ring_pts,[.0035]*11,6,(0,1,0))
-        tube("AgedBrass",f"Accessories/WristBuckle_{label}",[(x*.452,1.030,.036),(x*.452,1.030,.036)], [.001,.001],4,(0,1,0))
-        tube("AgedBrass",f"Accessories/WristBuckleFrame_{label}",[(x*.449,1.021,.036),(x*.449,1.039,.036)],[.0035,.0035],8,(1,0,0))
-    else:
-        ellipsoid("AgedBrass",f"Accessories/GauntletButton_{label}",(x*.452,1.040,.034),(.007,.007,.005),8,10)
+        fz = .054 + (1.5 - j) * .021
+        length = (.052, .058, .054, .042)[j]
+        tube("Leather", f"Accessories/Glove_{label}_Finger{j+1}",
+            [(x*.387, .914, fz), (x*.388, .886, fz+.004), (x*.388, .872, fz+.009), (x*.390, .914 - length, fz+.014)],
+            [(.0115, .0115), (.0092, .0092), (.0099, .0099), (.0068, .0070)], 10, (1, 0, 0))
+    tube("Leather", f"Accessories/Glove_{label}_Thumb",
+        [(x*.360, .928, .082), (x*.344, .898, .096), (x*.336, .872, .102)],
+        [(.016, .016), (.0125, .0125), (.0085, .0085)], 10, (1, 0, 0))
+
+    ring_pts = [(x*.386 + .064*math.cos(2*math.pi*k/12), 1.030, .036 + .064*math.sin(2*math.pi*k/12)*0.9) for k in range(12)]
+    ring_pts.append(ring_pts[0])
+    strap_band("Leather", f"Accessories/WristStrap_{label}", ring_pts, width=.014, thick=.003, normal_fn=lambda p, t: norm((p[0]-x*.386, 0, p[2]-.036)), closed=True)
+    wbx, wby, wbz = x*(.386 + .065), 1.030, .036
+    buckle_frame("AgedBrass", f"Accessories/WristBuckle_{label}", (wbx, wby, wbz), (x*1.0, 0, 0), up=(0, 1, 0), width=.018, height=.022, bar_r=.0022)
 
 
 # =========================================================================
-# WAISTCOAT: fitted wine wool visible inside the coat's front opening;
-# V-necked front panel with bound armhole edges, bone buttons on an offset
-# placket, two pocket welts, bound hem. Sits clear inside the coat shell.
+# WAISTCOAT & SHIRT & CRAVAT: fitted wine wool vest, vertical seams,
+# bone buttons with thread stitches, pocket welts with brass watch fob chain,
+# ivory standing shirt collar band, wrapped cravat with aged brass pin brooch.
 # =========================================================================
-WC_ROWS = [(0.985,.250,.147,-0.12,0.06),(1.05,.238,.141,-0.13,0.07),
-           (1.13,.230,.138,-0.16,0.10),(1.21,.238,.141,-0.24,0.18),
-           (1.29,.262,.146,-0.40,0.34),(1.37,.300,.152,-0.50,0.44),
-           (1.43,.306,.146,-0.54,0.48),(1.468,.292,.128,-0.56,0.50)]
+
+WC_ROWS = [(0.985, .250, .147, -0.12, 0.06), (1.05, .238, .141, -0.13, 0.07),
+           (1.13, .230, .138, -0.16, 0.10), (1.21, .238, .141, -0.24, 0.18),
+           (1.29, .262, .146, -0.40, 0.34), (1.37, .300, .152, -0.50, 0.44),
+           (1.43, .306, .146, -0.54, 0.48), (1.468, .292, .128, -0.56, 0.50)]
+
 def wc_rows():
     return [(lambda a, y=y, rx=rx, rz=rz, a0=a0, a1=a1: (y, rx, rz, 0.0, a0, a1))
             for y, rx, rz, a0, a1 in WC_ROWS]
+
 def wc_fold(a, ri):
     y = WC_ROWS[ri][0]
-    return (0.0028*math.sin(7*a+1.0)*smoothstep(1.05,1.15,y)*(1.0-smoothstep(1.30,1.40,y)), 0.0, 0.0)
+    return (0.0028*math.sin(7*a + 1.0)*smoothstep(1.05, 1.15, y)*(1.0 - smoothstep(1.30, 1.40, y)), 0.0, 0.0)
+
 thick_ring_shell("ClothAccent", "UpperClothing/Waistcoat", wc_rows(),
-    thick=.008, sides=18, a0=-0.70, a1=0.66, rim_start=True, rim_end=True, fold=wc_fold)
-# offset button placket line (asymmetric, left of centre) with bone buttons
+    thick=.008, sides=20, a0=-0.70, a1=0.66, rim_start=True, rim_end=True, fold=wc_fold)
+
 wc_y = [r[0] for r in WC_ROWS]; wc_rx = [r[1] for r in WC_ROWS]; wc_rz = [r[2] for r in WC_ROWS]
 for i in range(5):
-    y = 1.40 - .085*i
+    y = 1.38 - .082*i
     ry = interp_val(y, wc_y, wc_rx); rzv = interp_val(y, wc_y, wc_rz)
-    p = shell_point(y, ry, rzv, 0.0, -0.06, 0.004, 0, 0)
-    ellipsoid("BoneThread", f"Accessories/WaistcoatButton_{i+1}", (p[0], p[1], p[2]), (.0085, .0085, .005), 8, 10)
+    p = shell_point(y, ry, rzv, 0.0, -0.06, 0.005, 0, 0)
+    button_disc("BoneThread", f"Accessories/WaistcoatButton_{i+1}", p, (0, 0.15, 1.0), radius=.0075, thick=.0032, thread_mat="AgedBrass")
+
 for wi, wy in ((1, 1.14), (2, 1.23)):
     ry = interp_val(wy, wc_y, wc_rx); rzv = interp_val(wy, wc_y, wc_rz)
     p0 = shell_point(wy, ry, rzv, 0.0, -0.16, 0.005, 0, 0)
-    p1 = shell_point(wy, ry, rzv, 0.0, 0.13, 0.005, 0, 0)
-    tube("BoneThread", f"Accessories/WaistcoatWelt_{wi}", [p0, vadd(lerp(p0, p1, .5), (0, .002, 0)), p1], [.003]*3, 6, (0, 1, 0))
+    p1 = shell_point(wy, ry, rzv, 0.0, -0.02, 0.005, 0, 0)
+    tube("BoneThread", f"Accessories/WaistcoatWeltL_{wi}", [p0, vadd(lerp(p0, p1, .5), (0, .002, 0)), p1], [.0028]*3, 6, (0, 1, 0))
+    p0r = shell_point(wy, ry, rzv, 0.0, 0.02, 0.005, 0, 0)
+    p1r = shell_point(wy, ry, rzv, 0.0, 0.16, 0.005, 0, 0)
+    tube("BoneThread", f"Accessories/WaistcoatWeltR_{wi}", [p0r, vadd(lerp(p0r, p1r, .5), (0, .002, 0)), p1r], [.0028]*3, 6, (0, 1, 0))
 
-# =========================================================================
-# SHIRT + CRACVAT: ivory standing collar band hugging the neck, cuffs at
-# the wrists; wrapped neckcloth with an off-center knot and two unequal
-# tails falling over the waistcoat.
-# =========================================================================
+chain_pts = []
+for k in range(9):
+    t = k / 8.0
+    cy = 1.22 - 0.05 * math.sin(math.pi * t)
+    cx = 0.08 * (1.0 - t) - 0.04 * t
+    cz = 0.142 + 0.010 * math.sin(math.pi * t)
+    chain_pts.append((cx, cy, cz))
+tube("AgedBrass", "Accessories/WatchChain", chain_pts, [.0022]*9, 6, (0, 1, 0))
+
 thick_ring_shell("BoneThread", "UpperClothing/ShirtCollar",
-    [ (lambda a, y=y, rx=rx, rz=rz: (y, rx, rz, -0.011)) for y, rx, rz in
-      ((1.477,.0675,.0715),(1.522,.0705,.0745)) ],
-    thick=.0035, sides=22, a0=0.0, a1=2*math.pi, wrap=True, rim_start=False, rim_end=True)
-for side, label in ((-1,"L"),(1,"R")):
-    x=side
-    thick_ring_shell("BoneThread", f"UpperClothing/ShirtCuff_{label}",
-        [ (lambda a, y=y, rx=rx, rz=rz: (y, rx, rz, .037)) for y, rx, rz in
-          ((.958,.050,.047),(0.982,.053,.050)) ],
-        thick=.003, sides=14, a0=0.0, a1=2*math.pi, wrap=True,
-        rim_start=False, rim_end=True, center=(x*.390, 0, 0))
+    [(lambda a, y=y, rx=rx, rz=rz: (y, rx, rz, -0.011)) for y, rx, rz in
+     ((1.477, .0675, .0715), (1.522, .0705, .0745))],
+    thick=.0035, sides=24, a0=0.0, a1=2*math.pi, wrap=True, rim_start=False, rim_end=True)
+collar_stitch_pts = [(.071*math.sin(2*math.pi*k/12), 1.520, -.011 + .075*math.cos(2*math.pi*k/12)) for k in range(12)]
+stitch_dashes("ClothAccent", "UpperClothing/ShirtCollarStitch", collar_stitch_pts, 10, r=0.0018, length=0.009)
+
 neck_pts = []
-for k in range(7):
-    a = -0.95 + 1.9*k/6
-    neck_pts.append((0.083*math.sin(a), 1.494 - 0.006*(k/6.0), -0.011 + 0.082*math.cos(a)))
+for k in range(8):
+    a = -0.95 + 1.9*k/7
+    neck_pts.append((0.083*math.sin(a), 1.494 - 0.006*(k/7.0), -0.011 + 0.082*math.cos(a)))
 strap_band("BoneThread", "Accessories/CravatBand", neck_pts, width=.034, thick=.006,
     normal_fn=lambda p, t: norm((p[0], 0.15, p[2])))
 ellipsoid("BoneThread", "Accessories/CravatKnot", (.014, 1.488, .108), (.026, .021, .017), 8, 12)
+
+button_disc("AgedBrass", "Accessories/CravatBrooch", (.014, 1.488, .124), (0.05, 0.1, 1.0), radius=.0075, thick=.0032, thread_mat=None)
+
 def front_normal(p, t):
     return norm((p[0]*0.35, 0, 1.0))
+
 strap_band("BoneThread", "Accessories/CravatTailL",
     [(.026, 1.478, .114), (.042, 1.410, .122), (.050, 1.340, .116), (.054, 1.324, .114)],
     width=.026, thick=.004, normal_fn=front_normal)
+stitch_dashes("ClothAccent", "Accessories/CravatTailLStitch",
+    [(.026, 1.478, .116), (.042, 1.410, .124), (.050, 1.340, .118)], 4, r=0.0018, length=0.009)
+
 strap_band("BoneThread", "Accessories/CravatTailR",
     [(.004, 1.480, .115), (-.004, 1.435, .123), (-.012, 1.404, .118)],
     width=.024, thick=.004, normal_fn=front_normal)
 
+
 # =========================================================================
-# THE WAYFARER'S GREATCOAT - original design.
-# A heavy, layered greatcoat built as true cloth solids. The front closes
-# left-over-right with a deep V opening over the waistcoat; the standing
-# collar and the asymmetric shoulder mantle wrap the back; sleeves carry
-# gathered heads, elbow creases and bound cuffs. Every cut edge is bound
-# with a rim so the cloth reads with real thickness. Layers stack:
-# shirt > waistcoat > coat bodice > belt > coat skirt > boots.
-# Character faces +Z; a=0 is front centre, wearer's left is +X (a=+pi/2).
+# GREATCOAT BODICE & BACK TAILORING (Crucial for Gameplay Camera!):
+# Asymmetric left-over-right closure, raised center-back spine seam welt,
+# curved shoulder-blade princess seams, shoulder epaulettes with brass buttons,
+# folded-back wine lapels with double saddle stitching, 4 pairs of aged
+# brass frog clasps down torso, side pocket welts with button flaps.
 # =========================================================================
 
-# Inner-surface radii of the coat bodice (y, rx, rz). Outer face adds COAT_T.
-BODICE_ROWS = [(1.00,.272,.168),(1.03,.254,.157),
-               (1.16,.262,.158),(1.28,.290,.162),(1.38,.312,.160),
-               (1.455,.302,.148),(1.495,.266,.125)]
-COAT_T = 0.011          # cloth thickness of the coat body
+BODICE_ROWS = [(1.00, .272, .168), (1.03, .254, .157),
+               (1.16, .262, .158), (1.28, .290, .162), (1.38, .312, .160),
+               (1.455, .302, .148), (1.495, .266, .125)]
+COAT_T = 0.011
 
 def coat_inner(y):
     return (interp_val(y, [r[0] for r in BODICE_ROWS], [r[1] for r in BODICE_ROWS]),
@@ -1069,18 +1226,15 @@ def coat_surf(a, y, out=0.0):
     rx, rz = coat_inner(y)
     return shell_point(y, rx + COAT_T + out, rz + COAT_T + out, 0.0, a, 0.0, 0.0, 0.0)
 
-# Front-opening edges: the V gapes wide at the collar and closes below the
-# chest; the left panel overlaps past centre (left-over-right closure).
-def edge_left(y):    # V half-width on the wearer's left of centre (+angle)
+def edge_left(y):
     return 0.50 * smoothstep(1.20, 1.47, y) + 0.10 * (1 - smoothstep(1.20, 1.47, y))
-def edge_right(y):   # V half-width on the wearer's right of centre (+angle)
+def edge_right(y):
     return 0.42 * smoothstep(1.18, 1.45, y) + 0.06 * (1 - smoothstep(1.18, 1.45, y))
 
 def bodice_rows_factory(which):
     rows = []
     for y, rx, rz in BODICE_ROWS:
         def fn(a, y=y, rx=rx, rz=rz, which=which):
-            # left panel: +edge -> left side -> back; right panel: back -> right side -> -edge
             if which == "L":
                 return (y, rx, rz, 0.0, edge_left(y), math.pi)
             return (y, rx, rz, 0.0, math.pi, 2*math.pi - edge_right(y))
@@ -1092,12 +1246,12 @@ def bodice_fold_factory(panel):
         am = a % (2*math.pi)
         y = BODICE_ROWS[min(ri, len(BODICE_ROWS)-1)][0]
         dr = 0.0
-        w = smoothstep(1.40, 1.475, y)                      # structured shoulders
+        w = smoothstep(1.40, 1.475, y)
         dr += 0.005 * w * (gauss(am, math.pi/2, .50) + gauss(am, 1.5*math.pi, .50))
         dr += 0.004 * math.sin(9*a + 0.8) * smoothstep(.94, 1.02, y) * (1 - smoothstep(1.08, 1.22, y))
         dr -= 0.004 * gauss(am, math.pi, 0.45) * (1 - smoothstep(1.18, 1.34, y))
         if panel == "L":
-            dr += 0.005 * max(0.0, math.cos(am))            # overlap lift near front only
+            dr += 0.005 * max(0.0, math.cos(am))
         return (dr, 0.0, 0.0)
     return fold
 
@@ -1110,89 +1264,106 @@ thick_ring_shell("Cloth", "UpperClothing/CoatBodice_R",
     a0=math.pi, a1=2*math.pi - 0.06, rim_start=False, rim_end=True,
     fold=bodice_fold_factory("R"))
 
+spine_pts = [coat_surf(math.pi, y, out=0.002) for y in (1.02, 1.10, 1.18, 1.26, 1.35, 1.44, 1.485)]
+welt_seam("Cloth", "UpperClothing/SpineSeam", spine_pts, radius=0.004)
+stitch_dashes("BoneThread", "UpperClothing/SpineSeamStitch", spine_pts, 8, r=0.0022, length=0.012)
+
+for side, s_ang, label in ((-1, math.pi - 0.42, "L"), (1, math.pi + 0.42, "R")):
+    prin_pts = [coat_surf(s_ang + 0.08*(1.48 - y), y, out=0.002) for y in (1.03, 1.12, 1.22, 1.32, 1.42, 1.48)]
+    welt_seam("Cloth", f"UpperClothing/PrincessSeam_{label}", prin_pts, radius=0.0035)
+    stitch_dashes("BoneThread", f"UpperClothing/PrincessSeamStitch_{label}", prin_pts, 6, r=0.0020, length=0.011)
+
+for side, label in ((-1, "L"), (1, "R")):
+    x = side
+    ep_pts = [(x*.16, 1.478, -.005), (x*.22, 1.468, .002), (x*.28, 1.455, .008)]
+    strap_band("Leather", f"UpperClothing/Epaulette_{label}", ep_pts, width=.024, thick=.004, normal_fn=lambda p, t: (0, 1.0, 0))
+    stitch_dashes("BoneThread", f"UpperClothing/EpauletteStitch_{label}", ep_pts, 4, r=0.0020, length=0.009)
+    button_disc("AgedBrass", f"UpperClothing/EpauletteButton_{label}", (x*.17, 1.482, -.005), (0, 1.0, 0), radius=.0075, thick=.0032, thread_mat=None)
+
 def thick_panel(mat, name, grid, thick):
-    """Cloth solid from a point grid: front face, offset back face, rims."""
     rows, cols = len(grid), len(grid[0])
     pts = [p for row in grid for p in row]
-    # back face: offset each point inward along its radial direction
     back = []
     for p in grid:
         brow = []
         for x, y, z in p:
             r = math.hypot(x, z)
-            if r > 1e-9:
-                k = (r - thick) / r
-                brow.append((x*k, y, z*k))
-            else:
-                brow.append((x, y, z - thick))
+            k = (r - thick) / r if r > 1e-9 else 1.0
+            brow.append((x*k, y, z*k))
         back.append(brow)
     pts += [p for row in back for p in row]
     fs = []
     for r in range(rows-1):
         for c in range(cols-1):
-            i00=r*cols+c; i01=r*cols+c+1; i10=(r+1)*cols+c; i11=(r+1)*cols+c+1
-            o=rows*cols
-            fs.append((i00, i10, i11)); fs.append((i00, i11, i01))          # front
-            fs.append((o+i00, o+i11, o+i10)); fs.append((o+i00, o+i01, o+i11))  # back
-            fs.append((i01, i11, o+i11)); fs.append((i01, o+i11, o+i01))    # outer edge
-    for r in range(rows-1):                                                 # inner edge rim
-        i0=r*cols; i1=(r+1)*cols; o=rows*cols
+            i00 = r*cols+c; i01 = r*cols+c+1; i10 = (r+1)*cols+c; i11 = (r+1)*cols+c+1
+            o = rows*cols
+            fs.append((i00, i10, i11)); fs.append((i00, i11, i01))
+            fs.append((o+i00, o+i11, o+i10)); fs.append((o+i00, o+i01, o+i11))
+            fs.append((i01, i11, o+i11)); fs.append((i01, o+i11, o+i01))
+    for r in range(rows-1):
+        i0 = r*cols; i1 = (r+1)*cols; o = rows*cols
         fs.append((i0, o+i0, o+i1)); fs.append((i0, o+i1, i1))
-    for c in range(cols-1):                                                 # top/bottom rims
-        i0=c; i1=c+1; o=rows*cols; b=(rows-1)*cols
+    for c in range(cols-1):
+        i0 = c; i1 = c+1; o = rows*cols; b = (rows-1)*cols
         fs.append((i0, i1, o+i1)); fs.append((i0, o+i1, o+i0))
         fs.append((b+c, o+b+c, o+b+c+1)); fs.append((b+c, o+b+c+1, b+c+1))
     add_mesh(mat, name, pts, fs)
 
-
-
-def coat_edge_point(y, panel, out=0.0):
-    """Point exactly on the *displaced* bodice surface at a front edge."""
-    if panel == "L":
-        a = edge_left(y); fold = bodice_fold_factory("L")
-    else:
-        a = edge_right(y); fold = bodice_fold_factory("R")
-    ri = min(range(len(BODICE_ROWS)), key=lambda i: abs(BODICE_ROWS[i][0] - y))
-    dr, _, _ = fold(a, ri)
-    p = coat_surf(a, y, out=0.0)
-    return (p[0] * (1.0 + dr / max(math.hypot(p[0], p[2]), 1e-6)), p[1],
-            p[2] * (1.0 + dr / max(math.hypot(p[0], p[2]), 1e-6)))
-
-# Folded-back lapels: wide wine panels lying on the chest beside the open V,
-# narrow at the collar and widening as they descend, ending mid-chest where
-# the closure takes over. The left (over) lapel is broader by design.
 for panel, label, spread_top, spread_bot, y0, y1 in (("L", "L", 0.15, 0.30, 1.22, 1.496),
                                                      ("R", "R", 0.13, 0.26, 1.24, 1.464)):
     sgn = 1.0 if panel == "L" else -1.0
     edge_fn = edge_left if panel == "L" else edge_right
     grid = []
+    outer_lapel_edge = []
     for k in range(9):
         t = k / 8.0
-        y = y0 + (y1-y0)*t
+        y = y0 + (y1 - y0)*t
         row = []
         for j in range(4):
             u = j / 3.0
-            spread = spread_bot + (spread_top - spread_bot) * t   # wide chest, narrow collar
+            spread = spread_bot + (spread_top - spread_bot) * t
             a = sgn * (edge_fn(y) + spread * u)
             p = coat_surf(a, y, out=0.002 + 0.002*u)
             row.append(p)
+            if j == 3:
+                outer_lapel_edge.append(p)
         grid.append(row)
     thick_panel("ClothAccent", f"UpperClothing/Lapel_{label}", grid, thick=.006)
+    stitch_dashes("BoneThread", f"UpperClothing/LapelStitch_{label}", outer_lapel_edge, 8, r=0.0022, length=0.011)
+    top_p = outer_lapel_edge[-1]
+    rivet_cap("AgedBrass", f"UpperClothing/LapelStud_{label}", top_p, (sgn*0.5, 0.2, 0.8), radius=0.0055, height=0.0035)
 
-# Brass hook fasteners along the closed overlap below the lapels.
+def coat_edge_point(y, panel, out=0.0):
+    a = edge_left(y) if panel == "L" else edge_right(y)
+    p = coat_surf(a, y, out=out)
+    return p
+
 for hi, hy in enumerate((1.02, 1.10, 1.18, 1.26)):
-    p = coat_edge_point(hy, "L", out=0.003)
-    a = edge_left(hy)
-    tdir = (math.cos(a), 0.0, -math.sin(a))
-    tube("AgedBrass", f"Accessories/CoatHook_{hi+1}",
-         [vadd(p, vmul(tdir, .010)), p, vadd(p, (0, -.011, 0))], [.0032]*3, 6, (0, 1, 0))
-    stud = coat_edge_point(hy + 0.004, "R", out=0.0)
-    ellipsoid("AgedBrass", f"Accessories/CoatHookStud_{hi+1}", stud, (.006, .006, .004), 8, 10)
+    pL = coat_edge_point(hy, "L", out=0.004)
+    pR = coat_edge_point(hy, "R", out=0.004)
+    strap_band("Leather", f"Accessories/FrogTabL_{hi+1}", [vadd(pL, (.020, 0, -.005)), pL], width=.014, thick=.003, normal_fn=lambda p, t: (0, 0, 1.0))
+    strap_band("Leather", f"Accessories/FrogTabR_{hi+1}", [vadd(pR, (-.020, 0, -.005)), pR], width=.014, thick=.003, normal_fn=lambda p, t: (0, 0, 1.0))
+    rivet_cap("AgedBrass", f"Accessories/FrogRivetL_{hi+1}", vadd(pL, (.016, 0, -.003)), (0, 0, 1.0), radius=0.0045)
+    rivet_cap("AgedBrass", f"Accessories/FrogRivetR_{hi+1}", vadd(pR, (-.016, 0, -.003)), (0, 0, 1.0), radius=0.0045)
+    torus_arc("AgedBrass", f"Accessories/FrogLoop_{hi+1}", vadd(pL, (-.005, 0, .002)), .007, .0022, 6, 10, axis=(0, 1, 0))
+    tube("AgedBrass", f"Accessories/FrogToggle_{hi+1}", [vadd(pR, (-.012, -.008, .002)), vadd(pR, (-.002, .008, .002))], [.0026, .0026], 6, (0, 0, 1))
 
-# -------------------------------------------------------------------------
-# Coat skirt: continues from under the belt to an asymmetric split hem,
-# swept back below the waist, deep sway folds front-to-back.
-# -------------------------------------------------------------------------
+for side, s_ang, label in ((-1, math.pi*0.5 + 0.15, "L"), (1, 1.5*math.pi - 0.15, "R")):
+    x = side
+    p_pts = [coat_surf(s_ang - 0.10, 1.06, out=0.004), coat_surf(s_ang, 1.055, out=0.006), coat_surf(s_ang + 0.10, 1.06, out=0.004)]
+    strap_band("ClothAccent", f"UpperClothing/PocketFlap_{label}", p_pts, width=.036, thick=.005, normal_fn=lambda p, t: norm((p[0], 0, p[2])))
+    stitch_dashes("BoneThread", f"UpperClothing/PocketFlapStitch_{label}", p_pts, 4, r=0.0020, length=0.010)
+    p_mid = coat_surf(s_ang, 1.045, out=0.008)
+    button_disc("AgedBrass", f"UpperClothing/PocketButton_{label}", p_mid, norm((p_mid[0], 0, p_mid[2])), radius=.007, thick=.003, thread_mat=None)
+
+
+# =========================================================================
+# COAT SKIRT & REAR VENT (High Gameplay Camera Visibility!):
+# Sweeping asymmetric skirt, bound hem piping along bottom edges,
+# rear split tail vent with accordion kick pleat, rear waist martingale
+# tab with pair of aged brass crested greatcoat tail buttons.
+# =========================================================================
+
 def skirt_rows(front_edge, span_a0, span_a1, hem_back_y, hem_front_lift, flare_rx, flare_rz):
     rows = []
     depths = [0.0, .07, .19, .34, .47, 1.00 - hem_back_y]
@@ -1231,18 +1402,34 @@ thick_ring_shell("Cloth", "LowerClothing/CoatSkirt_L", skL, thick=COAT_T, sides=
 thick_ring_shell("Cloth", "LowerClothing/CoatSkirt_R", skR, thick=COAT_T, sides=34,
     a0=math.pi, a1=2*math.pi + 0.12, rim_start=True, rim_end=True, fold=skirt_fold(0.12, 2.9))
 
-# -------------------------------------------------------------------------
-# Standing collar: wraps the back of the neck, open at the throat; wine
-# outer shell with a contrasting inner facing, an offset throat tab and a
-# miniature brass buckle (asymmetric throat closure).
-# -------------------------------------------------------------------------
+# Rear Tail Vent & Accordion Kick Pleat
+pleat_pts = [coat_surf(math.pi, y, out=-0.004) for y in (0.42, 0.55, 0.70, 0.85, 0.98)]
+welt_seam("ClothAccent", "LowerClothing/VentPleat", pleat_pts, radius=0.008)
+
+# Rear Waist Martingale Tab & Aged Brass Greatcoat Buttons
+tab_pts = [coat_surf(math.pi - 0.32, 1.018, out=0.012), coat_surf(math.pi, 1.015, out=0.014), coat_surf(math.pi + 0.32, 1.018, out=0.012)]
+strap_band("Leather", "Accessories/RearMartingale", tab_pts, width=.038, thick=.006, normal_fn=lambda p, t: norm((p[0], 0, p[2])))
+stitch_dashes("BoneThread", "Accessories/RearMartingaleStitch", tab_pts, 6, r=0.0024, length=0.012)
+btnL = coat_surf(math.pi - 0.28, 1.018, out=0.018)
+btnR = coat_surf(math.pi + 0.28, 1.018, out=0.018)
+button_disc("AgedBrass", "Accessories/RearCoatButton_L", btnL, norm((btnL[0], 0, btnL[2])), radius=.010, thick=.004, thread_mat=None)
+button_disc("AgedBrass", "Accessories/RearCoatButton_R", btnR, norm((btnR[0], 0, btnR[2])), radius=.010, thick=.004, thread_mat=None)
+
+
+# =========================================================================
+# STANDING GREATCOAT COLLAR: high standing collar wrapping the neck,
+# wine outer shell with dark blue facing, bone piping along top rim,
+# buckled leather throat tab & aged brass studs.
+# =========================================================================
+
 def collar_profile(y0, h_front, h_back, rx, rz, grow, zc=-0.008):
     def fn(a):
-        ang = (a + math.pi) % (2*math.pi) - math.pi   # 0 at front centre
+        ang = (a + math.pi) % (2*math.pi) - math.pi
         back_w = 1.0 - clamp(abs(ang) / math.pi, 0.0, 1.0)
         h = h_front + (h_back - h_front) * (back_w ** 1.3)
         return (y0 + h, rx + grow * h, rz + grow * h, zc)
     return fn
+
 def blended_rows(f0, f1, ts, gap_a=0.86):
     out = []
     for t in ts:
@@ -1252,116 +1439,145 @@ def blended_rows(f0, f1, ts, gap_a=0.86):
                     p0[2] + (p1[2]-p0[2])*t, p0[3], gap_a + t*0.02, 2*math.pi - gap_a - t*0.02)
         out.append(fn)
     return out
+
 COLLAR_A0 = 0.86
 collar_base = collar_profile(1.486, 0.0, 0.0, .0945, .1005, .16)
-collar_top  = collar_profile(1.486, .030, .078, .0945, .1005, .16)
+collar_top = collar_profile(1.486, .030, .078, .0945, .1005, .16)
 thick_ring_shell("ClothAccent", "UpperClothing/CoatCollar",
     blended_rows(collar_base, collar_top, (0.0, 0.4, 0.75, 1.0)),
     thick=.006, sides=30, a0=COLLAR_A0, a1=2*math.pi-COLLAR_A0, rim_start=False, rim_end=True)
+
 facing_base = collar_profile(1.486, 0.0, 0.0, .0885, .0945, .16)
-facing_top  = collar_profile(1.486, .024, .064, .0885, .0945, .16)
+facing_top = collar_profile(1.486, .024, .064, .0885, .0945, .16)
 thick_ring_shell("Cloth", "UpperClothing/CollarFacing",
     blended_rows(facing_base, facing_top, (0.0, 0.55, 1.0)),
     thick=.005, sides=30, a0=COLLAR_A0, a1=2*math.pi-COLLAR_A0, rim_start=False, rim_end=True)
+
 collar_edge = []
 for k in range(15):
     t = k / 14.0
     a = (COLLAR_A0 + (2*math.pi - 2*COLLAR_A0) * t)
     p = collar_top(a)
     collar_edge.append(shell_point(p[0] + 0.002, p[1] + 0.008, p[2] + 0.008, p[3], a, 0, 0, 0))
-tube("BoneThread", "Accessories/CollarPiping", collar_edge, [.0032]*15, 6, (0, 1, 0))
-# throat tab: bridges from the left collar edge across the gap, buckled.
+tube("BoneThread", "Accessories/CollarPiping", collar_edge, [.0034]*15, 6, (0, 1, 0))
+stitch_dashes("ClothAccent", "Accessories/CollarStitch", collar_edge, 10, r=0.0020, length=0.010)
+
 tab_pts = []
 for k in range(7):
     t = k / 6.0
-    a = 0.92 - (0.92 + 0.92)*t     # left edge to right edge, through front
+    a = 0.92 - (0.92 + 0.92)*t
     tab_pts.append(shell_point(1.512 + 0.004*t, .101 - .002*t, .106 + .002*t, -0.008, a, 0, 0, 0))
-strap_band("Leather", "Accessories/CollarTab", tab_pts, width=.016, thick=.003,
-    normal_fn=lambda p, t: norm((p[0], 0.35, p[2])))
+strap_band("Leather", "Accessories/CollarTab", tab_pts, width=.016, thick=.0032, normal_fn=lambda p, t: norm((p[0], 0.35, p[2])))
+stitch_dashes("BoneThread", "Accessories/CollarTabStitch", tab_pts, 4, r=0.0018, length=0.009)
 be = tab_pts[-1]
-tube("AgedBrass", "Accessories/CollarBuckleSide", [(be[0]-.0055, be[1]-.0055, be[2]+.004), (be[0]-.0055, be[1]+.0055, be[2]+.004)], [.0024, .0024], 6, (0, 0, 1))
-tube("AgedBrass", "Accessories/CollarBuckleSide2", [(be[0]+.0055, be[1]-.0055, be[2]+.004), (be[0]+.0055, be[1]+.0055, be[2]+.004)], [.0024, .0024], 6, (0, 0, 1))
-tube("AgedBrass", "Accessories/CollarBuckleBar", [(be[0]-.0055, be[1]+.0055, be[2]+.004), (be[0]+.0055, be[1]+.0055, be[2]+.004)], [.0024, .0024], 6, (0, 1, 0))
-# small bone stud on the right collar edge where the tab points
+buckle_frame("AgedBrass", "Accessories/CollarBuckle", (be[0], be[1], be[2] + .004), (0, 0.2, 1.0), up=(0, 1, 0), width=.018, height=.022, bar_r=.0022)
 stud_p = shell_point(1.508, .102, .107, -0.008, -0.86, 0, 0, 0)
-ellipsoid("BoneThread", "Accessories/CollarStud", stud_p, (.005, .005, .004), 8, 10)
+rivet_cap("AgedBrass", "Accessories/CollarStud", stud_p, (-0.6, 0.2, 0.8), radius=.0055)
 
-# -------------------------------------------------------------------------
-# Shoulder mantle: short asymmetric half-cape wrapping the BACK and both
-# shoulders, open at the chest; deepest at the left-back, ripples along the
-# hem, bound hem with bone piping and a brass chain clasp at its right edge.
-# -------------------------------------------------------------------------
+
+# =========================================================================
+# SHOULDER MANTLE / HALF-CAPE (High Gameplay Camera Visibility!):
+# Asymmetric mantle wrapping back and shoulders (deeper on left),
+# bound hem with bone piping, hem saddle stitching, cowl neck fold,
+# dual aged brass ornate shoulder clasps and connecting chain swag.
+# =========================================================================
+
 MANTLE_A0, MANTLE_A1 = 1.95, 2*math.pi - 1.95
+
 def mantle_row_fn(t):
     def fn(a, t=t):
-        s = (a - MANTLE_A0) / (MANTLE_A1 - MANTLE_A0)      # 0 right edge, 1 left edge
-        back_w = math.sin(clamp(s, 0.0, 1.0) * math.pi)     # 0 at edges, 1 at back
+        s = (a - MANTLE_A0) / (MANTLE_A1 - MANTLE_A0)
+        back_w = math.sin(clamp(s, 0.0, 1.0) * math.pi)
         depth = 0.075 + 0.105 * (back_w ** 1.4) + 0.026 * gauss(a, 2.45, 0.8)
         y0, rx0, rz0 = 1.492, .310, .168
         y1, rx1, rz1 = y0 - depth, .334 + .014*back_w, .184 + .012*back_w
         return (y0 + (y1 - y0)*t, rx0 + (rx1 - rx0)*t, rz0 + (rz1 - rz0)*t, 0.0,
                 MANTLE_A0 + 0.02*t, MANTLE_A1 - 0.02*t)
     return fn
+
 def mantle_fold(a, ri):
     t = ri / 3.0
     return (0.0035*math.sin(7*a + .3)*t, -0.006*math.sin(5*a + 1.2)*t, 0.0)
+
 mantle_rows = [mantle_row_fn(t) for t in (0.0, 0.45, 1.0)]
 thick_ring_shell("Cloth", "UpperClothing/ShoulderMantle", mantle_rows,
     thick=.008, sides=34, a0=MANTLE_A0, a1=MANTLE_A1, rim_start=True, rim_end=True,
     fold=mantle_fold)
+
 mantle_hem = []
 for k in range(23):
     a = MANTLE_A0 + (MANTLE_A1 - MANTLE_A0)*k/22
     p = mantle_row_fn(1.0)(a)
     dr, dy, _ = mantle_fold(a, 3)
     mantle_hem.append(shell_point(p[0] + dy, p[1] + dr + .002, p[2] + dr + .002, 0.0, a, 0, 0, 0))
-tube("BoneThread", "Accessories/MantleHemPiping", mantle_hem, [.0032]*23, 6, (0, 1, 0))
-# small brass stud pair pins the mantle edge to the shoulder seam
-for si, sa in enumerate((MANTLE_A0 + 0.05, 2*math.pi - MANTLE_A0 - 0.05)):
-    p = mantle_row_fn(0.02)(sa)
-    ellipsoid("AgedBrass", f"Accessories/MantleStud_{si+1}",
-              (p[0]*1.0, p[1], p[2]), (.007, .007, .005), 8, 10)
+tube("BoneThread", "Accessories/MantleHemPiping", mantle_hem, [.0034]*23, 6, (0, 1, 0))
+stitch_dashes("ClothAccent", "Accessories/MantleHemStitch", mantle_hem, 14, r=0.0022, length=0.012)
 
-# -------------------------------------------------------------------------
-# Coat sleeves: gathered heads, elbow creases, bound cuffs with a folded
-# wine cuff band; leather cuff strap and buckle on the right sleeve only,
-# stitched elbow reinforcement patch on the left.
-# -------------------------------------------------------------------------
+for si, sa, label in ((1, MANTLE_A0 + 0.06, "R"), (2, 2*math.pi - MANTLE_A0 - 0.06, "L")):
+    p = mantle_row_fn(0.04)(sa)
+    clasp_c = (p[0], p[1] + 0.004, p[2] + 0.004)
+    button_disc("AgedBrass", f"Accessories/MantleClasp_{label}", clasp_c, (0, 0.8, 0.6), radius=.009, thick=.004, thread_mat=None)
+    torus_arc("AgedBrass", f"Accessories/MantleClaspRing_{label}", clasp_c, .011, .0024, 6, 10, axis=(0, 1, 0))
+
+chain_pts = []
+p_clasp_R = mantle_row_fn(0.04)(MANTLE_A0 + 0.06)
+p_clasp_L = mantle_row_fn(0.04)(2*math.pi - MANTLE_A0 - 0.06)
+for k in range(11):
+    t = k / 10.0
+    cp = lerp(p_clasp_R, p_clasp_L, t)
+    sag = 0.024 * math.sin(math.pi * t)
+    chain_pts.append((cp[0], cp[1] - sag, cp[2] + 0.010 * math.sin(math.pi * t)))
+tube("AgedBrass", "Accessories/MantleChainSwag", chain_pts, [.0022]*11, 6, (0, 1, 0))
+
+
+# =========================================================================
+# COAT SLEEVES: gathered heads, elbow creases, tailored arm seams,
+# left stitched elbow reinforcement patch, right cuff strap & buckle.
+# =========================================================================
+
 def sleeve_fold_factory(side):
     def fold(i, s_idx, a):
         dr = 0.0
-        dr += 0.005 * math.sin(3*a + 1.7*side) * max(0.0, 1.0 - i)      # gathered head
-        dr -= 0.0065 * math.exp(-((i - 2.05)/0.55)**2) * (0.55 + 0.45*math.cos(2*a + side))  # elbow creases
+        dr += 0.005 * math.sin(3*a + 1.7*side) * max(0.0, 1.0 - i)
+        dr -= 0.0065 * math.exp(-((i - 2.05)/0.55)**2) * (0.55 + 0.45*math.cos(2*a + side))
         return dr
     return fold
+
 for side, label in ((-1, "L"), (1, "R")):
     x = side
-    thick_tube("Cloth", f"UpperClothing/CoatSleeve_{label}",
-        [(x*.201, 1.462, -.008), (x*.296, 1.360, .008), (x*.352, 1.185, .020),
-         (x*.383, 1.065, .032), (x*.389, 1.012, .036)],
+    sleeve_pts = [(x*.201, 1.462, -.008), (x*.296, 1.360, .008), (x*.352, 1.185, .020),
+                  (x*.383, 1.065, .032), (x*.389, 1.012, .036)]
+    thick_tube("Cloth", f"UpperClothing/CoatSleeve_{label}", sleeve_pts,
         [(.097, .100), (.080, .084), (.069, .073), (.061, .064), (.058, .061)],
         sides=22, thick=.009, fold=sleeve_fold_factory(side), rim_start=True, rim_end=True)
-    thick_tube("ClothAccent", f"UpperClothing/CuffFold_{label}",
-        [(x*.389, 1.010, .036), (x*.392, .982, .038)],
-        [(.061, .065), (.068, .073)], sides=20, thick=.005, rim_start=False, rim_end=True)
-    if side < 0:  # left: stitched elbow reinforcement patch
+    outer_seam = [(x*(.201 + .098), 1.462, -.008), (x*(.296 + .082), 1.360, .008),
+                  (x*(.352 + .070), 1.185, .020), (x*(.383 + .062), 1.065, .032), (x*(.389 + .059), 1.012, .036)]
+    welt_seam("Cloth", f"UpperClothing/SleeveSeam_{label}", outer_seam, radius=0.0034)
+    stitch_dashes("BoneThread", f"UpperClothing/SleeveSeamStitch_{label}", outer_seam, 8, r=0.0020, length=0.011)
+
+    if side < 0:
         ellipsoid("ClothAccent", f"UpperClothing/ElbowPatch_{label}", (x*.416, 1.185, .022), (.012, .052, .048), 8, 12)
-        patch_rim = [(x*.424, 1.185 + .043*math.cos(2*math.pi*k/8), .022 + .040*math.sin(2*math.pi*k/8)) for k in range(8)]
-        stitch_dashes("BoneThread", f"Accessories/ElbowPatchStitch_{label}", patch_rim, 8, r=.0024, length=.010)
-    else:         # right: cuff strap with small buckle
+        patch_rim = [(x*.424, 1.185 + .043*math.cos(2*math.pi*k/10), .022 + .040*math.sin(2*math.pi*k/10)) for k in range(10)]
+        stitch_dashes("BoneThread", f"Accessories/ElbowPatchStitch_{label}", patch_rim, 10, r=0.0024, length=0.010)
+    else:
         ring_pts = [(x*.388 + .0645*math.cos(2*math.pi*k/10), 1.048, .034 + .058*math.sin(2*math.pi*k/10)) for k in range(10)]
         ring_pts.append(ring_pts[0])
-        tube("Leather", f"Accessories/CuffStrap_{label}", ring_pts, [.0032]*11, 6, (0, 1, 0))
-        bxc = x*.452
-        tube("AgedBrass", f"Accessories/CuffBuckleFrame_{label}", [(bxc, 1.038, .034), (bxc, 1.058, .034)], [.0035, .0035], 8, (1, 0, 0))
-        tube("AgedBrass", f"Accessories/CuffBuckleBar_{label}", [(bxc - x*.008, 1.038, .034), (bxc - x*.008, 1.058, .034)], [.003, .003], 8, (1, 0, 0))
+        strap_band("Leather", f"Accessories/CuffStrap_{label}", ring_pts, width=.014, thick=.0032, normal_fn=lambda p, t: norm((p[0]-x*.388, 0, p[2]-.034)), closed=True)
+        bxc = x * (.388 + .066)
+        buckle_frame("AgedBrass", f"Accessories/CuffBuckle_{label}", (bxc, 1.048, .034), (x*1.0, 0, 0), up=(0, 1, 0), width=.018, height=.022, bar_r=.0024)
+
 
 # =========================================================================
-# BELT: wide leather belt cinched over the coat, with a brass frame buckle,
-# prong, two keepers, a punched hanging tip, a flapped field pouch on the
-# right-back hip and a left hanger strap with D-ring and mourning tassel.
+# BELT & ACCESSORIES (High Gameplay Camera Visibility!):
+# Cinched wide leather belt with double border saddle stitching,
+# ornate aged brass frame buckle, prong & dual leather keepers,
+# punched hanging tip with eyelet, field pouch with lid flap,
+# stitching & brass stud, left hip hanger strap, brass D-ring,
+# mourning tassel with bone thread coil, and secondary brass clip.
 # =========================================================================
+
 BELT_Y = 1.033
+
 def belt_ring(a):
     rx, rz = coat_inner(1.03)
     rx += COAT_T + 0.0055; rz += COAT_T + 0.0055
@@ -1373,37 +1589,31 @@ belt_pts = [belt_ring(2*math.pi*k/32) for k in range(32)]
 belt_pts.append(belt_pts[0])
 strap_band("Leather", "Accessories/Belt", belt_pts, width=.078, thick=.009,
     normal_fn=lambda p, t: norm((p[0], 0, p[2])), closed=True)
-# buckle frame, prong and keepers just left of centre-front
+
+double_stitch_band("BoneThread", "Accessories/BeltStitch", belt_pts[:-1], 28,
+    normal_fn=lambda p, t: norm((p[0], 0, p[2])), offset=0.030, r=0.0022, length=0.012)
+
 BA = 0.30
 buck_c = belt_ring(BA)
 buck_out = norm((buck_c[0], 0, buck_c[2]))
-buck_t = (-buck_out[2], 0.0, buck_out[0])
-buck_z = vmul(buck_out, .012)
-for sgn in (-1, 1):
-    tube("AgedBrass", f"Accessories/BuckleSide_{sgn}",
-         [vadd(vadd(buck_c, buck_z), vmul(buck_t, sgn*.024)),
-          vadd(vadd(buck_c, buck_z), vadd(vmul(buck_t, sgn*.024), (0, .052, 0)))], [.005, .005], 8, (0, 1, 0))
-for yy in (0.0, .052):
-    tube("AgedBrass", f"Accessories/BuckleCross_{yy}",
-         [vadd(vadd(buck_c, buck_z), (0, yy, 0)),
-          (buck_c[0] + buck_z[0] + buck_t[0]*.024, BELT_Y + yy, buck_c[2] + buck_z[2] + buck_t[2]*.024)],
-         [.005, .005], 8, (0, 1, 0))
-tube("AgedBrass", "Accessories/BuckleProng",
-     [(buck_c[0] + buck_out[0]*.012, BELT_Y, buck_c[2] + buck_out[2]*.012),
-      (buck_c[0] + buck_out[0]*.012 + buck_t[0]*.020, BELT_Y + .002, buck_c[2] + buck_out[2]*.012 + buck_t[2]*.020)],
-     [.0035, .0035], 6, (0, 1, 0))
+buckle_frame("AgedBrass", "Accessories/MainBeltBuckle", vadd(buck_c, vmul(buck_out, .010)), buck_out, up=(0, 1, 0), width=.048, height=.082, bar_r=.0045)
+
 for ki, ka in enumerate((0.56, 0.05)):
     keep_pts = [belt_ring(ka - 0.11 + 0.22*k/7) for k in range(8)]
-    keep_pts = [vadd(p, vmul(norm((p[0], 0, p[2])), .001)) for p in keep_pts]
+    keep_pts = [vadd(p, vmul(norm((p[0], 0, p[2])), .002)) for p in keep_pts]
     strap_band("Leather", f"Accessories/BeltKeeper_{ki+1}", keep_pts, width=.086, thick=.012,
         normal_fn=lambda p, t: norm((p[0], 0, p[2])))
-# hanging tip beyond the buckle with three punch holes and a brass eyelet
+    stitch_dashes("BoneThread", f"Accessories/BeltKeeperStitch_{ki+1}", keep_pts, 4, r=0.0020, length=0.009)
+
 tip_pts = [vadd(belt_ring(BA - 0.05), (0, -.015, 0)),
            vadd(belt_ring(BA - 0.09), (0, -.055, 0)),
            vadd(belt_ring(BA - 0.12), (0, -.100, 0))]
-tip_pts = [vadd(p, vmul(norm((p[0], 0, p[2])), .004)) for p in tip_pts]
+tip_pts = [vadd(p, vmul(norm((p[0], 0, p[2])), .005)) for p in tip_pts]
 strap_band("Leather", "Accessories/BeltTip", tip_pts, width=.050, thick=.007,
     normal_fn=lambda p, t: norm((p[0], 0, p[2])))
+double_stitch_band("BoneThread", "Accessories/BeltTipStitch", tip_pts, 4,
+    normal_fn=lambda p, t: norm((p[0], 0, p[2])), offset=0.018, r=0.0020, length=0.009)
+
 for hh in range(3):
     hp = lerp(tip_pts[0], tip_pts[2], 0.35 + 0.3*hh)
     ellipsoid("BootSole", f"Accessories/BeltHole_{hh+1}", vadd(hp, vmul(norm((hp[0], 0, hp[2])), .004)),
@@ -1412,7 +1622,6 @@ eye_c = lerp(tip_pts[0], tip_pts[2], 0.30)
 torus_arc("AgedBrass", "Accessories/BeltEyelet", vadd(eye_c, vmul(norm((eye_c[0], 0, eye_c[2])), .006)),
           .007, .0022, 6, 10, axis=(math.cos(BA - 0.07), 0, -math.sin(BA - 0.07)))
 
-# field pouch on the right-back hip
 PA = -2.25
 pc = belt_ring(PA)
 pout = norm((pc[0], 0, pc[2]))
@@ -1420,6 +1629,7 @@ ptan = (-pout[2], 0.0, pout[0])
 pouch_c = vadd(pc, (0, -.055, 0))
 rot = ((ptan[0], 0, ptan[2]), (0, 1, 0), (pout[0], 0, pout[2]))
 ellipsoid("Leather", "Accessories/FieldPouch", vadd(pouch_c, vmul(pout, .022)), (.054, .064, .040), 10, 16, rotation=rot)
+
 flap_pts = []
 for k in range(6):
     t = k / 5.0
@@ -1428,10 +1638,13 @@ for k in range(6):
     flap_pts.append(vadd(vadd(bp, (0, -.075, 0)), vmul(norm((bp[0], 0, bp[2])), .030 + .012*math.sin(math.pi*t))))
 strap_band("Leather", "Accessories/PouchFlap", flap_pts, width=.080, thick=.005,
     normal_fn=lambda p, t: norm((p[0], 0, p[2])))
-stitch_dashes("BoneThread", "Accessories/PouchFlapStitch", flap_pts[1:5], 4, r=.0024, length=.011)
-ellipsoid("AgedBrass", "Accessories/PouchStud", vadd(vadd(flap_pts[2], (0, -.018, 0)), vmul(norm((flap_pts[2][0], 0, flap_pts[2][2])), .008)), (.007, .007, .004), 8, 10)
+stitch_dashes("BoneThread", "Accessories/PouchFlapStitch", flap_pts, 6, r=.0024, length=.011)
+rivet_cap("AgedBrass", "Accessories/PouchStud", vadd(vadd(flap_pts[2], (0, -.018, 0)), vmul(norm((flap_pts[2][0], 0, flap_pts[2][2])), .008)), pout, radius=.007, height=.004)
 
-# left hip hanger strap, D-ring and braided mourning tassel (original ornament)
+for li, la in enumerate((PA - 0.28, PA + 0.28)):
+    lp = belt_ring(la)
+    rivet_cap("AgedBrass", f"Accessories/PouchRivet_{li+1}", vadd(lp, (0, -.025, 0)), norm((lp[0], 0, lp[2])), radius=.0045)
+
 HA = 2.35
 hang_pts = [vadd(belt_ring(HA), (0, .012, 0)),
             vadd(belt_ring(HA + .06), (0, -.062, 0)),
@@ -1439,9 +1652,12 @@ hang_pts = [vadd(belt_ring(HA), (0, .012, 0)),
 hang_pts = [vadd(p, vmul(norm((p[0], 0, p[2])), .004)) for p in hang_pts]
 strap_band("Leather", "Accessories/HangerStrap", hang_pts, width=.020, thick=.004,
     normal_fn=lambda p, t: norm((p[0], 0, p[2])))
+stitch_dashes("BoneThread", "Accessories/HangerStrapStitch", hang_pts, 4, r=0.0018, length=0.009)
+
 dring_c = vadd(hang_pts[2], vmul(norm((hang_pts[2][0], 0, hang_pts[2][2])), .010))
 torus_arc("AgedBrass", "Accessories/HangerDRing", dring_c, .016, .0032, 6, 12,
           axis=(math.cos(HA + .09), 0, -math.sin(HA + .09)))
+
 tas_dir = norm((dring_c[0], 0, dring_c[2]))
 tassel_pts = [vadd(dring_c, vmul(tas_dir, .006)),
               vadd(dring_c, (vmul(tas_dir, .010)[0], -.045, vmul(tas_dir, .010)[2])),
@@ -1451,65 +1667,104 @@ tube("BoneThread", "Accessories/TasselWrap",
      [vadd(dring_c, (vmul(tas_dir, .007)[0], -.012, vmul(tas_dir, .007)[2])),
       vadd(dring_c, (vmul(tas_dir, .007)[0], -.020, vmul(tas_dir, .007)[2]))], [.0045, .0045], 6, (0, 1, 0))
 
+torus_arc("AgedBrass", "Accessories/ToolClipRing", vadd(dring_c, (0, -.025, .012)), .010, .0020, 6, 10, axis=(0, 1, 0))
+
+
 # =========================================================================
-# BALDRIC + HOLLOW COMPASS: a single stitched leather band from the right
-# shoulder to the left hip, carrying the Wayfarer's original navigational
-# instrument - two nested brass rings and a balanced needle on a dark face.
+# BALDRIC & GOTHIC NAVIGATIONAL COMPASS / ASTROLABE:
+# Diagonal leather baldric across chest & back with double saddle stitching,
+# front aged brass adjustment frame buckle with prong & keeper,
+# rear shoulder-blade strap slider, drop strap with brass mounting loop,
+# nested gimballed brass astrolabe rings, pointer needle & dial face.
 # =========================================================================
-bald_pts = [coat_surf(-1.50, 1.452, out=.013),
-            coat_surf(-1.10, 1.375, out=.012),
-            coat_surf(-0.60, 1.300, out=.011),
-            coat_surf(-0.12, 1.235, out=.011),
-            coat_surf(0.42, 1.175, out=.011),
-            coat_surf(0.95, 1.110, out=.011),
-            coat_surf(1.35, 1.062, out=.013)]
+
+bald_pts_front = [coat_surf(-1.50, 1.452, out=.013),
+                  coat_surf(-1.10, 1.375, out=.012),
+                  coat_surf(-0.60, 1.300, out=.011),
+                  coat_surf(-0.12, 1.235, out=.011),
+                  coat_surf(0.42, 1.175, out=.011),
+                  coat_surf(0.95, 1.110, out=.011),
+                  coat_surf(1.35, 1.062, out=.013)]
+
 def baldric_normal(p, t):
     wr = smoothstep(1.28, 1.42, p[1])
     radial = norm((p[0], 0, p[2]))
     return norm(vadd(vmul(radial, 1.0 - wr), vmul((0, 1, 0), wr)))
-strap_band("Leather", "Accessories/Baldric", bald_pts, width=.034, thick=.0045, normal_fn=baldric_normal)
-stitch_dashes("BoneThread", "Accessories/BaldricStitch", bald_pts[1:6], 8, r=.0026, length=.012)
-# instrument drop strap
-drop_top = bald_pts[3]
-drop_bot = vadd(drop_top, (0, -.030, 0))
+
+strap_band("Leather", "Accessories/Baldric", bald_pts_front, width=.034, thick=.0045, normal_fn=baldric_normal)
+double_stitch_band("BoneThread", "Accessories/BaldricStitch", bald_pts_front, 10,
+    normal_fn=baldric_normal, offset=0.012, r=0.0022, length=0.011)
+
+bald_pts_back = [coat_surf(-1.50, 1.452, out=.013),
+                 coat_surf(-1.95, 1.370, out=.012),
+                 coat_surf(-2.40, 1.280, out=.012),
+                 coat_surf(-2.80, 1.180, out=.012),
+                 coat_surf(2.80, 1.080, out=.013)]
+strap_band("Leather", "Accessories/BaldricBack", bald_pts_back, width=.034, thick=.0045, normal_fn=baldric_normal)
+double_stitch_band("BoneThread", "Accessories/BaldricBackStitch", bald_pts_back, 8,
+    normal_fn=baldric_normal, offset=0.012, r=0.0022, length=0.011)
+
+b_buck_p = bald_pts_front[2]
+b_buck_n = baldric_normal(b_buck_p, None)
+buckle_frame("AgedBrass", "Accessories/BaldricBuckle", b_buck_p, b_buck_n, up=(0.6, 0.8, 0), width=.028, height=.038, bar_r=.0032)
+
+b_back_p = bald_pts_back[2]
+b_back_n = baldric_normal(b_back_p, None)
+buckle_frame("AgedBrass", "Accessories/BaldricBackSlider", b_back_p, b_back_n, up=(0.6, 0.8, 0), width=.026, height=.036, bar_r=.0030, has_prong=False)
+
+drop_top = bald_pts_front[3]
+drop_bot = vadd(drop_top, (0, -.032, 0))
 drop_bot = vadd(drop_bot, vmul(norm((drop_bot[0], 0, drop_bot[2])), .006))
-strap_band("Leather", "Accessories/CompassDrop", [drop_top, vadd(lerp(drop_top, drop_bot, .5), vmul(norm((drop_top[0], 0, drop_top[2])), .004)), drop_bot],
+strap_band("Leather", "Accessories/CompassDrop",
+           [drop_top, vadd(lerp(drop_top, drop_bot, .5), vmul(norm((drop_top[0], 0, drop_bot[2])), .004)), drop_bot],
            width=.014, thick=.003, normal_fn=lambda p, t: norm((p[0], 0, p[2])))
-comp_c = vadd(drop_bot, (0, -.036, 0))
+stitch_dashes("BoneThread", "Accessories/CompassDropStitch", [drop_top, drop_bot], 3, r=0.0018, length=0.008)
+
+comp_c = vadd(drop_bot, (0, -.038, 0))
 comp_c = vadd(comp_c, vmul(norm((comp_c[0], 0, comp_c[2])), .012))
 comp_dir = norm((comp_c[0], 0.15, comp_c[2]))
 comp_up = (0, 1, 0)
 comp_t = norm(cross(comp_up, comp_dir))
 comp_b = norm(cross(comp_dir, comp_t))
 face_rot = ((comp_t[0], comp_t[1], comp_t[2]), (comp_b[0], comp_b[1], comp_b[2]), (comp_dir[0], comp_dir[1], comp_dir[2]))
+
 ellipsoid("ClothAccent", "Accessories/CompassFace", comp_c, (.030, .030, .005), 10, 16, rotation=face_rot)
 torus_arc("AgedBrass", "Accessories/CompassRingOuter", comp_c, .034, .0045, 8, 24, axis=comp_dir)
 tilt_axis = norm(vadd(comp_dir, vmul(comp_t, .55)))
 torus_arc("AgedBrass", "Accessories/CompassRingInner", comp_c, .022, .0032, 6, 18, axis=tilt_axis)
+
 needle_a = vadd(comp_c, vmul(comp_t, -.017))
 needle_b = vadd(vadd(comp_c, vmul(comp_t, .017)), vmul(comp_dir, .002))
-tube("AgedBrass", "Accessories/CompassNeedle", [needle_a, comp_c, needle_b], [.002, .0026, .002], 6, (0, 1, 0))
-ellipsoid("AgedBrass", "Accessories/CompassStud", vadd(comp_c, vmul(comp_dir, .008)), (.006, .006, .004), 8, 10)
+tube("AgedBrass", "Accessories/CompassNeedle", [needle_a, comp_c, needle_b], [.002, .0028, .002], 6, (0, 1, 0))
+button_disc("AgedBrass", "Accessories/CompassStud", vadd(comp_c, vmul(comp_dir, .008)), comp_dir, radius=.006, thick=.0035, thread_mat=None)
 torus_arc("AgedBrass", "Accessories/CompassLoop", vadd(drop_bot, (0, .004, 0)), .008, .002, 6, 10, axis=(1, 0, 0))
 
 
-# Export material buffers in stable order. Normals are generated by Unity from smooth vertex rings.
-obj_path=os.path.join(OUT,f"SM_Character_VeilboundWayfarer{SUFFIX}.obj")
-mtl_path=os.path.join(OUT,f"SM_Character_VeilboundWayfarer{SUFFIX}.mtl")
-with open(obj_path,"w",encoding="utf-8") as f:
+# =========================================================================
+# EXPORT BUFFERS IN STABLE ORDER
+# =========================================================================
+
+obj_path = os.path.join(OUT, f"SM_Character_VeilboundWayfarer{SUFFIX}.obj")
+mtl_path = os.path.join(OUT, f"SM_Character_VeilboundWayfarer{SUFFIX}.mtl")
+
+with open(obj_path, "w", encoding="utf-8") as f:
     f.write(f"# Veilbound Wayfarer - original Vespershade protagonist (DETAIL={DETAIL:.2f}), 1 unit = 1 metre\n")
-    f.write("# Layered wardrobe: every garment is a cloth solid (outer face, lining face, bound rims).\n")
-    f.write("# Logical regions: body, head, hair, upper clothing, lower clothing, boots, gloves, accessories.\n")
+    f.write("# Layered wardrobe: closed cloth solids with outer face, lining face, bound edge rims,\n")
+    f.write("# tailoring seams, double saddle stitching, crested buttons, frame buckles, straps, clasps and astrolabe.\n")
     f.write("mtllib SM_Character_VeilboundWayfarer.mtl\no SM_Character_VeilboundWayfarer\ng VeilboundWayfarer\n")
-    offset=0
+    offset = 0
     for mat in MATERIALS:
-        for x,y,z in verts[mat]: f.write(f"v {x:.6f} {y:.6f} {z:.6f}\n")
+        for x, y, z in verts[mat]:
+            f.write(f"v {x:.6f} {y:.6f} {z:.6f}\n")
         f.write(f"usemtl {mat}\n")
-        for a,b,c in faces[mat]: f.write(f"f {a+offset} {b+offset} {c+offset}\n")
+        for a, b, c in faces[mat]:
+            f.write(f"f {a+offset} {b+offset} {c+offset}\n")
         offset += len(verts[mat])
-with open(mtl_path,"w",encoding="utf-8") as f:
-    f.write("# Original tonal palette; Unity prefab uses authored Standard materials.\n")
+
+with open(mtl_path, "w", encoding="utf-8") as f:
+    f.write("# Original tonal palette; Unity prefab uses authored Standard / PBR materials.\n")
     for mat in MATERIALS:
-        rgb,shine=colors[mat]
+        rgb, shine = colors[mat]
         f.write(f"newmtl {mat}\nKa 0.03 0.03 0.03\nKd {rgb[0]:.4f} {rgb[1]:.4f} {rgb[2]:.4f}\nKs {shine:.3f} {shine:.3f} {shine:.3f}\nNs 32\n\n")
-print(f"Wrote {obj_path}: {sum(map(len,verts.values()))} vertices, {sum(map(len,faces.values()))} triangles, {len(MATERIALS)} material regions")
+
+print(f"Wrote {obj_path}: {sum(map(len, verts.values()))} vertices, {sum(map(len, faces.values()))} triangles, {len(MATERIALS)} material regions")
