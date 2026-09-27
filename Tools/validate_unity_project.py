@@ -61,6 +61,7 @@ CLASS_NAMES = {
     129: "PlayerSettings",
     136: "CapsuleCollider",
     143: "CharacterController",
+    205: "LODGroup",
     157: "LightmapSettings",
     196: "NavMeshSettings",
     1001: "PrefabInstance",
