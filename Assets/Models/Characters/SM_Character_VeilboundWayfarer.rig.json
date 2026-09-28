@@ -1,0 +1,10468 @@
+{
+ "format": "vespershade.rig/1",
+ "mesh": "SM_Character_VeilboundWayfarer.obj",
+ "units": "metres",
+ "up": "Y",
+ "character_faces": "+Z",
+ "bind_pose": "identity (mesh authored in bind pose; zero-rotation FK reproduces the OBJ exactly)",
+ "skeleton": {
+  "root": "Root",
+  "bones": [
+   {
+    "name": "Root",
+    "parent": null,
+    "head": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "group": "root",
+    "side": null,
+    "humanoid": null
+   },
+   {
+    "name": "Pelvis",
+    "parent": "Root",
+    "head": [
+     0.0,
+     0.945,
+     -0.012
+    ],
+    "group": "torso",
+    "side": null,
+    "humanoid": "Hips",
+    "axes": {
+     "flex": [
+      1.0,
+      0.0,
+      0.0
+     ],
+     "abd": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "twist": [
+      0.0,
+      1.0,
+      0.0
+     ]
+    }
+   },
+   {
+    "name": "Spine1",
+    "parent": "Pelvis",
+    "head": [
+     0.0,
+     1.045,
+     -0.01
+    ],
+    "group": "torso",
+    "side": null,
+    "humanoid": "Spine",
+    "axes": {
+     "flex": [
+      1.0,
+      0.0,
+      0.0
+     ],
+     "abd": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "twist": [
+      0.0,
+      1.0,
+      0.0
+     ]
+    }
+   },
+   {
+    "name": "Spine2",
+    "parent": "Spine1",
+    "head": [
+     0.0,
+     1.165,
+     -0.012
+    ],
+    "group": "torso",
+    "side": null,
+    "humanoid": "Chest",
+    "axes": {
+     "flex": [
+      1.0,
+      0.0,
+      0.0
+     ],
+     "abd": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "twist": [
+      0.0,
+      1.0,
+      0.0
+     ]
+    }
+   },
+   {
+    "name": "Chest",
+    "parent": "Spine2",
+    "head": [
+     0.0,
+     1.29,
+     -0.014
+    ],
+    "group": "torso",
+    "side": null,
+    "humanoid": "UpperChest",
+    "axes": {
+     "flex": [
+      1.0,
+      0.0,
+      0.0
+     ],
+     "abd": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "twist": [
+      0.0,
+      1.0,
+      0.0
+     ]
+    }
+   },
+   {
+    "name": "Neck",
+    "parent": "Chest",
+    "head": [
+     0.0,
+     1.432,
+     -0.016
+    ],
+    "group": "torso",
+    "side": null,
+    "humanoid": "Neck",
+    "axes": {
+     "flex": [
+      1.0,
+      0.0,
+      0.0
+     ],
+     "abd": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "twist": [
+      0.0,
+      1.0,
+      0.0
+     ]
+    }
+   },
+   {
+    "name": "Head",
+    "parent": "Neck",
+    "head": [
+     0.0,
+     1.508,
+     -0.02
+    ],
+    "group": "torso",
+    "side": null,
+    "humanoid": "Head",
+    "axes": {
+     "flex": [
+      1.0,
+      0.0,
+      0.0
+     ],
+     "abd": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "twist": [
+      0.0,
+      1.0,
+      0.0
+     ]
+    }
+   },
+   {
+    "name": "HeadEnd",
+    "parent": "Head",
+    "head": [
+     0.0,
+     1.808,
+     -0.02
+    ],
+    "group": "torso",
+    "side": null,
+    "humanoid": null,
+    "axes": {
+     "flex": [
+      1.0,
+      0.0,
+      0.0
+     ],
+     "abd": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "twist": [
+      0.0,
+      1.0,
+      0.0
+     ]
+    }
+   },
+   {
+    "name": "RClavicle",
+    "parent": "Chest",
+    "head": [
+     0.03,
+     1.428,
+     0.014
+    ],
+    "group": "torso",
+    "side": "R",
+    "humanoid": "RightShoulder",
+    "axes": {
+     "flex": [
+      0.0,
+      -1,
+      0.0
+     ],
+     "abd": [
+      0.0,
+      0.0,
+      1
+     ],
+     "twist": [
+      1,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   {
+    "name": "LClavicle",
+    "parent": "Chest",
+    "head": [
+     -0.03,
+     1.428,
+     0.014
+    ],
+    "group": "torso",
+    "side": "L",
+    "humanoid": "LeftShoulder",
+    "axes": {
+     "flex": [
+      0.0,
+      1,
+      0.0
+     ],
+     "abd": [
+      0.0,
+      0.0,
+      -1
+     ],
+     "twist": [
+      -1,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   {
+    "name": "RShoulder",
+    "parent": "RClavicle",
+    "head": [
+     0.201,
+     1.462,
+     -0.008
+    ],
+    "group": "arm",
+    "side": "R",
+    "humanoid": "RightUpperArm",
+    "axes": {
+     "flex": [
+      -1,
+      0,
+      0
+     ],
+     "abd": [
+      0,
+      0,
+      1
+     ],
+     "twist": [
+      0,
+      -1,
+      0
+     ]
+    }
+   },
+   {
+    "name": "RElbow",
+    "parent": "RShoulder",
+    "head": [
+     0.352,
+     1.185,
+     0.02
+    ],
+    "group": "arm",
+    "side": "R",
+    "humanoid": "RightLowerArm",
+    "axes": {
+     "flex": [
+      -1,
+      0,
+      0
+     ],
+     "abd": [
+      0,
+      0,
+      1
+     ],
+     "twist": [
+      0.27993,
+      -0.949763,
+      0.139965
+     ]
+    }
+   },
+   {
+    "name": "RForearm",
+    "parent": "RElbow",
+    "head": [
+     0.38,
+     1.09,
+     0.034
+    ],
+    "group": "arm",
+    "side": "R",
+    "humanoid": null,
+    "axes": {
+     "flex": [
+      -1,
+      0,
+      0
+     ],
+     "abd": [
+      0,
+      0,
+      1
+     ],
+     "twist": [
+      0.060659,
+      -0.990759,
+      0.121317
+     ]
+    }
+   },
+   {
+    "name": "RWrist",
+    "parent": "RForearm",
+    "head": [
+     0.386,
+     0.992,
+     0.046
+    ],
+    "group": "arm",
+    "side": "R",
+    "humanoid": null,
+    "axes": {
+     "flex": [
+      0.400579,
+      -0.052662,
+      -0.914748
+     ],
+     "abd": [
+      -0.913024,
+      -0.106809,
+      -0.393674
+     ],
+     "twist": [
+      0.076972,
+      -0.992884,
+      0.090867
+     ]
+    }
+   },
+   {
+    "name": "RHand",
+    "parent": "RWrist",
+    "head": [
+     0.389695,
+     0.944342,
+     0.050362
+    ],
+    "group": "hand",
+    "side": "R",
+    "humanoid": "RightHand",
+    "axes": {
+     "flex": [
+      0.400579,
+      -0.052662,
+      -0.914748
+     ],
+     "abd": [
+      -0.913024,
+      -0.106809,
+      -0.393674
+     ],
+     "twist": [
+      0.076972,
+      -0.992884,
+      0.090867
+     ]
+    }
+   },
+   {
+    "name": "RThumbCMC",
+    "parent": "RHand",
+    "head": [
+     0.373318,
+     0.97507,
+     0.069844
+    ],
+    "group": "hand",
+    "side": "R",
+    "humanoid": "RightThumbProximal",
+    "axes": {
+     "flex": [
+      0.400579,
+      -0.052662,
+      -0.914748
+     ],
+     "abd": [
+      -0.913024,
+      -0.106809,
+      -0.393674
+     ],
+     "twist": [
+      -0.372879,
+      -0.67336,
+      0.638394
+     ]
+    }
+   },
+   {
+    "name": "RThumbMCP",
+    "parent": "RThumbCMC",
+    "head": [
+     0.359426,
+     0.949983,
+     0.093628
+    ],
+    "group": "hand",
+    "side": "R",
+    "humanoid": "RightThumbIntermediate",
+    "axes": {
+     "flex": [
+      0.400579,
+      -0.052662,
+      -0.914748
+     ],
+     "abd": [
+      -0.913024,
+      -0.106809,
+      -0.393674
+     ],
+     "twist": [
+      -0.278644,
+      -0.317768,
+      0.906301
+     ]
+    }
+   },
+   {
+    "name": "RThumbIP",
+    "parent": "RThumbMCP",
+    "head": [
+     0.351284,
+     0.940697,
+     0.120113
+    ],
+    "group": "hand",
+    "side": "R",
+    "humanoid": "RightThumbDistal",
+    "axes": {
+     "flex": [
+      0.400579,
+      -0.052662,
+      -0.914748
+     ],
+     "abd": [
+      -0.913024,
+      -0.106809,
+      -0.393674
+     ],
+     "twist": [
+      -0.03171,
+      -0.367248,
+      0.929582
+     ]
+    }
+   },
+   {
+    "name": "RIndexMCP",
+    "parent": "RHand",
+    "head": [
+     0.386321,
+     0.904001,
+     0.085642
+    ],
+    "group": "hand",
+    "side": "R",
+    "humanoid": "RightIndexProximal",
+    "axes": {
+     "flex": [
+      0.400579,
+      -0.052662,
+      -0.914748
+     ],
+     "abd": [
+      -0.913024,
+      -0.106809,
+      -0.393674
+     ],
+     "twist": [
+      -0.078665,
+      -0.991981,
+      0.098918
+     ]
+    }
+   },
+   {
+    "name": "RIndexPIP",
+    "parent": "RIndexMCP",
+    "head": [
+     0.383332,
+     0.866305,
+     0.089401
+    ],
+    "group": "hand",
+    "side": "R",
+    "humanoid": "RightIndexIntermediate",
+    "axes": {
+     "flex": [
+      0.400579,
+      -0.052662,
+      -0.914748
+     ],
+     "abd": [
+      -0.913024,
+      -0.106809,
+      -0.393674
+     ],
+     "twist": [
+      -0.173782,
+      -0.983147,
+      0.056756
+     ]
+    }
+   },
+   {
+    "name": "RIndexDIP",
+    "parent": "RIndexPIP",
+    "head": [
+     0.379508,
+     0.844676,
+     0.09065
+    ],
+    "group": "hand",
+    "side": "R",
+    "humanoid": "RightIndexDistal",
+    "axes": {
+     "flex": [
+      0.400579,
+      -0.052662,
+      -0.914748
+     ],
+     "abd": [
+      -0.913024,
+      -0.106809,
+      -0.393674
+     ],
+     "twist": [
+      -0.220806,
+      -0.974665,
+      0.035676
+     ]
+    }
+   },
+   {
+    "name": "RMiddleMCP",
+    "parent": "RHand",
+    "head": [
+     0.395195,
+     0.896937,
+     0.066978
+    ],
+    "group": "hand",
+    "side": "R",
+    "humanoid": "RightMiddleProximal",
+    "axes": {
+     "flex": [
+      0.400579,
+      -0.052662,
+      -0.914748
+     ],
+     "abd": [
+      -0.913024,
+      -0.106809,
+      -0.393674
+     ],
+     "twist": [
+      -0.082742,
+      -0.996347,
+      0.021126
+     ]
+    }
+   },
+   {
+    "name": "RMiddlePIP",
+    "parent": "RMiddleMCP",
+    "head": [
+     0.391802,
+     0.856087,
+     0.067844
+    ],
+    "group": "hand",
+    "side": "R",
+    "humanoid": "RightMiddleIntermediate",
+    "axes": {
+     "flex": [
+      0.400579,
+      -0.052662,
+      -0.914748
+     ],
+     "abd": [
+      -0.913024,
+      -0.106809,
+      -0.393674
+     ],
+     "twist": [
+      -0.193334,
+      -0.980728,
+      -0.028203
+     ]
+    }
+   },
+   {
+    "name": "RMiddleDIP",
+    "parent": "RMiddlePIP",
+    "head": [
+     0.386969,
+     0.831569,
+     0.067139
+    ],
+    "group": "hand",
+    "side": "R",
+    "humanoid": "RightMiddleDistal",
+    "axes": {
+     "flex": [
+      0.400579,
+      -0.052662,
+      -0.914748
+     ],
+     "abd": [
+      -0.913024,
+      -0.106809,
+      -0.393674
+     ],
+     "twist": [
+      -0.255339,
+      -0.965214,
+      -0.056248
+     ]
+    }
+   },
+   {
+    "name": "RRingMCP",
+    "parent": "RHand",
+    "head": [
+     0.402899,
+     0.899856,
+     0.048319
+    ],
+    "group": "hand",
+    "side": "R",
+    "humanoid": "RightRingProximal",
+    "axes": {
+     "flex": [
+      0.400579,
+      -0.052662,
+      -0.914748
+     ],
+     "abd": [
+      -0.913024,
+      -0.106809,
+      -0.393674
+     ],
+     "twist": [
+      -0.070472,
+      -0.996272,
+      -0.049763
+     ]
+    }
+   },
+   {
+    "name": "RRingPIP",
+    "parent": "RRingMCP",
+    "head": [
+     0.40015,
+     0.861001,
+     0.046379
+    ],
+    "group": "hand",
+    "side": "R",
+    "humanoid": "RightRingIntermediate",
+    "axes": {
+     "flex": [
+      0.400579,
+      -0.052662,
+      -0.914748
+     ],
+     "abd": [
+      -0.913024,
+      -0.106809,
+      -0.393674
+     ],
+     "twist": [
+      -0.195983,
+      -0.974866,
+      -0.105958
+     ]
+    }
+   },
+   {
+    "name": "RRingDIP",
+    "parent": "RRingPIP",
+    "head": [
+     0.395447,
+     0.837604,
+     0.043836
+    ],
+    "group": "hand",
+    "side": "R",
+    "humanoid": "RightRingDistal",
+    "axes": {
+     "flex": [
+      0.400579,
+      -0.052662,
+      -0.914748
+     ],
+     "abd": [
+      -0.913024,
+      -0.106809,
+      -0.393674
+     ],
+     "twist": [
+      -0.257254,
+      -0.957034,
+      -0.133816
+     ]
+    }
+   },
+   {
+    "name": "RLittleMCP",
+    "parent": "RHand",
+    "head": [
+     0.409052,
+     0.911709,
+     0.029561
+    ],
+    "group": "hand",
+    "side": "R",
+    "humanoid": "RightLittleProximal",
+    "axes": {
+     "flex": [
+      0.400579,
+      -0.052662,
+      -0.914748
+     ],
+     "abd": [
+      -0.913024,
+      -0.106809,
+      -0.393674
+     ],
+     "twist": [
+      -0.073368,
+      -0.989144,
+      -0.127327
+     ]
+    }
+   },
+   {
+    "name": "RLittlePIP",
+    "parent": "RLittleMCP",
+    "head": [
+     0.406851,
+     0.882035,
+     0.025741
+    ],
+    "group": "hand",
+    "side": "R",
+    "humanoid": "RightLittleIntermediate",
+    "axes": {
+     "flex": [
+      0.400579,
+      -0.052662,
+      -0.914748
+     ],
+     "abd": [
+      -0.913024,
+      -0.106809,
+      -0.393674
+     ],
+     "twist": [
+      -0.242363,
+      -0.948567,
+      -0.203668
+     ]
+    }
+   },
+   {
+    "name": "RLittleDIP",
+    "parent": "RLittlePIP",
+    "head": [
+     0.402489,
+     0.864961,
+     0.022075
+    ],
+    "group": "hand",
+    "side": "R",
+    "humanoid": "RightLittleDistal",
+    "axes": {
+     "flex": [
+      0.400579,
+      -0.052662,
+      -0.914748
+     ],
+     "abd": [
+      -0.913024,
+      -0.106809,
+      -0.393674
+     ],
+     "twist": [
+      -0.330308,
+      -0.911709,
+      -0.244302
+     ]
+    }
+   },
+   {
+    "name": "LShoulder",
+    "parent": "LClavicle",
+    "head": [
+     -0.201,
+     1.462,
+     -0.008
+    ],
+    "group": "arm",
+    "side": "L",
+    "humanoid": "LeftUpperArm",
+    "axes": {
+     "flex": [
+      -1,
+      0,
+      0
+     ],
+     "abd": [
+      0,
+      0,
+      -1
+     ],
+     "twist": [
+      0,
+      -1,
+      0
+     ]
+    }
+   },
+   {
+    "name": "LElbow",
+    "parent": "LShoulder",
+    "head": [
+     -0.352,
+     1.185,
+     0.02
+    ],
+    "group": "arm",
+    "side": "L",
+    "humanoid": "LeftLowerArm",
+    "axes": {
+     "flex": [
+      -1,
+      0,
+      0
+     ],
+     "abd": [
+      0,
+      0,
+      -1
+     ],
+     "twist": [
+      -0.27993,
+      -0.949763,
+      0.139965
+     ]
+    }
+   },
+   {
+    "name": "LForearm",
+    "parent": "LElbow",
+    "head": [
+     -0.38,
+     1.09,
+     0.034
+    ],
+    "group": "arm",
+    "side": "L",
+    "humanoid": null,
+    "axes": {
+     "flex": [
+      -1,
+      0,
+      0
+     ],
+     "abd": [
+      0,
+      0,
+      -1
+     ],
+     "twist": [
+      -0.060659,
+      -0.990759,
+      0.121317
+     ]
+    }
+   },
+   {
+    "name": "LWrist",
+    "parent": "LForearm",
+    "head": [
+     -0.386,
+     0.992,
+     0.046
+    ],
+    "group": "arm",
+    "side": "L",
+    "humanoid": null,
+    "axes": {
+     "flex": [
+      0.400579,
+      0.052662,
+      0.914748
+     ],
+     "abd": [
+      -0.913024,
+      0.106809,
+      0.393674
+     ],
+     "twist": [
+      -0.076972,
+      -0.992884,
+      0.090867
+     ]
+    }
+   },
+   {
+    "name": "LHand",
+    "parent": "LWrist",
+    "head": [
+     -0.389695,
+     0.944342,
+     0.050362
+    ],
+    "group": "hand",
+    "side": "L",
+    "humanoid": "LeftHand",
+    "axes": {
+     "flex": [
+      0.400579,
+      0.052662,
+      0.914748
+     ],
+     "abd": [
+      -0.913024,
+      0.106809,
+      0.393674
+     ],
+     "twist": [
+      -0.076972,
+      -0.992884,
+      0.090867
+     ]
+    }
+   },
+   {
+    "name": "LThumbCMC",
+    "parent": "LHand",
+    "head": [
+     -0.373318,
+     0.97507,
+     0.069844
+    ],
+    "group": "hand",
+    "side": "L",
+    "humanoid": "LeftThumbProximal",
+    "axes": {
+     "flex": [
+      0.400579,
+      0.052662,
+      0.914748
+     ],
+     "abd": [
+      -0.913024,
+      0.106809,
+      0.393674
+     ],
+     "twist": [
+      0.372879,
+      -0.67336,
+      0.638394
+     ]
+    }
+   },
+   {
+    "name": "LThumbMCP",
+    "parent": "LThumbCMC",
+    "head": [
+     -0.359426,
+     0.949983,
+     0.093628
+    ],
+    "group": "hand",
+    "side": "L",
+    "humanoid": "LeftThumbIntermediate",
+    "axes": {
+     "flex": [
+      0.400579,
+      0.052662,
+      0.914748
+     ],
+     "abd": [
+      -0.913024,
+      0.106809,
+      0.393674
+     ],
+     "twist": [
+      0.278644,
+      -0.317768,
+      0.906301
+     ]
+    }
+   },
+   {
+    "name": "LThumbIP",
+    "parent": "LThumbMCP",
+    "head": [
+     -0.351284,
+     0.940697,
+     0.120113
+    ],
+    "group": "hand",
+    "side": "L",
+    "humanoid": "LeftThumbDistal",
+    "axes": {
+     "flex": [
+      0.400579,
+      0.052662,
+      0.914748
+     ],
+     "abd": [
+      -0.913024,
+      0.106809,
+      0.393674
+     ],
+     "twist": [
+      0.03171,
+      -0.367248,
+      0.929582
+     ]
+    }
+   },
+   {
+    "name": "LIndexMCP",
+    "parent": "LHand",
+    "head": [
+     -0.386321,
+     0.904001,
+     0.085642
+    ],
+    "group": "hand",
+    "side": "L",
+    "humanoid": "LeftIndexProximal",
+    "axes": {
+     "flex": [
+      0.400579,
+      0.052662,
+      0.914748
+     ],
+     "abd": [
+      -0.913024,
+      0.106809,
+      0.393674
+     ],
+     "twist": [
+      0.078665,
+      -0.991981,
+      0.098918
+     ]
+    }
+   },
+   {
+    "name": "LIndexPIP",
+    "parent": "LIndexMCP",
+    "head": [
+     -0.383332,
+     0.866305,
+     0.089401
+    ],
+    "group": "hand",
+    "side": "L",
+    "humanoid": "LeftIndexIntermediate",
+    "axes": {
+     "flex": [
+      0.400579,
+      0.052662,
+      0.914748
+     ],
+     "abd": [
+      -0.913024,
+      0.106809,
+      0.393674
+     ],
+     "twist": [
+      0.173782,
+      -0.983147,
+      0.056756
+     ]
+    }
+   },
+   {
+    "name": "LIndexDIP",
+    "parent": "LIndexPIP",
+    "head": [
+     -0.379508,
+     0.844676,
+     0.09065
+    ],
+    "group": "hand",
+    "side": "L",
+    "humanoid": "LeftIndexDistal",
+    "axes": {
+     "flex": [
+      0.400579,
+      0.052662,
+      0.914748
+     ],
+     "abd": [
+      -0.913024,
+      0.106809,
+      0.393674
+     ],
+     "twist": [
+      0.220806,
+      -0.974665,
+      0.035676
+     ]
+    }
+   },
+   {
+    "name": "LMiddleMCP",
+    "parent": "LHand",
+    "head": [
+     -0.395195,
+     0.896937,
+     0.066978
+    ],
+    "group": "hand",
+    "side": "L",
+    "humanoid": "LeftMiddleProximal",
+    "axes": {
+     "flex": [
+      0.400579,
+      0.052662,
+      0.914748
+     ],
+     "abd": [
+      -0.913024,
+      0.106809,
+      0.393674
+     ],
+     "twist": [
+      0.082742,
+      -0.996347,
+      0.021126
+     ]
+    }
+   },
+   {
+    "name": "LMiddlePIP",
+    "parent": "LMiddleMCP",
+    "head": [
+     -0.391802,
+     0.856087,
+     0.067844
+    ],
+    "group": "hand",
+    "side": "L",
+    "humanoid": "LeftMiddleIntermediate",
+    "axes": {
+     "flex": [
+      0.400579,
+      0.052662,
+      0.914748
+     ],
+     "abd": [
+      -0.913024,
+      0.106809,
+      0.393674
+     ],
+     "twist": [
+      0.193334,
+      -0.980728,
+      -0.028203
+     ]
+    }
+   },
+   {
+    "name": "LMiddleDIP",
+    "parent": "LMiddlePIP",
+    "head": [
+     -0.386969,
+     0.831569,
+     0.067139
+    ],
+    "group": "hand",
+    "side": "L",
+    "humanoid": "LeftMiddleDistal",
+    "axes": {
+     "flex": [
+      0.400579,
+      0.052662,
+      0.914748
+     ],
+     "abd": [
+      -0.913024,
+      0.106809,
+      0.393674
+     ],
+     "twist": [
+      0.255339,
+      -0.965214,
+      -0.056248
+     ]
+    }
+   },
+   {
+    "name": "LRingMCP",
+    "parent": "LHand",
+    "head": [
+     -0.402899,
+     0.899856,
+     0.048319
+    ],
+    "group": "hand",
+    "side": "L",
+    "humanoid": "LeftRingProximal",
+    "axes": {
+     "flex": [
+      0.400579,
+      0.052662,
+      0.914748
+     ],
+     "abd": [
+      -0.913024,
+      0.106809,
+      0.393674
+     ],
+     "twist": [
+      0.070472,
+      -0.996272,
+      -0.049763
+     ]
+    }
+   },
+   {
+    "name": "LRingPIP",
+    "parent": "LRingMCP",
+    "head": [
+     -0.40015,
+     0.861001,
+     0.046379
+    ],
+    "group": "hand",
+    "side": "L",
+    "humanoid": "LeftRingIntermediate",
+    "axes": {
+     "flex": [
+      0.400579,
+      0.052662,
+      0.914748
+     ],
+     "abd": [
+      -0.913024,
+      0.106809,
+      0.393674
+     ],
+     "twist": [
+      0.195983,
+      -0.974866,
+      -0.105958
+     ]
+    }
+   },
+   {
+    "name": "LRingDIP",
+    "parent": "LRingPIP",
+    "head": [
+     -0.395447,
+     0.837604,
+     0.043836
+    ],
+    "group": "hand",
+    "side": "L",
+    "humanoid": "LeftRingDistal",
+    "axes": {
+     "flex": [
+      0.400579,
+      0.052662,
+      0.914748
+     ],
+     "abd": [
+      -0.913024,
+      0.106809,
+      0.393674
+     ],
+     "twist": [
+      0.257254,
+      -0.957034,
+      -0.133816
+     ]
+    }
+   },
+   {
+    "name": "LLittleMCP",
+    "parent": "LHand",
+    "head": [
+     -0.409052,
+     0.911709,
+     0.029561
+    ],
+    "group": "hand",
+    "side": "L",
+    "humanoid": "LeftLittleProximal",
+    "axes": {
+     "flex": [
+      0.400579,
+      0.052662,
+      0.914748
+     ],
+     "abd": [
+      -0.913024,
+      0.106809,
+      0.393674
+     ],
+     "twist": [
+      0.073368,
+      -0.989144,
+      -0.127327
+     ]
+    }
+   },
+   {
+    "name": "LLittlePIP",
+    "parent": "LLittleMCP",
+    "head": [
+     -0.406851,
+     0.882035,
+     0.025741
+    ],
+    "group": "hand",
+    "side": "L",
+    "humanoid": "LeftLittleIntermediate",
+    "axes": {
+     "flex": [
+      0.400579,
+      0.052662,
+      0.914748
+     ],
+     "abd": [
+      -0.913024,
+      0.106809,
+      0.393674
+     ],
+     "twist": [
+      0.242363,
+      -0.948567,
+      -0.203668
+     ]
+    }
+   },
+   {
+    "name": "LLittleDIP",
+    "parent": "LLittlePIP",
+    "head": [
+     -0.402489,
+     0.864961,
+     0.022075
+    ],
+    "group": "hand",
+    "side": "L",
+    "humanoid": "LeftLittleDistal",
+    "axes": {
+     "flex": [
+      0.400579,
+      0.052662,
+      0.914748
+     ],
+     "abd": [
+      -0.913024,
+      0.106809,
+      0.393674
+     ],
+     "twist": [
+      0.330308,
+      -0.911709,
+      -0.244302
+     ]
+    }
+   },
+   {
+    "name": "RHip",
+    "parent": "Pelvis",
+    "head": [
+     0.1,
+     0.905,
+     0.0
+    ],
+    "group": "leg",
+    "side": "R",
+    "humanoid": "RightUpperLeg",
+    "axes": {
+     "flex": [
+      -1,
+      0,
+      0
+     ],
+     "abd": [
+      0,
+      0,
+      1
+     ],
+     "twist": [
+      0,
+      1,
+      0
+     ]
+    }
+   },
+   {
+    "name": "RKnee",
+    "parent": "RHip",
+    "head": [
+     0.116,
+     0.492,
+     0.008
+    ],
+    "group": "leg",
+    "side": "R",
+    "humanoid": "RightLowerLeg",
+    "axes": {
+     "flex": [
+      1,
+      0,
+      0
+     ],
+     "abd": [
+      0,
+      0,
+      1
+     ],
+     "twist": [
+      0,
+      1,
+      0
+     ]
+    }
+   },
+   {
+    "name": "RAnkle",
+    "parent": "RKnee",
+    "head": [
+     0.118,
+     0.105,
+     -0.034
+    ],
+    "group": "leg",
+    "side": "R",
+    "humanoid": "RightFoot",
+    "axes": {
+     "flex": [
+      -1,
+      0,
+      0
+     ],
+     "abd": [
+      0,
+      0,
+      1
+     ],
+     "twist": [
+      0,
+      1,
+      0
+     ]
+    }
+   },
+   {
+    "name": "RBall",
+    "parent": "RAnkle",
+    "head": [
+     0.118,
+     0.031,
+     0.112
+    ],
+    "group": "leg",
+    "side": "R",
+    "humanoid": "RightToes",
+    "axes": {
+     "flex": [
+      -1,
+      0,
+      0
+     ],
+     "abd": [
+      0,
+      0,
+      1
+     ],
+     "twist": [
+      0,
+      1,
+      0
+     ]
+    }
+   },
+   {
+    "name": "RToe",
+    "parent": "RBall",
+    "head": [
+     0.118,
+     0.036,
+     0.176
+    ],
+    "group": "leg",
+    "side": "R",
+    "humanoid": null,
+    "axes": {
+     "flex": [
+      -1,
+      0,
+      0
+     ],
+     "abd": [
+      0,
+      0,
+      1
+     ],
+     "twist": [
+      0,
+      1,
+      0
+     ]
+    }
+   },
+   {
+    "name": "LHip",
+    "parent": "Pelvis",
+    "head": [
+     -0.1,
+     0.905,
+     0.0
+    ],
+    "group": "leg",
+    "side": "L",
+    "humanoid": "LeftUpperLeg",
+    "axes": {
+     "flex": [
+      -1,
+      0,
+      0
+     ],
+     "abd": [
+      0,
+      0,
+      -1
+     ],
+     "twist": [
+      0,
+      -1,
+      0
+     ]
+    }
+   },
+   {
+    "name": "LKnee",
+    "parent": "LHip",
+    "head": [
+     -0.116,
+     0.492,
+     0.008
+    ],
+    "group": "leg",
+    "side": "L",
+    "humanoid": "LeftLowerLeg",
+    "axes": {
+     "flex": [
+      1,
+      0,
+      0
+     ],
+     "abd": [
+      0,
+      0,
+      -1
+     ],
+     "twist": [
+      0,
+      -1,
+      0
+     ]
+    }
+   },
+   {
+    "name": "LAnkle",
+    "parent": "LKnee",
+    "head": [
+     -0.118,
+     0.105,
+     -0.034
+    ],
+    "group": "leg",
+    "side": "L",
+    "humanoid": "LeftFoot",
+    "axes": {
+     "flex": [
+      -1,
+      0,
+      0
+     ],
+     "abd": [
+      0,
+      0,
+      -1
+     ],
+     "twist": [
+      0,
+      -1,
+      0
+     ]
+    }
+   },
+   {
+    "name": "LBall",
+    "parent": "LAnkle",
+    "head": [
+     -0.118,
+     0.031,
+     0.112
+    ],
+    "group": "leg",
+    "side": "L",
+    "humanoid": "LeftToes",
+    "axes": {
+     "flex": [
+      -1,
+      0,
+      0
+     ],
+     "abd": [
+      0,
+      0,
+      -1
+     ],
+     "twist": [
+      0,
+      -1,
+      0
+     ]
+    }
+   },
+   {
+    "name": "LToe",
+    "parent": "LBall",
+    "head": [
+     -0.118,
+     0.036,
+     0.176
+    ],
+    "group": "leg",
+    "side": "L",
+    "humanoid": null,
+    "axes": {
+     "flex": [
+      -1,
+      0,
+      0
+     ],
+     "abd": [
+      0,
+      0,
+      -1
+     ],
+     "twist": [
+      0,
+      -1,
+      0
+     ]
+    }
+   }
+  ],
+  "axis_convention": "torso/neck/head flex + = bend forward, abd + = bend left, twist + = turn right; clavicle flex + = shoulder forward, abd + = shrug up; arm flex + = swing forward, abd + = outboard, twist + = segment roll; leg flex + = hip forward / knee folds back, abd + = outboard; foot flex + = dorsiflexion"
+ },
+ "humanoid": {
+  "avatar_mapping": [
+   {
+    "bone": "Pelvis",
+    "human": "Hips"
+   },
+   {
+    "bone": "Spine1",
+    "human": "Spine"
+   },
+   {
+    "bone": "Spine2",
+    "human": "Chest"
+   },
+   {
+    "bone": "Chest",
+    "human": "UpperChest"
+   },
+   {
+    "bone": "Neck",
+    "human": "Neck"
+   },
+   {
+    "bone": "Head",
+    "human": "Head"
+   },
+   {
+    "bone": "RClavicle",
+    "human": "RightShoulder"
+   },
+   {
+    "bone": "RShoulder",
+    "human": "RightUpperArm"
+   },
+   {
+    "bone": "RElbow",
+    "human": "RightLowerArm"
+   },
+   {
+    "bone": "RHand",
+    "human": "RightHand"
+   },
+   {
+    "bone": "RThumbCMC",
+    "human": "RightThumbProximal"
+   },
+   {
+    "bone": "RThumbMCP",
+    "human": "RightThumbIntermediate"
+   },
+   {
+    "bone": "RThumbIP",
+    "human": "RightThumbDistal"
+   },
+   {
+    "bone": "RHip",
+    "human": "RightUpperLeg"
+   },
+   {
+    "bone": "RKnee",
+    "human": "RightLowerLeg"
+   },
+   {
+    "bone": "RAnkle",
+    "human": "RightFoot"
+   },
+   {
+    "bone": "RBall",
+    "human": "RightToes"
+   },
+   {
+    "bone": "RIndexMCP",
+    "human": "RightIndexProximal"
+   },
+   {
+    "bone": "RIndexPIP",
+    "human": "RightIndexIntermediate"
+   },
+   {
+    "bone": "RIndexDIP",
+    "human": "RightIndexDistal"
+   },
+   {
+    "bone": "RMiddleMCP",
+    "human": "RightMiddleProximal"
+   },
+   {
+    "bone": "RMiddlePIP",
+    "human": "RightMiddleIntermediate"
+   },
+   {
+    "bone": "RMiddleDIP",
+    "human": "RightMiddleDistal"
+   },
+   {
+    "bone": "RRingMCP",
+    "human": "RightRingProximal"
+   },
+   {
+    "bone": "RRingPIP",
+    "human": "RightRingIntermediate"
+   },
+   {
+    "bone": "RRingDIP",
+    "human": "RightRingDistal"
+   },
+   {
+    "bone": "RLittleMCP",
+    "human": "RightLittleProximal"
+   },
+   {
+    "bone": "RLittlePIP",
+    "human": "RightLittleIntermediate"
+   },
+   {
+    "bone": "RLittleDIP",
+    "human": "RightLittleDistal"
+   },
+   {
+    "bone": "LClavicle",
+    "human": "LeftShoulder"
+   },
+   {
+    "bone": "LShoulder",
+    "human": "LeftUpperArm"
+   },
+   {
+    "bone": "LElbow",
+    "human": "LeftLowerArm"
+   },
+   {
+    "bone": "LHand",
+    "human": "LeftHand"
+   },
+   {
+    "bone": "LThumbCMC",
+    "human": "LeftThumbProximal"
+   },
+   {
+    "bone": "LThumbMCP",
+    "human": "LeftThumbIntermediate"
+   },
+   {
+    "bone": "LThumbIP",
+    "human": "LeftThumbDistal"
+   },
+   {
+    "bone": "LHip",
+    "human": "LeftUpperLeg"
+   },
+   {
+    "bone": "LKnee",
+    "human": "LeftLowerLeg"
+   },
+   {
+    "bone": "LAnkle",
+    "human": "LeftFoot"
+   },
+   {
+    "bone": "LBall",
+    "human": "LeftToes"
+   },
+   {
+    "bone": "LIndexMCP",
+    "human": "LeftIndexProximal"
+   },
+   {
+    "bone": "LIndexPIP",
+    "human": "LeftIndexIntermediate"
+   },
+   {
+    "bone": "LIndexDIP",
+    "human": "LeftIndexDistal"
+   },
+   {
+    "bone": "LMiddleMCP",
+    "human": "LeftMiddleProximal"
+   },
+   {
+    "bone": "LMiddlePIP",
+    "human": "LeftMiddleIntermediate"
+   },
+   {
+    "bone": "LMiddleDIP",
+    "human": "LeftMiddleDistal"
+   },
+   {
+    "bone": "LRingMCP",
+    "human": "LeftRingProximal"
+   },
+   {
+    "bone": "LRingPIP",
+    "human": "LeftRingIntermediate"
+   },
+   {
+    "bone": "LRingDIP",
+    "human": "LeftRingDistal"
+   },
+   {
+    "bone": "LLittleMCP",
+    "human": "LeftLittleProximal"
+   },
+   {
+    "bone": "LLittlePIP",
+    "human": "LeftLittleIntermediate"
+   },
+   {
+    "bone": "LLittleDIP",
+    "human": "LeftLittleDistal"
+   }
+  ],
+  "required": [
+   "Hips",
+   "Spine",
+   "Chest",
+   "Neck",
+   "Head",
+   "LeftShoulder",
+   "LeftUpperArm",
+   "LeftLowerArm",
+   "LeftHand",
+   "RightShoulder",
+   "RightUpperArm",
+   "RightLowerArm",
+   "RightHand",
+   "LeftUpperLeg",
+   "LeftLowerLeg",
+   "LeftFoot",
+   "LeftToes",
+   "RightUpperLeg",
+   "RightLowerLeg",
+   "RightFoot",
+   "RightToes"
+  ],
+  "optional": [
+   "UpperChest",
+   "LeftThumbProximal",
+   "LeftThumbIntermediate",
+   "LeftThumbDistal",
+   "LeftIndexProximal",
+   "LeftIndexIntermediate",
+   "LeftIndexDistal",
+   "LeftMiddleProximal",
+   "LeftMiddleIntermediate",
+   "LeftMiddleDistal",
+   "LeftRingProximal",
+   "LeftRingIntermediate",
+   "LeftRingDistal",
+   "LeftLittleProximal",
+   "LeftLittleIntermediate",
+   "LeftLittleDistal",
+   "RightThumbProximal",
+   "RightThumbIntermediate",
+   "RightThumbDistal",
+   "RightIndexProximal",
+   "RightIndexIntermediate",
+   "RightIndexDistal",
+   "RightMiddleProximal",
+   "RightMiddleIntermediate",
+   "RightMiddleDistal",
+   "RightRingProximal",
+   "RightRingIntermediate",
+   "RightRingDistal",
+   "RightLittleProximal",
+   "RightLittleIntermediate",
+   "RightLittleDistal"
+  ],
+  "helpers": [
+   "RForearm",
+   "LForearm",
+   "RWrist",
+   "LWrist",
+   "RThumbCMC",
+   "LThumbCMC",
+   "RToe",
+   "LToe",
+   "HeadEnd"
+  ],
+  "helper_note": "helper bones stay in the hierarchy but map to no humanoid slot; the forearm is split in two so wrist roll is distributed and the toe rides the ball",
+  "pose_note": "bind pose is a relaxed A-pose: the arm hangs 22 deg off vertical, elbows gently bent (18.7 deg), legs straight; Unity's AvatarBuilder solves the T-pose from it"
+ },
+ "weights": "computed deterministically from the bind position by Tools/body_rig.py:weights_for(side, chain, point); the hands delegate to Tools/hand_rig.py, the boots to Tools/boot_rig.py",
+ "detail_binding": "parts with `bind: stiff` are small solids (stitch dashes, buttons, buckles, rivets, rings, patches, straps, ears, eyes) up to Tools/body_rig.py:DETAIL_MAX_DIAGONAL across: all their vertices share the weights of the part `centroid`, so they keep their shape instead of folding through themselves or shearing across a joint",
+ "parts": [
+  {
+   "name": "Head/FaceAndNeck",
+   "mat": "Skin",
+   "start": 14284,
+   "end": 21325,
+   "side": null,
+   "chain": "head"
+  },
+  {
+   "name": "Head/DetailedEars",
+   "mat": "Skin",
+   "start": 21325,
+   "end": 21425,
+   "side": null,
+   "chain": "head"
+  },
+  {
+   "name": "Head/Eyes",
+   "mat": "Eyes",
+   "start": 51177,
+   "end": 51469,
+   "side": null,
+   "chain": "head",
+   "bind": "stiff",
+   "centroid": [
+    0.0,
+    1.692,
+    0.052
+   ]
+  },
+  {
+   "name": "Head/Eyebrows",
+   "mat": "Hair",
+   "start": 23009,
+   "end": 23089,
+   "side": null,
+   "chain": "head",
+   "bind": "stiff",
+   "centroid": [
+    -0.0,
+    1.7171,
+    0.0574
+   ]
+  },
+  {
+   "name": "Hair/CrownCap",
+   "mat": "Hair",
+   "start": 23089,
+   "end": 24194,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "CrownSweep_R1",
+   "mat": "Hair",
+   "start": 24194,
+   "end": 24316,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "CrownSweep_R2",
+   "mat": "Hair",
+   "start": 24316,
+   "end": 24438,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "CrownSweep_R3",
+   "mat": "Hair",
+   "start": 24438,
+   "end": 24560,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "CrownSweep_R4",
+   "mat": "Hair",
+   "start": 24560,
+   "end": 24682,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "CrownSweep_R5",
+   "mat": "Hair",
+   "start": 24682,
+   "end": 24804,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "CrownSweep_L1",
+   "mat": "Hair",
+   "start": 24804,
+   "end": 24926,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "CrownSweep_L2",
+   "mat": "Hair",
+   "start": 24926,
+   "end": 25048,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "CrownSweep_L3",
+   "mat": "Hair",
+   "start": 25048,
+   "end": 25170,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "CrownSweep_L4",
+   "mat": "Hair",
+   "start": 25170,
+   "end": 25292,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "CrownSweep_L5",
+   "mat": "Hair",
+   "start": 25292,
+   "end": 25414,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "CrownSweep_B1",
+   "mat": "Hair",
+   "start": 25414,
+   "end": 25536,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "CrownSweep_B2",
+   "mat": "Hair",
+   "start": 25536,
+   "end": 25658,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "CrownSweep_B3",
+   "mat": "Hair",
+   "start": 25658,
+   "end": 25780,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "CrownSweep_B4",
+   "mat": "Hair",
+   "start": 25780,
+   "end": 25902,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "CrownSweep_B5",
+   "mat": "Hair",
+   "start": 25902,
+   "end": 26024,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "CrownSweep_B6",
+   "mat": "Hair",
+   "start": 26024,
+   "end": 26146,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "CrownSweep_B7",
+   "mat": "Hair",
+   "start": 26146,
+   "end": 26268,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "CrownSweep_B8",
+   "mat": "Hair",
+   "start": 26268,
+   "end": 26390,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "CrownWhorl_1",
+   "mat": "Hair",
+   "start": 26390,
+   "end": 26520,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "CrownWhorl_2",
+   "mat": "Hair",
+   "start": 26520,
+   "end": 26650,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "DomeFan_R0",
+   "mat": "Hair",
+   "start": 26650,
+   "end": 26764,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "DomeFan_R1",
+   "mat": "Hair",
+   "start": 26764,
+   "end": 26878,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "DomeFan_R2",
+   "mat": "Hair",
+   "start": 26878,
+   "end": 26992,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "DomeFan_R3",
+   "mat": "Hair",
+   "start": 26992,
+   "end": 27106,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "DomeFan_L0",
+   "mat": "Hair",
+   "start": 27106,
+   "end": 27220,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "DomeFan_L1",
+   "mat": "Hair",
+   "start": 27220,
+   "end": 27334,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "DomeFan_L2",
+   "mat": "Hair",
+   "start": 27334,
+   "end": 27448,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "SideSweep_R1",
+   "mat": "Hair",
+   "start": 27448,
+   "end": 27554,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "SideSweep_R2",
+   "mat": "Hair",
+   "start": 27554,
+   "end": 27660,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "SideSweep_L1",
+   "mat": "Hair",
+   "start": 27660,
+   "end": 27766,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "SideSweep_L2",
+   "mat": "Hair",
+   "start": 27766,
+   "end": 27872,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "EarFill_R",
+   "mat": "Hair",
+   "start": 27872,
+   "end": 27951,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "EarFill_L",
+   "mat": "Hair",
+   "start": 27951,
+   "end": 28030,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "Fringe_Sweep",
+   "mat": "Hair",
+   "start": 28030,
+   "end": 28116,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "Fringe_Sweep_R",
+   "mat": "Hair",
+   "start": 28116,
+   "end": 28202,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "Fringe_Sweep_L",
+   "mat": "Hair",
+   "start": 28202,
+   "end": 28288,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "Fringe_PartShort",
+   "mat": "Hair",
+   "start": 28288,
+   "end": 28374,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "Fringe_WidowsPeak",
+   "mat": "Hair",
+   "start": 28374,
+   "end": 28460,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "Temple_Frame_R",
+   "mat": "Hair",
+   "start": 28460,
+   "end": 28546,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "Temple_Frame_L",
+   "mat": "Hair",
+   "start": 28546,
+   "end": 28632,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "Temple_Tuck_R",
+   "mat": "Hair",
+   "start": 28632,
+   "end": 28718,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "Temple_Tuck_L",
+   "mat": "Hair",
+   "start": 28718,
+   "end": 28804,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "NapeLayer_1",
+   "mat": "Hair",
+   "start": 28804,
+   "end": 28904,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "NapeLayer_2",
+   "mat": "Hair",
+   "start": 28904,
+   "end": 29004,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "NapeLayer_3",
+   "mat": "Hair",
+   "start": 29004,
+   "end": 29104,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "NapeLayer_4",
+   "mat": "Hair",
+   "start": 29104,
+   "end": 29204,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "NapeLayer_5",
+   "mat": "Hair",
+   "start": 29204,
+   "end": 29304,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "NapeLayer_6",
+   "mat": "Hair",
+   "start": 29304,
+   "end": 29404,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "NapeLayer_7",
+   "mat": "Hair",
+   "start": 29404,
+   "end": 29504,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "NapeLayer_8",
+   "mat": "Hair",
+   "start": 29504,
+   "end": 29604,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "Hair/Gather",
+   "mat": "Hair",
+   "start": 29604,
+   "end": 29745,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "TailRope_1",
+   "mat": "Hair",
+   "start": 29745,
+   "end": 29838,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "TailRope_2",
+   "mat": "Hair",
+   "start": 29838,
+   "end": 29931,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "TailRope_3",
+   "mat": "Hair",
+   "start": 29931,
+   "end": 30024,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "TailRope_4",
+   "mat": "Hair",
+   "start": 30024,
+   "end": 30117,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "HairlineWisp_1",
+   "mat": "Hair",
+   "start": 30117,
+   "end": 30167,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "HairlineWisp_2",
+   "mat": "Hair",
+   "start": 30167,
+   "end": 30217,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "HairlineWisp_3",
+   "mat": "Hair",
+   "start": 30217,
+   "end": 30267,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "HairlineWisp_4",
+   "mat": "Hair",
+   "start": 30267,
+   "end": 30317,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "HairlineWisp_5",
+   "mat": "Hair",
+   "start": 30317,
+   "end": 30367,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "HairlineWisp_6",
+   "mat": "Hair",
+   "start": 30367,
+   "end": 30417,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "HairlineWisp_7",
+   "mat": "Hair",
+   "start": 30417,
+   "end": 30467,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "HairlineWisp_8",
+   "mat": "Hair",
+   "start": 30467,
+   "end": 30517,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "Accessories/HairTieWrap_1",
+   "mat": "BoneThread",
+   "start": 38097,
+   "end": 38213,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "Accessories/HairTieWrap_2",
+   "mat": "BoneThread",
+   "start": 38213,
+   "end": 38329,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "Accessories/HairTieKnot_1",
+   "mat": "BoneThread",
+   "start": 38329,
+   "end": 38409,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "Accessories/HairTieKnot_2",
+   "mat": "BoneThread",
+   "start": 38409,
+   "end": 38489,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "Accessories/HairTieEnd_1",
+   "mat": "BoneThread",
+   "start": 38489,
+   "end": 38515,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "Accessories/HairTieEnd_2",
+   "mat": "BoneThread",
+   "start": 38515,
+   "end": 38541,
+   "side": null,
+   "chain": "hair"
+  },
+  {
+   "name": "Body/Torso",
+   "mat": "Skin",
+   "start": 21425,
+   "end": 21605,
+   "side": null,
+   "chain": "torso"
+  },
+  {
+   "name": "Body/Forearm_L",
+   "mat": "Skin",
+   "start": 21605,
+   "end": 21687,
+   "side": "L",
+   "chain": "armL"
+  },
+  {
+   "name": "Body/Forearm_R",
+   "mat": "Skin",
+   "start": 21687,
+   "end": 21769,
+   "side": "R",
+   "chain": "armR"
+  },
+  {
+   "name": "LowerBody/TrouserYoke",
+   "mat": "Trouser",
+   "start": 6524,
+   "end": 6784,
+   "side": null,
+   "chain": "hip"
+  },
+  {
+   "name": "LowerBody/Seat",
+   "mat": "Trouser",
+   "start": 6784,
+   "end": 7006,
+   "side": null,
+   "chain": "hip"
+  },
+  {
+   "name": "LowerBody/Leg_L",
+   "mat": "Trouser",
+   "start": 7006,
+   "end": 7510,
+   "side": "L",
+   "chain": "legL"
+  },
+  {
+   "name": "LowerBody/SideSeam_L",
+   "mat": "Trouser",
+   "start": 7510,
+   "end": 7596,
+   "side": "L",
+   "chain": "legL"
+  },
+  {
+   "name": "LowerBody/SideSeamStitch_L_d0",
+   "mat": "BoneThread",
+   "start": 38541,
+   "end": 38555,
+   "side": "L",
+   "chain": "legL",
+   "bind": "stiff",
+   "centroid": [
+    -0.211176,
+    0.888813,
+    -0.002
+   ]
+  },
+  {
+   "name": "LowerBody/SideSeamStitch_L_d1",
+   "mat": "BoneThread",
+   "start": 38555,
+   "end": 38569,
+   "side": "L",
+   "chain": "legL",
+   "bind": "stiff",
+   "centroid": [
+    -0.208115,
+    0.808125,
+    -0.003
+   ]
+  },
+  {
+   "name": "LowerBody/SideSeamStitch_L_d2",
+   "mat": "BoneThread",
+   "start": 38569,
+   "end": 38583,
+   "side": "L",
+   "chain": "legL",
+   "bind": "stiff",
+   "centroid": [
+    -0.203744,
+    0.7275,
+    -0.004
+   ]
+  },
+  {
+   "name": "LowerBody/SideSeamStitch_L_d3",
+   "mat": "BoneThread",
+   "start": 38583,
+   "end": 38597,
+   "side": "L",
+   "chain": "legL",
+   "bind": "stiff",
+   "centroid": [
+    -0.19948,
+    0.669375,
+    -0.004
+   ]
+  },
+  {
+   "name": "LowerBody/SideSeamStitch_L_d4",
+   "mat": "BoneThread",
+   "start": 38597,
+   "end": 38611,
+   "side": "L",
+   "chain": "legL",
+   "bind": "stiff",
+   "centroid": [
+    -0.198126,
+    0.594375,
+    -0.004
+   ]
+  },
+  {
+   "name": "LowerBody/SideSeamStitch_L_d5",
+   "mat": "BoneThread",
+   "start": 38611,
+   "end": 38625,
+   "side": "L",
+   "chain": "legL",
+   "bind": "stiff",
+   "centroid": [
+    -0.197958,
+    0.5225,
+    -0.004
+   ]
+  },
+  {
+   "name": "LowerBody/SideSeamStitch_L_d6",
+   "mat": "BoneThread",
+   "start": 38625,
+   "end": 38639,
+   "side": "L",
+   "chain": "legL",
+   "bind": "stiff",
+   "centroid": [
+    -0.159589,
+    0.33,
+    0.010188
+   ]
+  },
+  {
+   "name": "LowerBody/SideSeamStitch_L_d7",
+   "mat": "BoneThread",
+   "start": 38639,
+   "end": 38653,
+   "side": "L",
+   "chain": "legL",
+   "bind": "stiff",
+   "centroid": [
+    -0.173108,
+    0.460625,
+    0.009481
+   ]
+  },
+  {
+   "name": "LowerBody/Leg_R",
+   "mat": "Trouser",
+   "start": 7596,
+   "end": 8100,
+   "side": "R",
+   "chain": "legR"
+  },
+  {
+   "name": "LowerBody/SideSeam_R",
+   "mat": "Trouser",
+   "start": 8100,
+   "end": 8186,
+   "side": "R",
+   "chain": "legR"
+  },
+  {
+   "name": "LowerBody/SideSeamStitch_R_d0",
+   "mat": "BoneThread",
+   "start": 38653,
+   "end": 38667,
+   "side": "R",
+   "chain": "legR",
+   "bind": "stiff",
+   "centroid": [
+    0.211176,
+    0.888813,
+    -0.002
+   ]
+  },
+  {
+   "name": "LowerBody/SideSeamStitch_R_d1",
+   "mat": "BoneThread",
+   "start": 38667,
+   "end": 38681,
+   "side": "R",
+   "chain": "legR",
+   "bind": "stiff",
+   "centroid": [
+    0.208115,
+    0.808125,
+    -0.003
+   ]
+  },
+  {
+   "name": "LowerBody/SideSeamStitch_R_d2",
+   "mat": "BoneThread",
+   "start": 38681,
+   "end": 38695,
+   "side": "R",
+   "chain": "legR",
+   "bind": "stiff",
+   "centroid": [
+    0.203744,
+    0.7275,
+    -0.004
+   ]
+  },
+  {
+   "name": "LowerBody/SideSeamStitch_R_d3",
+   "mat": "BoneThread",
+   "start": 38695,
+   "end": 38709,
+   "side": "R",
+   "chain": "legR",
+   "bind": "stiff",
+   "centroid": [
+    0.19948,
+    0.669375,
+    -0.004
+   ]
+  },
+  {
+   "name": "LowerBody/SideSeamStitch_R_d4",
+   "mat": "BoneThread",
+   "start": 38709,
+   "end": 38723,
+   "side": "R",
+   "chain": "legR",
+   "bind": "stiff",
+   "centroid": [
+    0.198126,
+    0.594375,
+    -0.004
+   ]
+  },
+  {
+   "name": "LowerBody/SideSeamStitch_R_d5",
+   "mat": "BoneThread",
+   "start": 38723,
+   "end": 38737,
+   "side": "R",
+   "chain": "legR",
+   "bind": "stiff",
+   "centroid": [
+    0.197958,
+    0.5225,
+    -0.004
+   ]
+  },
+  {
+   "name": "LowerBody/SideSeamStitch_R_d6",
+   "mat": "BoneThread",
+   "start": 38737,
+   "end": 38751,
+   "side": "R",
+   "chain": "legR",
+   "bind": "stiff",
+   "centroid": [
+    0.159589,
+    0.33,
+    0.010188
+   ]
+  },
+  {
+   "name": "LowerBody/SideSeamStitch_R_d7",
+   "mat": "BoneThread",
+   "start": 38751,
+   "end": 38765,
+   "side": "R",
+   "chain": "legR",
+   "bind": "stiff",
+   "centroid": [
+    0.173108,
+    0.460625,
+    0.009481
+   ]
+  },
+  {
+   "name": "UpperClothing/ShirtCuff_L",
+   "mat": "BoneThread",
+   "start": 38765,
+   "end": 38829,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.39,
+    0.974,
+    0.037
+   ]
+  },
+  {
+   "name": "UpperClothing/ShirtCuffButton_L",
+   "mat": "BoneThread",
+   "start": 38829,
+   "end": 38915,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.446,
+    0.974,
+    0.037
+   ]
+  },
+  {
+   "name": "UpperClothing/ShirtCuffButton_L_Rim",
+   "mat": "BoneThread",
+   "start": 38915,
+   "end": 38987,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.4466,
+    0.974,
+    0.037
+   ]
+  },
+  {
+   "name": "UpperClothing/CuffFold_L",
+   "mat": "ClothAccent",
+   "start": 3636,
+   "end": 3716,
+   "side": "L",
+   "chain": "armL"
+  },
+  {
+   "name": "UpperClothing/CuffButton_L_1",
+   "mat": "AgedBrass",
+   "start": 30517,
+   "end": 30603,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.457,
+    1.025,
+    0.036
+   ]
+  },
+  {
+   "name": "UpperClothing/CuffButton_L_1_Rim",
+   "mat": "AgedBrass",
+   "start": 30603,
+   "end": 30675,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.45775,
+    1.025,
+    0.036
+   ]
+  },
+  {
+   "name": "UpperClothing/CuffButton_L_2",
+   "mat": "AgedBrass",
+   "start": 30675,
+   "end": 30761,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.457,
+    1.007,
+    0.036
+   ]
+  },
+  {
+   "name": "UpperClothing/CuffButton_L_2_Rim",
+   "mat": "AgedBrass",
+   "start": 30761,
+   "end": 30833,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.45775,
+    1.007,
+    0.036
+   ]
+  },
+  {
+   "name": "UpperClothing/CuffButton_L_3",
+   "mat": "AgedBrass",
+   "start": 30833,
+   "end": 30919,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.457,
+    0.989,
+    0.036
+   ]
+  },
+  {
+   "name": "UpperClothing/CuffButton_L_3_Rim",
+   "mat": "AgedBrass",
+   "start": 30919,
+   "end": 30991,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.45775,
+    0.989,
+    0.036
+   ]
+  },
+  {
+   "name": "Accessories/Gauntlet_L",
+   "mat": "Gloves",
+   "start": 48759,
+   "end": 48879,
+   "side": "L",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/GauntletStitch_L_d0",
+   "mat": "BoneThread",
+   "start": 38987,
+   "end": 39001,
+   "side": "L",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/GauntletStitch_L_d1",
+   "mat": "BoneThread",
+   "start": 39001,
+   "end": 39015,
+   "side": "L",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/GauntletStitch_L_d2",
+   "mat": "BoneThread",
+   "start": 39015,
+   "end": 39029,
+   "side": "L",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/GauntletStitch_L_d3",
+   "mat": "BoneThread",
+   "start": 39029,
+   "end": 39043,
+   "side": "L",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/GauntletStitch_L_d4",
+   "mat": "BoneThread",
+   "start": 39043,
+   "end": 39057,
+   "side": "L",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/GauntletStitch_L_d5",
+   "mat": "BoneThread",
+   "start": 39057,
+   "end": 39071,
+   "side": "L",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/GauntletStitch_L_d6",
+   "mat": "BoneThread",
+   "start": 39071,
+   "end": 39085,
+   "side": "L",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/GauntletStitch_L_d7",
+   "mat": "BoneThread",
+   "start": 39085,
+   "end": 39099,
+   "side": "L",
+   "chain": "cuff"
+  },
+  {
+   "name": "Hand/Skin/Palm_L",
+   "mat": "Skin",
+   "start": 21769,
+   "end": 21987,
+   "side": "L",
+   "chain": "palm"
+  },
+  {
+   "name": "Hand/Skin/Index_L",
+   "mat": "Skin",
+   "start": 21987,
+   "end": 22069,
+   "side": "L",
+   "chain": "digit0"
+  },
+  {
+   "name": "Hand/Skin/Middle_L",
+   "mat": "Skin",
+   "start": 22069,
+   "end": 22151,
+   "side": "L",
+   "chain": "digit1"
+  },
+  {
+   "name": "Hand/Skin/Ring_L",
+   "mat": "Skin",
+   "start": 22151,
+   "end": 22233,
+   "side": "L",
+   "chain": "digit2"
+  },
+  {
+   "name": "Hand/Skin/Little_L",
+   "mat": "Skin",
+   "start": 22233,
+   "end": 22315,
+   "side": "L",
+   "chain": "digit3"
+  },
+  {
+   "name": "Hand/Skin/Thumb_L",
+   "mat": "Skin",
+   "start": 22315,
+   "end": 22389,
+   "side": "L",
+   "chain": "thumb"
+  },
+  {
+   "name": "Hand/Glove/PalmStall_L",
+   "mat": "Gloves",
+   "start": 48879,
+   "end": 49097,
+   "side": "L",
+   "chain": "palm"
+  },
+  {
+   "name": "Hand/Glove/IndexStall_L",
+   "mat": "Gloves",
+   "start": 49097,
+   "end": 49179,
+   "side": "L",
+   "chain": "digit0"
+  },
+  {
+   "name": "Hand/Glove/MiddleStall_L",
+   "mat": "Gloves",
+   "start": 49179,
+   "end": 49261,
+   "side": "L",
+   "chain": "digit1"
+  },
+  {
+   "name": "Hand/Glove/RingStall_L",
+   "mat": "Gloves",
+   "start": 49261,
+   "end": 49343,
+   "side": "L",
+   "chain": "digit2"
+  },
+  {
+   "name": "Hand/Glove/LittleStall_L",
+   "mat": "Gloves",
+   "start": 49343,
+   "end": 49425,
+   "side": "L",
+   "chain": "digit3"
+  },
+  {
+   "name": "Hand/Glove/ThumbStall_L",
+   "mat": "Gloves",
+   "start": 49425,
+   "end": 49499,
+   "side": "L",
+   "chain": "thumb"
+  },
+  {
+   "name": "Accessories/GloveBridge_L",
+   "mat": "Gloves",
+   "start": 49499,
+   "end": 49627,
+   "side": "L",
+   "chain": "bridge"
+  },
+  {
+   "name": "Hand/Glove/IndexSeam_L",
+   "mat": "Gloves",
+   "start": 49627,
+   "end": 49649,
+   "side": "L",
+   "chain": "digit0"
+  },
+  {
+   "name": "Hand/Glove/MiddleSeam_L",
+   "mat": "Gloves",
+   "start": 49649,
+   "end": 49671,
+   "side": "L",
+   "chain": "digit1"
+  },
+  {
+   "name": "Hand/Glove/RingSeam_L",
+   "mat": "Gloves",
+   "start": 49671,
+   "end": 49693,
+   "side": "L",
+   "chain": "digit2"
+  },
+  {
+   "name": "Hand/Glove/LittleSeam_L",
+   "mat": "Gloves",
+   "start": 49693,
+   "end": 49715,
+   "side": "L",
+   "chain": "digit3"
+  },
+  {
+   "name": "Hand/Glove/ThumbSeam_L",
+   "mat": "Gloves",
+   "start": 49715,
+   "end": 49732,
+   "side": "L",
+   "chain": "thumb"
+  },
+  {
+   "name": "Hand/Glove/Web0_L",
+   "mat": "Gloves",
+   "start": 49732,
+   "end": 49752,
+   "side": "L",
+   "chain": "web0"
+  },
+  {
+   "name": "Hand/Glove/Web1_L",
+   "mat": "Gloves",
+   "start": 49752,
+   "end": 49772,
+   "side": "L",
+   "chain": "web1"
+  },
+  {
+   "name": "Hand/Glove/Web2_L",
+   "mat": "Gloves",
+   "start": 49772,
+   "end": 49792,
+   "side": "L",
+   "chain": "web2"
+  },
+  {
+   "name": "Hand/Glove/ThumbWeb_L",
+   "mat": "Gloves",
+   "start": 49792,
+   "end": 49812,
+   "side": "L",
+   "chain": "webT"
+  },
+  {
+   "name": "Accessories/KnuckleGuard_L",
+   "mat": "Gloves",
+   "start": 49812,
+   "end": 49848,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_L_-0.0072_d0",
+   "mat": "BoneThread",
+   "start": 39099,
+   "end": 39113,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_L_-0.0072_d1",
+   "mat": "BoneThread",
+   "start": 39113,
+   "end": 39127,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_L_-0.0072_d2",
+   "mat": "BoneThread",
+   "start": 39127,
+   "end": 39141,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_L_-0.0072_d3",
+   "mat": "BoneThread",
+   "start": 39141,
+   "end": 39155,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_L_-0.0072_d4",
+   "mat": "BoneThread",
+   "start": 39155,
+   "end": 39169,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_L_-0.0072_d5",
+   "mat": "BoneThread",
+   "start": 39169,
+   "end": 39183,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_L_-0.0072_d6",
+   "mat": "BoneThread",
+   "start": 39183,
+   "end": 39197,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_L_+0.0072_d0",
+   "mat": "BoneThread",
+   "start": 39197,
+   "end": 39211,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_L_+0.0072_d1",
+   "mat": "BoneThread",
+   "start": 39211,
+   "end": 39225,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_L_+0.0072_d2",
+   "mat": "BoneThread",
+   "start": 39225,
+   "end": 39239,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_L_+0.0072_d3",
+   "mat": "BoneThread",
+   "start": 39239,
+   "end": 39253,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_L_+0.0072_d4",
+   "mat": "BoneThread",
+   "start": 39253,
+   "end": 39267,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_L_+0.0072_d5",
+   "mat": "BoneThread",
+   "start": 39267,
+   "end": 39281,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_L_+0.0072_d6",
+   "mat": "BoneThread",
+   "start": 39281,
+   "end": 39295,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/KnuckleRidge_Index_L",
+   "mat": "Gloves",
+   "start": 49848,
+   "end": 49865,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/KnuckleRidge_Middle_L",
+   "mat": "Gloves",
+   "start": 49865,
+   "end": 49882,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/KnuckleRidge_Ring_L",
+   "mat": "Gloves",
+   "start": 49882,
+   "end": 49899,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/KnuckleRidge_Little_L",
+   "mat": "Gloves",
+   "start": 49899,
+   "end": 49916,
+   "side": "L",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/WristStrap_L",
+   "mat": "Gloves",
+   "start": 49916,
+   "end": 49968,
+   "side": "L",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/WristButton_L",
+   "mat": "AgedBrass",
+   "start": 30991,
+   "end": 31077,
+   "side": "L",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/WristButton_L_Rim",
+   "mat": "AgedBrass",
+   "start": 31077,
+   "end": 31149,
+   "side": "L",
+   "chain": "cuff"
+  },
+  {
+   "name": "UpperClothing/ShirtCuff_R",
+   "mat": "BoneThread",
+   "start": 39295,
+   "end": 39359,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.39,
+    0.974,
+    0.037
+   ]
+  },
+  {
+   "name": "UpperClothing/ShirtCuffButton_R",
+   "mat": "BoneThread",
+   "start": 39359,
+   "end": 39445,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.446,
+    0.974,
+    0.037
+   ]
+  },
+  {
+   "name": "UpperClothing/ShirtCuffButton_R_Rim",
+   "mat": "BoneThread",
+   "start": 39445,
+   "end": 39517,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.4466,
+    0.974,
+    0.037
+   ]
+  },
+  {
+   "name": "UpperClothing/CuffFold_R",
+   "mat": "ClothAccent",
+   "start": 3716,
+   "end": 3796,
+   "side": "R",
+   "chain": "armR"
+  },
+  {
+   "name": "UpperClothing/CuffButton_R_1",
+   "mat": "AgedBrass",
+   "start": 31149,
+   "end": 31235,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.457,
+    1.025,
+    0.036
+   ]
+  },
+  {
+   "name": "UpperClothing/CuffButton_R_1_Rim",
+   "mat": "AgedBrass",
+   "start": 31235,
+   "end": 31307,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.45775,
+    1.025,
+    0.036
+   ]
+  },
+  {
+   "name": "UpperClothing/CuffButton_R_2",
+   "mat": "AgedBrass",
+   "start": 31307,
+   "end": 31393,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.457,
+    1.007,
+    0.036
+   ]
+  },
+  {
+   "name": "UpperClothing/CuffButton_R_2_Rim",
+   "mat": "AgedBrass",
+   "start": 31393,
+   "end": 31465,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.45775,
+    1.007,
+    0.036
+   ]
+  },
+  {
+   "name": "UpperClothing/CuffButton_R_3",
+   "mat": "AgedBrass",
+   "start": 31465,
+   "end": 31551,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.457,
+    0.989,
+    0.036
+   ]
+  },
+  {
+   "name": "UpperClothing/CuffButton_R_3_Rim",
+   "mat": "AgedBrass",
+   "start": 31551,
+   "end": 31623,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.45775,
+    0.989,
+    0.036
+   ]
+  },
+  {
+   "name": "Accessories/Gauntlet_R",
+   "mat": "Gloves",
+   "start": 49968,
+   "end": 50088,
+   "side": "R",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/GauntletStitch_R_d0",
+   "mat": "BoneThread",
+   "start": 39517,
+   "end": 39531,
+   "side": "R",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/GauntletStitch_R_d1",
+   "mat": "BoneThread",
+   "start": 39531,
+   "end": 39545,
+   "side": "R",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/GauntletStitch_R_d2",
+   "mat": "BoneThread",
+   "start": 39545,
+   "end": 39559,
+   "side": "R",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/GauntletStitch_R_d3",
+   "mat": "BoneThread",
+   "start": 39559,
+   "end": 39573,
+   "side": "R",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/GauntletStitch_R_d4",
+   "mat": "BoneThread",
+   "start": 39573,
+   "end": 39587,
+   "side": "R",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/GauntletStitch_R_d5",
+   "mat": "BoneThread",
+   "start": 39587,
+   "end": 39601,
+   "side": "R",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/GauntletStitch_R_d6",
+   "mat": "BoneThread",
+   "start": 39601,
+   "end": 39615,
+   "side": "R",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/GauntletStitch_R_d7",
+   "mat": "BoneThread",
+   "start": 39615,
+   "end": 39629,
+   "side": "R",
+   "chain": "cuff"
+  },
+  {
+   "name": "Hand/Skin/Palm_R",
+   "mat": "Skin",
+   "start": 22389,
+   "end": 22607,
+   "side": "R",
+   "chain": "palm"
+  },
+  {
+   "name": "Hand/Skin/Index_R",
+   "mat": "Skin",
+   "start": 22607,
+   "end": 22689,
+   "side": "R",
+   "chain": "digit0"
+  },
+  {
+   "name": "Hand/Skin/Middle_R",
+   "mat": "Skin",
+   "start": 22689,
+   "end": 22771,
+   "side": "R",
+   "chain": "digit1"
+  },
+  {
+   "name": "Hand/Skin/Ring_R",
+   "mat": "Skin",
+   "start": 22771,
+   "end": 22853,
+   "side": "R",
+   "chain": "digit2"
+  },
+  {
+   "name": "Hand/Skin/Little_R",
+   "mat": "Skin",
+   "start": 22853,
+   "end": 22935,
+   "side": "R",
+   "chain": "digit3"
+  },
+  {
+   "name": "Hand/Skin/Thumb_R",
+   "mat": "Skin",
+   "start": 22935,
+   "end": 23009,
+   "side": "R",
+   "chain": "thumb"
+  },
+  {
+   "name": "Hand/Glove/PalmStall_R",
+   "mat": "Gloves",
+   "start": 50088,
+   "end": 50306,
+   "side": "R",
+   "chain": "palm"
+  },
+  {
+   "name": "Hand/Glove/IndexStall_R",
+   "mat": "Gloves",
+   "start": 50306,
+   "end": 50388,
+   "side": "R",
+   "chain": "digit0"
+  },
+  {
+   "name": "Hand/Glove/MiddleStall_R",
+   "mat": "Gloves",
+   "start": 50388,
+   "end": 50470,
+   "side": "R",
+   "chain": "digit1"
+  },
+  {
+   "name": "Hand/Glove/RingStall_R",
+   "mat": "Gloves",
+   "start": 50470,
+   "end": 50552,
+   "side": "R",
+   "chain": "digit2"
+  },
+  {
+   "name": "Hand/Glove/LittleStall_R",
+   "mat": "Gloves",
+   "start": 50552,
+   "end": 50634,
+   "side": "R",
+   "chain": "digit3"
+  },
+  {
+   "name": "Hand/Glove/ThumbStall_R",
+   "mat": "Gloves",
+   "start": 50634,
+   "end": 50708,
+   "side": "R",
+   "chain": "thumb"
+  },
+  {
+   "name": "Accessories/GloveBridge_R",
+   "mat": "Gloves",
+   "start": 50708,
+   "end": 50836,
+   "side": "R",
+   "chain": "bridge"
+  },
+  {
+   "name": "Hand/Glove/IndexSeam_R",
+   "mat": "Gloves",
+   "start": 50836,
+   "end": 50858,
+   "side": "R",
+   "chain": "digit0"
+  },
+  {
+   "name": "Hand/Glove/MiddleSeam_R",
+   "mat": "Gloves",
+   "start": 50858,
+   "end": 50880,
+   "side": "R",
+   "chain": "digit1"
+  },
+  {
+   "name": "Hand/Glove/RingSeam_R",
+   "mat": "Gloves",
+   "start": 50880,
+   "end": 50902,
+   "side": "R",
+   "chain": "digit2"
+  },
+  {
+   "name": "Hand/Glove/LittleSeam_R",
+   "mat": "Gloves",
+   "start": 50902,
+   "end": 50924,
+   "side": "R",
+   "chain": "digit3"
+  },
+  {
+   "name": "Hand/Glove/ThumbSeam_R",
+   "mat": "Gloves",
+   "start": 50924,
+   "end": 50941,
+   "side": "R",
+   "chain": "thumb"
+  },
+  {
+   "name": "Hand/Glove/Web0_R",
+   "mat": "Gloves",
+   "start": 50941,
+   "end": 50961,
+   "side": "R",
+   "chain": "web0"
+  },
+  {
+   "name": "Hand/Glove/Web1_R",
+   "mat": "Gloves",
+   "start": 50961,
+   "end": 50981,
+   "side": "R",
+   "chain": "web1"
+  },
+  {
+   "name": "Hand/Glove/Web2_R",
+   "mat": "Gloves",
+   "start": 50981,
+   "end": 51001,
+   "side": "R",
+   "chain": "web2"
+  },
+  {
+   "name": "Hand/Glove/ThumbWeb_R",
+   "mat": "Gloves",
+   "start": 51001,
+   "end": 51021,
+   "side": "R",
+   "chain": "webT"
+  },
+  {
+   "name": "Accessories/KnuckleGuard_R",
+   "mat": "Gloves",
+   "start": 51021,
+   "end": 51057,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_R_-0.0072_d0",
+   "mat": "BoneThread",
+   "start": 39629,
+   "end": 39643,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_R_-0.0072_d1",
+   "mat": "BoneThread",
+   "start": 39643,
+   "end": 39657,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_R_-0.0072_d2",
+   "mat": "BoneThread",
+   "start": 39657,
+   "end": 39671,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_R_-0.0072_d3",
+   "mat": "BoneThread",
+   "start": 39671,
+   "end": 39685,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_R_-0.0072_d4",
+   "mat": "BoneThread",
+   "start": 39685,
+   "end": 39699,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_R_-0.0072_d5",
+   "mat": "BoneThread",
+   "start": 39699,
+   "end": 39713,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_R_-0.0072_d6",
+   "mat": "BoneThread",
+   "start": 39713,
+   "end": 39727,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_R_+0.0072_d0",
+   "mat": "BoneThread",
+   "start": 39727,
+   "end": 39741,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_R_+0.0072_d1",
+   "mat": "BoneThread",
+   "start": 39741,
+   "end": 39755,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_R_+0.0072_d2",
+   "mat": "BoneThread",
+   "start": 39755,
+   "end": 39769,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_R_+0.0072_d3",
+   "mat": "BoneThread",
+   "start": 39769,
+   "end": 39783,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_R_+0.0072_d4",
+   "mat": "BoneThread",
+   "start": 39783,
+   "end": 39797,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_R_+0.0072_d5",
+   "mat": "BoneThread",
+   "start": 39797,
+   "end": 39811,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/KnuckleGuardStitch_R_+0.0072_d6",
+   "mat": "BoneThread",
+   "start": 39811,
+   "end": 39825,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/KnuckleRidge_Index_R",
+   "mat": "Gloves",
+   "start": 51057,
+   "end": 51074,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/KnuckleRidge_Middle_R",
+   "mat": "Gloves",
+   "start": 51074,
+   "end": 51091,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/KnuckleRidge_Ring_R",
+   "mat": "Gloves",
+   "start": 51091,
+   "end": 51108,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Hand/Glove/KnuckleRidge_Little_R",
+   "mat": "Gloves",
+   "start": 51108,
+   "end": 51125,
+   "side": "R",
+   "chain": "guard"
+  },
+  {
+   "name": "Accessories/WristStrap_R",
+   "mat": "Gloves",
+   "start": 51125,
+   "end": 51177,
+   "side": "R",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/WristBuckle_R_BarTop",
+   "mat": "AgedBrass",
+   "start": 31623,
+   "end": 31637,
+   "side": "R",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/WristBuckle_R_BarRight",
+   "mat": "AgedBrass",
+   "start": 31637,
+   "end": 31651,
+   "side": "R",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/WristBuckle_R_BarBot",
+   "mat": "AgedBrass",
+   "start": 31651,
+   "end": 31665,
+   "side": "R",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/WristBuckle_R_BarLeft",
+   "mat": "AgedBrass",
+   "start": 31665,
+   "end": 31679,
+   "side": "R",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/WristBuckle_R_Spindle",
+   "mat": "AgedBrass",
+   "start": 31679,
+   "end": 31693,
+   "side": "R",
+   "chain": "cuff"
+  },
+  {
+   "name": "Accessories/WristBuckle_R_Prong",
+   "mat": "AgedBrass",
+   "start": 31693,
+   "end": 31707,
+   "side": "R",
+   "chain": "cuff"
+  },
+  {
+   "name": "UpperClothing/Waistcoat",
+   "mat": "ClothAccent",
+   "start": 3796,
+   "end": 4132,
+   "side": null,
+   "chain": "torso"
+  },
+  {
+   "name": "Accessories/WaistcoatButton_1",
+   "mat": "BoneThread",
+   "start": 39825,
+   "end": 39911,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.018644,
+    1.38,
+    0.155693
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatButton_1_Rim",
+   "mat": "BoneThread",
+   "start": 39911,
+   "end": 39983,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.018644,
+    1.380142,
+    0.156642
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatButton_1_th1",
+   "mat": "AgedBrass",
+   "start": 31707,
+   "end": 31717,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.018644,
+    1.380427,
+    0.158541
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatButton_1_th2",
+   "mat": "AgedBrass",
+   "start": 31717,
+   "end": 31727,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.018644,
+    1.380427,
+    0.158541
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatButton_2",
+   "mat": "BoneThread",
+   "start": 39983,
+   "end": 40069,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.01648,
+    1.298,
+    0.151307
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatButton_2_Rim",
+   "mat": "BoneThread",
+   "start": 40069,
+   "end": 40141,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.01648,
+    1.298142,
+    0.152256
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatButton_2_th1",
+   "mat": "AgedBrass",
+   "start": 31727,
+   "end": 31737,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.01648,
+    1.298427,
+    0.154155
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatButton_2_th2",
+   "mat": "AgedBrass",
+   "start": 31737,
+   "end": 31747,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.01648,
+    1.298427,
+    0.154155
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatButton_3",
+   "mat": "BoneThread",
+   "start": 40141,
+   "end": 40227,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.014886,
+    1.216,
+    0.146095
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatButton_3_Rim",
+   "mat": "BoneThread",
+   "start": 40227,
+   "end": 40299,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.014886,
+    1.216142,
+    0.147044
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatButton_3_th1",
+   "mat": "AgedBrass",
+   "start": 31747,
+   "end": 31757,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.014886,
+    1.216427,
+    0.148943
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatButton_3_th2",
+   "mat": "AgedBrass",
+   "start": 31757,
+   "end": 31767,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.014886,
+    1.216427,
+    0.148943
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatButton_4",
+   "mat": "BoneThread",
+   "start": 40299,
+   "end": 40385,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.014314,
+    1.134,
+    0.142876
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatButton_4_Rim",
+   "mat": "BoneThread",
+   "start": 40385,
+   "end": 40457,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.014314,
+    1.134142,
+    0.143826
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatButton_4_th1",
+   "mat": "AgedBrass",
+   "start": 31767,
+   "end": 31777,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.014314,
+    1.134427,
+    0.145725
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatButton_4_th2",
+   "mat": "AgedBrass",
+   "start": 31777,
+   "end": 31787,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.014314,
+    1.134427,
+    0.145725
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatButton_5",
+   "mat": "BoneThread",
+   "start": 40457,
+   "end": 40543,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.014764,
+    1.052,
+    0.145646
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatButton_5_Rim",
+   "mat": "BoneThread",
+   "start": 40543,
+   "end": 40615,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.014764,
+    1.052142,
+    0.146595
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatButton_5_th1",
+   "mat": "AgedBrass",
+   "start": 31787,
+   "end": 31797,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.014764,
+    1.052427,
+    0.148494
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatButton_5_th2",
+   "mat": "AgedBrass",
+   "start": 31797,
+   "end": 31807,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.014764,
+    1.052427,
+    0.148494
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatWeltL_1",
+   "mat": "BoneThread",
+   "start": 40615,
+   "end": 40635,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.021445,
+    1.1406,
+    0.14239
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatWeltR_1",
+   "mat": "BoneThread",
+   "start": 40635,
+   "end": 40655,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.021445,
+    1.1406,
+    0.14239
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatWeltL_2",
+   "mat": "BoneThread",
+   "start": 40655,
+   "end": 40675,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.022629,
+    1.2306,
+    0.146235
+   ]
+  },
+  {
+   "name": "Accessories/WaistcoatWeltR_2",
+   "mat": "BoneThread",
+   "start": 40675,
+   "end": 40695,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.022629,
+    1.2306,
+    0.146235
+   ]
+  },
+  {
+   "name": "Accessories/WatchChain",
+   "mat": "AgedBrass",
+   "start": 31807,
+   "end": 31863,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.02,
+    1.193068,
+    0.147386
+   ]
+  },
+  {
+   "name": "UpperClothing/ShirtCollar",
+   "mat": "BoneThread",
+   "start": 40695,
+   "end": 40791,
+   "side": null,
+   "chain": "neckwear"
+  },
+  {
+   "name": "UpperClothing/ShirtCollarStitch_d0",
+   "mat": "ClothAccent",
+   "start": 4132,
+   "end": 4146,
+   "side": null,
+   "chain": "neckwear",
+   "bind": "stiff",
+   "centroid": [
+    0.019525,
+    1.52,
+    0.058474
+   ]
+  },
+  {
+   "name": "UpperClothing/ShirtCollarStitch_d1",
+   "mat": "ClothAccent",
+   "start": 4146,
+   "end": 4160,
+   "side": null,
+   "chain": "neckwear",
+   "bind": "stiff",
+   "centroid": [
+    0.052392,
+    1.52,
+    0.036108
+   ]
+  },
+  {
+   "name": "UpperClothing/ShirtCollarStitch_d2",
+   "mat": "ClothAccent",
+   "start": 4160,
+   "end": 4174,
+   "side": null,
+   "chain": "neckwear",
+   "bind": "stiff",
+   "centroid": [
+    0.068622,
+    1.52,
+    -0.001625
+   ]
+  },
+  {
+   "name": "UpperClothing/ShirtCollarStitch_d3",
+   "mat": "ClothAccent",
+   "start": 4174,
+   "end": 4188,
+   "side": null,
+   "chain": "neckwear",
+   "bind": "stiff",
+   "centroid": [
+    0.062915,
+    1.52,
+    -0.042875
+   ]
+  },
+  {
+   "name": "UpperClothing/ShirtCollarStitch_d4",
+   "mat": "ClothAccent",
+   "start": 4188,
+   "end": 4202,
+   "side": null,
+   "chain": "neckwear",
+   "bind": "stiff",
+   "centroid": [
+    0.036799,
+    1.52,
+    -0.074579
+   ]
+  },
+  {
+   "name": "UpperClothing/ShirtCollarStitch_d5",
+   "mat": "ClothAccent",
+   "start": 4202,
+   "end": 4216,
+   "side": null,
+   "chain": "neckwear",
+   "bind": "stiff",
+   "centroid": [
+    -0.001775,
+    1.52,
+    -0.085498
+   ]
+  },
+  {
+   "name": "UpperClothing/ShirtCollarStitch_d6",
+   "mat": "ClothAccent",
+   "start": 4216,
+   "end": 4230,
+   "side": null,
+   "chain": "neckwear",
+   "bind": "stiff",
+   "centroid": [
+    -0.039398,
+    1.52,
+    -0.071834
+   ]
+  },
+  {
+   "name": "UpperClothing/ShirtCollarStitch_d7",
+   "mat": "ClothAccent",
+   "start": 4230,
+   "end": 4244,
+   "side": null,
+   "chain": "neckwear",
+   "bind": "stiff",
+   "centroid": [
+    -0.063866,
+    1.52,
+    -0.039125
+   ]
+  },
+  {
+   "name": "UpperClothing/ShirtCollarStitch_d8",
+   "mat": "ClothAccent",
+   "start": 4244,
+   "end": 4258,
+   "side": null,
+   "chain": "neckwear",
+   "bind": "stiff",
+   "centroid": [
+    -0.067671,
+    1.52,
+    0.002125
+   ]
+  },
+  {
+   "name": "UpperClothing/ShirtCollarStitch_d9",
+   "mat": "ClothAccent",
+   "start": 4258,
+   "end": 4272,
+   "side": null,
+   "chain": "neckwear",
+   "bind": "stiff",
+   "centroid": [
+    -0.049793,
+    1.52,
+    0.038853
+   ]
+  },
+  {
+   "name": "Accessories/CravatBand",
+   "mat": "BoneThread",
+   "start": 40791,
+   "end": 40823,
+   "side": null,
+   "chain": "neckwear",
+   "bind": "stiff",
+   "centroid": [
+    -0.0,
+    1.491,
+    0.056019
+   ]
+  },
+  {
+   "name": "Accessories/CravatKnot",
+   "mat": "BoneThread",
+   "start": 40823,
+   "end": 40909,
+   "side": null,
+   "chain": "neckwear",
+   "bind": "stiff",
+   "centroid": [
+    0.014,
+    1.488,
+    0.108
+   ]
+  },
+  {
+   "name": "Accessories/CravatBrooch",
+   "mat": "AgedBrass",
+   "start": 31863,
+   "end": 31949,
+   "side": null,
+   "chain": "neckwear",
+   "bind": "stiff",
+   "centroid": [
+    0.014,
+    1.488,
+    0.124
+   ]
+  },
+  {
+   "name": "Accessories/CravatBrooch_Rim",
+   "mat": "AgedBrass",
+   "start": 31949,
+   "end": 32021,
+   "side": null,
+   "chain": "neckwear",
+   "bind": "stiff",
+   "centroid": [
+    0.014048,
+    1.488095,
+    0.124954
+   ]
+  },
+  {
+   "name": "Accessories/CravatTailL",
+   "mat": "BoneThread",
+   "start": 40909,
+   "end": 40925,
+   "side": null,
+   "chain": "neckwear",
+   "bind": "stiff",
+   "centroid": [
+    0.043,
+    1.388,
+    0.1165
+   ]
+  },
+  {
+   "name": "Accessories/CravatTailLStitch_d0",
+   "mat": "ClothAccent",
+   "start": 4272,
+   "end": 4286,
+   "side": null,
+   "chain": "neckwear",
+   "bind": "stiff",
+   "centroid": [
+    0.03,
+    1.461,
+    0.118
+   ]
+  },
+  {
+   "name": "Accessories/CravatTailLStitch_d1",
+   "mat": "ClothAccent",
+   "start": 4286,
+   "end": 4300,
+   "side": null,
+   "chain": "neckwear",
+   "bind": "stiff",
+   "centroid": [
+    0.038,
+    1.427,
+    0.122
+   ]
+  },
+  {
+   "name": "Accessories/CravatTailLStitch_d2",
+   "mat": "ClothAccent",
+   "start": 4300,
+   "end": 4314,
+   "side": null,
+   "chain": "neckwear",
+   "bind": "stiff",
+   "centroid": [
+    0.044,
+    1.3925,
+    0.1225
+   ]
+  },
+  {
+   "name": "Accessories/CravatTailLStitch_d3",
+   "mat": "ClothAccent",
+   "start": 4314,
+   "end": 4328,
+   "side": null,
+   "chain": "neckwear",
+   "bind": "stiff",
+   "centroid": [
+    0.048,
+    1.3575,
+    0.1195
+   ]
+  },
+  {
+   "name": "Accessories/CravatTailR",
+   "mat": "BoneThread",
+   "start": 40925,
+   "end": 40937,
+   "side": null,
+   "chain": "neckwear",
+   "bind": "stiff",
+   "centroid": [
+    -0.004,
+    1.439667,
+    0.118667
+   ]
+  },
+  {
+   "name": "UpperClothing/CoatBodice_L",
+   "mat": "Cloth",
+   "start": 0,
+   "end": 738,
+   "side": null,
+   "chain": "torso"
+  },
+  {
+   "name": "UpperClothing/CoatBodice_R",
+   "mat": "Cloth",
+   "start": 738,
+   "end": 1476,
+   "side": null,
+   "chain": "torso"
+  },
+  {
+   "name": "UpperClothing/SpineSeam",
+   "mat": "Cloth",
+   "start": 1476,
+   "end": 1520,
+   "side": null,
+   "chain": "torso"
+  },
+  {
+   "name": "UpperClothing/SpineSeamStitch_d0",
+   "mat": "BoneThread",
+   "start": 40937,
+   "end": 40951,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.0,
+    1.05,
+    -0.172494
+   ]
+  },
+  {
+   "name": "UpperClothing/SpineSeamStitch_d1",
+   "mat": "BoneThread",
+   "start": 40951,
+   "end": 40965,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.0,
+    1.11,
+    -0.170679
+   ]
+  },
+  {
+   "name": "UpperClothing/SpineSeamStitch_d2",
+   "mat": "BoneThread",
+   "start": 40965,
+   "end": 40979,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.0,
+    1.17,
+    -0.171526
+   ]
+  },
+  {
+   "name": "UpperClothing/SpineSeamStitch_d3",
+   "mat": "BoneThread",
+   "start": 40979,
+   "end": 40993,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.0,
+    1.23,
+    -0.173333
+   ]
+  },
+  {
+   "name": "UpperClothing/SpineSeamStitch_d4",
+   "mat": "BoneThread",
+   "start": 40993,
+   "end": 41007,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.0,
+    1.29375,
+    -0.174058
+   ]
+  },
+  {
+   "name": "UpperClothing/SpineSeamStitch_d5",
+   "mat": "BoneThread",
+   "start": 41007,
+   "end": 41021,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.0,
+    1.36125,
+    -0.172325
+   ]
+  },
+  {
+   "name": "UpperClothing/SpineSeamStitch_d6",
+   "mat": "BoneThread",
+   "start": 41021,
+   "end": 41035,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.0,
+    1.42875,
+    -0.164675
+   ]
+  },
+  {
+   "name": "UpperClothing/SpineSeamStitch_d7",
+   "mat": "BoneThread",
+   "start": 41035,
+   "end": 41049,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.0,
+    1.468125,
+    -0.151119
+   ]
+  },
+  {
+   "name": "UpperClothing/PrincessSeam_L",
+   "mat": "Cloth",
+   "start": 1520,
+   "end": 1558,
+   "side": null,
+   "chain": "torso"
+  },
+  {
+   "name": "UpperClothing/PrincessSeamStitch_L_d0",
+   "mat": "BoneThread",
+   "start": 41049,
+   "end": 41063,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.101648,
+    1.0675,
+    -0.157693
+   ]
+  },
+  {
+   "name": "UpperClothing/PrincessSeamStitch_L_d1",
+   "mat": "BoneThread",
+   "start": 41063,
+   "end": 41077,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.106021,
+    1.145,
+    -0.158197
+   ]
+  },
+  {
+   "name": "UpperClothing/PrincessSeamStitch_L_d2",
+   "mat": "BoneThread",
+   "start": 41077,
+   "end": 41091,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.113259,
+    1.228333,
+    -0.159444
+   ]
+  },
+  {
+   "name": "UpperClothing/PrincessSeamStitch_L_d3",
+   "mat": "BoneThread",
+   "start": 41091,
+   "end": 41105,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.122556,
+    1.311667,
+    -0.15991
+   ]
+  },
+  {
+   "name": "UpperClothing/PrincessSeamStitch_L_d4",
+   "mat": "BoneThread",
+   "start": 41105,
+   "end": 41119,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.12758,
+    1.395,
+    -0.154323
+   ]
+  },
+  {
+   "name": "UpperClothing/PrincessSeamStitch_L_d5",
+   "mat": "BoneThread",
+   "start": 41119,
+   "end": 41133,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.123301,
+    1.455,
+    -0.141616
+   ]
+  },
+  {
+   "name": "UpperClothing/PrincessSeam_R",
+   "mat": "Cloth",
+   "start": 1558,
+   "end": 1596,
+   "side": null,
+   "chain": "torso"
+  },
+  {
+   "name": "UpperClothing/PrincessSeamStitch_R_d0",
+   "mat": "BoneThread",
+   "start": 41133,
+   "end": 41147,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.117857,
+    1.0675,
+    -0.153112
+   ]
+  },
+  {
+   "name": "UpperClothing/PrincessSeamStitch_R_d1",
+   "mat": "BoneThread",
+   "start": 41147,
+   "end": 41161,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.119514,
+    1.145,
+    -0.154457
+   ]
+  },
+  {
+   "name": "UpperClothing/PrincessSeamStitch_R_d2",
+   "mat": "BoneThread",
+   "start": 41161,
+   "end": 41175,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.123928,
+    1.228333,
+    -0.156603
+   ]
+  },
+  {
+   "name": "UpperClothing/PrincessSeamStitch_R_d3",
+   "mat": "BoneThread",
+   "start": 41175,
+   "end": 41189,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.130151,
+    1.311667,
+    -0.157998
+   ]
+  },
+  {
+   "name": "UpperClothing/PrincessSeamStitch_R_d4",
+   "mat": "BoneThread",
+   "start": 41189,
+   "end": 41203,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.131504,
+    1.395,
+    -0.153379
+   ]
+  },
+  {
+   "name": "UpperClothing/PrincessSeamStitch_R_d5",
+   "mat": "BoneThread",
+   "start": 41203,
+   "end": 41217,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.124469,
+    1.455,
+    -0.141345
+   ]
+  },
+  {
+   "name": "UpperClothing/Epaulette_L",
+   "mat": "Leather",
+   "start": 8186,
+   "end": 8198,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.22,
+    1.467,
+    0.001667
+   ]
+  },
+  {
+   "name": "UpperClothing/EpauletteStitch_L_d0",
+   "mat": "BoneThread",
+   "start": 41217,
+   "end": 41231,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.175,
+    1.4755,
+    -0.00325
+   ]
+  },
+  {
+   "name": "UpperClothing/EpauletteStitch_L_d1",
+   "mat": "BoneThread",
+   "start": 41231,
+   "end": 41245,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.205,
+    1.4705,
+    0.00025
+   ]
+  },
+  {
+   "name": "UpperClothing/EpauletteStitch_L_d2",
+   "mat": "BoneThread",
+   "start": 41245,
+   "end": 41259,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.235,
+    1.46475,
+    0.0035
+   ]
+  },
+  {
+   "name": "UpperClothing/EpauletteStitch_L_d3",
+   "mat": "BoneThread",
+   "start": 41259,
+   "end": 41273,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.265,
+    1.45825,
+    0.0065
+   ]
+  },
+  {
+   "name": "UpperClothing/EpauletteButton_L",
+   "mat": "AgedBrass",
+   "start": 32021,
+   "end": 32107,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.17,
+    1.482,
+    -0.005
+   ]
+  },
+  {
+   "name": "UpperClothing/EpauletteButton_L_Rim",
+   "mat": "AgedBrass",
+   "start": 32107,
+   "end": 32179,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.17,
+    1.48296,
+    -0.005
+   ]
+  },
+  {
+   "name": "UpperClothing/Epaulette_R",
+   "mat": "Leather",
+   "start": 8198,
+   "end": 8210,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.22,
+    1.467,
+    0.001667
+   ]
+  },
+  {
+   "name": "UpperClothing/EpauletteStitch_R_d0",
+   "mat": "BoneThread",
+   "start": 41273,
+   "end": 41287,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.175,
+    1.4755,
+    -0.00325
+   ]
+  },
+  {
+   "name": "UpperClothing/EpauletteStitch_R_d1",
+   "mat": "BoneThread",
+   "start": 41287,
+   "end": 41301,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.205,
+    1.4705,
+    0.00025
+   ]
+  },
+  {
+   "name": "UpperClothing/EpauletteStitch_R_d2",
+   "mat": "BoneThread",
+   "start": 41301,
+   "end": 41315,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.235,
+    1.46475,
+    0.0035
+   ]
+  },
+  {
+   "name": "UpperClothing/EpauletteStitch_R_d3",
+   "mat": "BoneThread",
+   "start": 41315,
+   "end": 41329,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.265,
+    1.45825,
+    0.0065
+   ]
+  },
+  {
+   "name": "UpperClothing/EpauletteButton_R",
+   "mat": "AgedBrass",
+   "start": 32179,
+   "end": 32265,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.17,
+    1.482,
+    -0.005
+   ]
+  },
+  {
+   "name": "UpperClothing/EpauletteButton_R_Rim",
+   "mat": "AgedBrass",
+   "start": 32265,
+   "end": 32337,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.17,
+    1.48296,
+    -0.005
+   ]
+  },
+  {
+   "name": "UpperClothing/Lapel_L",
+   "mat": "ClothAccent",
+   "start": 4328,
+   "end": 4400,
+   "side": null,
+   "chain": "torso"
+  },
+  {
+   "name": "UpperClothing/LapelStitch_L_d0",
+   "mat": "BoneThread",
+   "start": 41329,
+   "end": 41343,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.118955,
+    1.23725,
+    0.16067
+   ]
+  },
+  {
+   "name": "UpperClothing/LapelStitch_L_d1",
+   "mat": "BoneThread",
+   "start": 41343,
+   "end": 41357,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.13018,
+    1.27175,
+    0.159345
+   ]
+  },
+  {
+   "name": "UpperClothing/LapelStitch_L_d2",
+   "mat": "BoneThread",
+   "start": 41357,
+   "end": 41371,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.146637,
+    1.30625,
+    0.155554
+   ]
+  },
+  {
+   "name": "UpperClothing/LapelStitch_L_d3",
+   "mat": "BoneThread",
+   "start": 41371,
+   "end": 41385,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.165598,
+    1.34075,
+    0.150085
+   ]
+  },
+  {
+   "name": "UpperClothing/LapelStitch_L_d4",
+   "mat": "BoneThread",
+   "start": 41385,
+   "end": 41399,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.183032,
+    1.37525,
+    0.143667
+   ]
+  },
+  {
+   "name": "UpperClothing/LapelStitch_L_d5",
+   "mat": "BoneThread",
+   "start": 41399,
+   "end": 41413,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.193708,
+    1.40975,
+    0.136221
+   ]
+  },
+  {
+   "name": "UpperClothing/LapelStitch_L_d6",
+   "mat": "BoneThread",
+   "start": 41413,
+   "end": 41427,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.194676,
+    1.44425,
+    0.128675
+   ]
+  },
+  {
+   "name": "UpperClothing/LapelStitch_L_d7",
+   "mat": "BoneThread",
+   "start": 41427,
+   "end": 41441,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.181344,
+    1.47875,
+    0.118262
+   ]
+  },
+  {
+   "name": "UpperClothing/LapelStud_L",
+   "mat": "AgedBrass",
+   "start": 32337,
+   "end": 32389,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.170965,
+    1.496363,
+    0.112903
+   ]
+  },
+  {
+   "name": "UpperClothing/Lapel_R",
+   "mat": "ClothAccent",
+   "start": 4400,
+   "end": 4472,
+   "side": null,
+   "chain": "torso"
+  },
+  {
+   "name": "UpperClothing/LapelStitch_R_d0",
+   "mat": "BoneThread",
+   "start": 41441,
+   "end": 41455,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.110771,
+    1.254,
+    0.163584
+   ]
+  },
+  {
+   "name": "UpperClothing/LapelStitch_R_d1",
+   "mat": "BoneThread",
+   "start": 41455,
+   "end": 41469,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.122213,
+    1.282,
+    0.161857
+   ]
+  },
+  {
+   "name": "UpperClothing/LapelStitch_R_d2",
+   "mat": "BoneThread",
+   "start": 41469,
+   "end": 41483,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.13542,
+    1.31,
+    0.15885
+   ]
+  },
+  {
+   "name": "UpperClothing/LapelStitch_R_d3",
+   "mat": "BoneThread",
+   "start": 41483,
+   "end": 41497,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.149062,
+    1.338,
+    0.155274
+   ]
+  },
+  {
+   "name": "UpperClothing/LapelStitch_R_d4",
+   "mat": "BoneThread",
+   "start": 41497,
+   "end": 41511,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.161793,
+    1.366,
+    0.151839
+   ]
+  },
+  {
+   "name": "UpperClothing/LapelStitch_R_d5",
+   "mat": "BoneThread",
+   "start": 41511,
+   "end": 41525,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.16961,
+    1.394,
+    0.147386
+   ]
+  },
+  {
+   "name": "UpperClothing/LapelStitch_R_d6",
+   "mat": "BoneThread",
+   "start": 41525,
+   "end": 41539,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.171063,
+    1.422,
+    0.142465
+   ]
+  },
+  {
+   "name": "UpperClothing/LapelStitch_R_d7",
+   "mat": "BoneThread",
+   "start": 41539,
+   "end": 41553,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.166061,
+    1.45,
+    0.137462
+   ]
+  },
+  {
+   "name": "UpperClothing/LapelStud_R",
+   "mat": "AgedBrass",
+   "start": 32389,
+   "end": 32441,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.162365,
+    1.464363,
+    0.136001
+   ]
+  },
+  {
+   "name": "Accessories/FrogTabL_1",
+   "mat": "Leather",
+   "start": 8210,
+   "end": 8218,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.037454,
+    1.02,
+    0.172289
+   ]
+  },
+  {
+   "name": "Accessories/FrogTabR_1",
+   "mat": "Leather",
+   "start": 8218,
+   "end": 8226,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.00649,
+    1.02,
+    0.172851
+   ]
+  },
+  {
+   "name": "Accessories/FrogRivetL_1",
+   "mat": "AgedBrass",
+   "start": 32441,
+   "end": 32493,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.043454,
+    1.02,
+    0.173389
+   ]
+  },
+  {
+   "name": "Accessories/FrogRivetR_1",
+   "mat": "AgedBrass",
+   "start": 32493,
+   "end": 32545,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.00049,
+    1.02,
+    0.173951
+   ]
+  },
+  {
+   "name": "Accessories/FrogLoop_1",
+   "mat": "AgedBrass",
+   "start": 32545,
+   "end": 32605,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.022454,
+    1.02,
+    0.176789
+   ]
+  },
+  {
+   "name": "Accessories/FrogToggle_1",
+   "mat": "AgedBrass",
+   "start": 32605,
+   "end": 32619,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.00949,
+    1.02,
+    0.177351
+   ]
+  },
+  {
+   "name": "Accessories/FrogTabL_2",
+   "mat": "Leather",
+   "start": 8226,
+   "end": 8234,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.037285,
+    1.1,
+    0.169176
+   ]
+  },
+  {
+   "name": "Accessories/FrogTabR_2",
+   "mat": "Leather",
+   "start": 8234,
+   "end": 8242,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.006389,
+    1.1,
+    0.169728
+   ]
+  },
+  {
+   "name": "Accessories/FrogRivetL_2",
+   "mat": "AgedBrass",
+   "start": 32619,
+   "end": 32671,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.043285,
+    1.1,
+    0.170276
+   ]
+  },
+  {
+   "name": "Accessories/FrogRivetR_2",
+   "mat": "AgedBrass",
+   "start": 32671,
+   "end": 32723,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.000389,
+    1.1,
+    0.170828
+   ]
+  },
+  {
+   "name": "Accessories/FrogLoop_2",
+   "mat": "AgedBrass",
+   "start": 32723,
+   "end": 32783,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.022285,
+    1.1,
+    0.173676
+   ]
+  },
+  {
+   "name": "Accessories/FrogToggle_2",
+   "mat": "AgedBrass",
+   "start": 32783,
+   "end": 32797,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.009389,
+    1.1,
+    0.174228
+   ]
+  },
+  {
+   "name": "Accessories/FrogTabL_3",
+   "mat": "Leather",
+   "start": 8242,
+   "end": 8250,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.03812,
+    1.18,
+    0.170299
+   ]
+  },
+  {
+   "name": "Accessories/FrogTabR_3",
+   "mat": "Leather",
+   "start": 8250,
+   "end": 8258,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.00689,
+    1.18,
+    0.170854
+   ]
+  },
+  {
+   "name": "Accessories/FrogRivetL_3",
+   "mat": "AgedBrass",
+   "start": 32797,
+   "end": 32849,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.04412,
+    1.18,
+    0.171399
+   ]
+  },
+  {
+   "name": "Accessories/FrogRivetR_3",
+   "mat": "AgedBrass",
+   "start": 32849,
+   "end": 32901,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.00089,
+    1.18,
+    0.171954
+   ]
+  },
+  {
+   "name": "Accessories/FrogLoop_3",
+   "mat": "AgedBrass",
+   "start": 32901,
+   "end": 32961,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.02312,
+    1.18,
+    0.174799
+   ]
+  },
+  {
+   "name": "Accessories/FrogToggle_3",
+   "mat": "AgedBrass",
+   "start": 32961,
+   "end": 32975,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.00989,
+    1.18,
+    0.175354
+   ]
+  },
+  {
+   "name": "Accessories/FrogTabL_4",
+   "mat": "Leather",
+   "start": 8258,
+   "end": 8266,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.055024,
+    1.26,
+    0.171841
+   ]
+  },
+  {
+   "name": "Accessories/FrogTabR_4",
+   "mat": "Leather",
+   "start": 8266,
+   "end": 8274,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.030745,
+    1.26,
+    0.172203
+   ]
+  },
+  {
+   "name": "Accessories/FrogRivetL_4",
+   "mat": "AgedBrass",
+   "start": 32975,
+   "end": 33027,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.061024,
+    1.26,
+    0.172941
+   ]
+  },
+  {
+   "name": "Accessories/FrogRivetR_4",
+   "mat": "AgedBrass",
+   "start": 33027,
+   "end": 33079,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.024745,
+    1.26,
+    0.173303
+   ]
+  },
+  {
+   "name": "Accessories/FrogLoop_4",
+   "mat": "AgedBrass",
+   "start": 33079,
+   "end": 33139,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.040024,
+    1.26,
+    0.176341
+   ]
+  },
+  {
+   "name": "Accessories/FrogToggle_4",
+   "mat": "AgedBrass",
+   "start": 33139,
+   "end": 33153,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.033745,
+    1.26,
+    0.176703
+   ]
+  },
+  {
+   "name": "UpperClothing/PocketFlap_L",
+   "mat": "ClothAccent",
+   "start": 4472,
+   "end": 4484,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.267471,
+    1.058333,
+    -0.02575
+   ]
+  },
+  {
+   "name": "UpperClothing/PocketFlapStitch_L_d0",
+   "mat": "BoneThread",
+   "start": 41553,
+   "end": 41567,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.27025,
+    1.05875,
+    -0.012964
+   ]
+  },
+  {
+   "name": "UpperClothing/PocketFlapStitch_L_d1",
+   "mat": "BoneThread",
+   "start": 41567,
+   "end": 41581,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.269736,
+    1.05625,
+    -0.021675
+   ]
+  },
+  {
+   "name": "UpperClothing/PocketFlapStitch_L_d2",
+   "mat": "BoneThread",
+   "start": 41581,
+   "end": 41595,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.267715,
+    1.05625,
+    -0.030176
+   ]
+  },
+  {
+   "name": "UpperClothing/PocketFlapStitch_L_d3",
+   "mat": "BoneThread",
+   "start": 41595,
+   "end": 41609,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.264189,
+    1.05875,
+    -0.038466
+   ]
+  },
+  {
+   "name": "UpperClothing/PocketButton_L",
+   "mat": "AgedBrass",
+   "start": 33153,
+   "end": 33239,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.270847,
+    1.045,
+    -0.026318
+   ]
+  },
+  {
+   "name": "UpperClothing/PocketButton_L_Rim",
+   "mat": "AgedBrass",
+   "start": 33239,
+   "end": 33311,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.271743,
+    1.045,
+    -0.026405
+   ]
+  },
+  {
+   "name": "UpperClothing/PocketFlap_R",
+   "mat": "ClothAccent",
+   "start": 4484,
+   "end": 4496,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.267471,
+    1.058333,
+    -0.02575
+   ]
+  },
+  {
+   "name": "UpperClothing/PocketFlapStitch_R_d0",
+   "mat": "BoneThread",
+   "start": 41609,
+   "end": 41623,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.264189,
+    1.05875,
+    -0.038466
+   ]
+  },
+  {
+   "name": "UpperClothing/PocketFlapStitch_R_d1",
+   "mat": "BoneThread",
+   "start": 41623,
+   "end": 41637,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.267715,
+    1.05625,
+    -0.030176
+   ]
+  },
+  {
+   "name": "UpperClothing/PocketFlapStitch_R_d2",
+   "mat": "BoneThread",
+   "start": 41637,
+   "end": 41651,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.269736,
+    1.05625,
+    -0.021675
+   ]
+  },
+  {
+   "name": "UpperClothing/PocketFlapStitch_R_d3",
+   "mat": "BoneThread",
+   "start": 41651,
+   "end": 41665,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.27025,
+    1.05875,
+    -0.012964
+   ]
+  },
+  {
+   "name": "UpperClothing/PocketButton_R",
+   "mat": "AgedBrass",
+   "start": 33311,
+   "end": 33397,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.270847,
+    1.045,
+    -0.026318
+   ]
+  },
+  {
+   "name": "UpperClothing/PocketButton_R_Rim",
+   "mat": "AgedBrass",
+   "start": 33397,
+   "end": 33469,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.271743,
+    1.045,
+    -0.026405
+   ]
+  },
+  {
+   "name": "LowerClothing/CoatSkirt_L",
+   "mat": "Cloth",
+   "start": 1596,
+   "end": 2016,
+   "side": null,
+   "chain": "skirt"
+  },
+  {
+   "name": "LowerClothing/CoatSkirt_R",
+   "mat": "Cloth",
+   "start": 2016,
+   "end": 2436,
+   "side": null,
+   "chain": "skirt"
+  },
+  {
+   "name": "LowerClothing/VentPleat",
+   "mat": "ClothAccent",
+   "start": 4496,
+   "end": 4528,
+   "side": null,
+   "chain": "skirt"
+  },
+  {
+   "name": "Accessories/RearMartingale",
+   "mat": "Leather",
+   "start": 8274,
+   "end": 8286,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.0,
+    1.017,
+    -0.179193
+   ]
+  },
+  {
+   "name": "Accessories/RearMartingaleStitch_d0",
+   "mat": "BoneThread",
+   "start": 41665,
+   "end": 41679,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.0745,
+    1.0175,
+    -0.177116
+   ]
+  },
+  {
+   "name": "Accessories/RearMartingaleStitch_d1",
+   "mat": "BoneThread",
+   "start": 41679,
+   "end": 41693,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.0447,
+    1.0165,
+    -0.18127
+   ]
+  },
+  {
+   "name": "Accessories/RearMartingaleStitch_d2",
+   "mat": "BoneThread",
+   "start": 41693,
+   "end": 41707,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.0149,
+    1.0155,
+    -0.185423
+   ]
+  },
+  {
+   "name": "Accessories/RearMartingaleStitch_d3",
+   "mat": "BoneThread",
+   "start": 41707,
+   "end": 41721,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.0149,
+    1.0155,
+    -0.185423
+   ]
+  },
+  {
+   "name": "Accessories/RearMartingaleStitch_d4",
+   "mat": "BoneThread",
+   "start": 41721,
+   "end": 41735,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.0447,
+    1.0165,
+    -0.18127
+   ]
+  },
+  {
+   "name": "Accessories/RearMartingaleStitch_d5",
+   "mat": "BoneThread",
+   "start": 41735,
+   "end": 41749,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.0745,
+    1.0175,
+    -0.177116
+   ]
+  },
+  {
+   "name": "Accessories/RearCoatButton_L",
+   "mat": "AgedBrass",
+   "start": 33469,
+   "end": 33555,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.080198,
+    1.018,
+    -0.182985
+   ]
+  },
+  {
+   "name": "Accessories/RearCoatButton_L_Rim",
+   "mat": "AgedBrass",
+   "start": 33555,
+   "end": 33627,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.08068,
+    1.018,
+    -0.184084
+   ]
+  },
+  {
+   "name": "Accessories/RearCoatButton_R",
+   "mat": "AgedBrass",
+   "start": 33627,
+   "end": 33713,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.080198,
+    1.018,
+    -0.182985
+   ]
+  },
+  {
+   "name": "Accessories/RearCoatButton_R_Rim",
+   "mat": "AgedBrass",
+   "start": 33713,
+   "end": 33785,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.08068,
+    1.018,
+    -0.184084
+   ]
+  },
+  {
+   "name": "UpperClothing/CoatCollar",
+   "mat": "ClothAccent",
+   "start": 4528,
+   "end": 4776,
+   "side": null,
+   "chain": "collar"
+  },
+  {
+   "name": "UpperClothing/CollarFacing",
+   "mat": "Cloth",
+   "start": 2436,
+   "end": 2622,
+   "side": null,
+   "chain": "collar"
+  },
+  {
+   "name": "Accessories/CollarPiping",
+   "mat": "BoneThread",
+   "start": 41749,
+   "end": 41841,
+   "side": null,
+   "chain": "collar"
+  },
+  {
+   "name": "Accessories/CollarStitch_d0",
+   "mat": "ClothAccent",
+   "start": 4776,
+   "end": 4790,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    0.097854,
+    1.545645,
+    0.046033
+   ]
+  },
+  {
+   "name": "Accessories/CollarStitch_d1",
+   "mat": "ClothAccent",
+   "start": 4790,
+   "end": 4804,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    0.109928,
+    1.537935,
+    -0.004877
+   ]
+  },
+  {
+   "name": "Accessories/CollarStitch_d2",
+   "mat": "ClothAccent",
+   "start": 4804,
+   "end": 4818,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    0.098119,
+    1.530914,
+    -0.055399
+   ]
+  },
+  {
+   "name": "Accessories/CollarStitch_d3",
+   "mat": "ClothAccent",
+   "start": 4818,
+   "end": 4832,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    0.068168,
+    1.524645,
+    -0.096197
+   ]
+  },
+  {
+   "name": "Accessories/CollarStitch_d4",
+   "mat": "ClothAccent",
+   "start": 4832,
+   "end": 4846,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    0.024141,
+    1.519767,
+    -0.117392
+   ]
+  },
+  {
+   "name": "Accessories/CollarStitch_d5",
+   "mat": "ClothAccent",
+   "start": 4846,
+   "end": 4860,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    -0.024141,
+    1.519767,
+    -0.117392
+   ]
+  },
+  {
+   "name": "Accessories/CollarStitch_d6",
+   "mat": "ClothAccent",
+   "start": 4860,
+   "end": 4874,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    -0.068168,
+    1.524645,
+    -0.096197
+   ]
+  },
+  {
+   "name": "Accessories/CollarStitch_d7",
+   "mat": "ClothAccent",
+   "start": 4874,
+   "end": 4888,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    -0.098119,
+    1.530914,
+    -0.055399
+   ]
+  },
+  {
+   "name": "Accessories/CollarStitch_d8",
+   "mat": "ClothAccent",
+   "start": 4888,
+   "end": 4902,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    -0.109928,
+    1.537935,
+    -0.004877
+   ]
+  },
+  {
+   "name": "Accessories/CollarStitch_d9",
+   "mat": "ClothAccent",
+   "start": 4902,
+   "end": 4916,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    -0.097854,
+    1.545645,
+    0.046033
+   ]
+  },
+  {
+   "name": "Accessories/CollarTab",
+   "mat": "Leather",
+   "start": 8286,
+   "end": 8314,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    0.000366,
+    1.514,
+    0.079951
+   ]
+  },
+  {
+   "name": "Accessories/CollarTabStitch_d0",
+   "mat": "BoneThread",
+   "start": 41841,
+   "end": 41855,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    0.063546,
+    1.5125,
+    0.073269
+   ]
+  },
+  {
+   "name": "Accessories/CollarTabStitch_d1",
+   "mat": "BoneThread",
+   "start": 41855,
+   "end": 41869,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    0.022717,
+    1.5135,
+    0.095018
+   ]
+  },
+  {
+   "name": "Accessories/CollarTabStitch_d2",
+   "mat": "BoneThread",
+   "start": 41869,
+   "end": 41883,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    -0.022566,
+    1.5145,
+    0.095494
+   ]
+  },
+  {
+   "name": "Accessories/CollarTabStitch_d3",
+   "mat": "BoneThread",
+   "start": 41883,
+   "end": 41897,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    -0.062573,
+    1.5155,
+    0.074389
+   ]
+  },
+  {
+   "name": "Accessories/CollarBuckle_BarTop",
+   "mat": "AgedBrass",
+   "start": 33785,
+   "end": 33799,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    -0.078765,
+    1.527218,
+    0.061429
+   ]
+  },
+  {
+   "name": "Accessories/CollarBuckle_BarRight",
+   "mat": "AgedBrass",
+   "start": 33799,
+   "end": 33813,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    -0.087765,
+    1.516431,
+    0.063586
+   ]
+  },
+  {
+   "name": "Accessories/CollarBuckle_BarBot",
+   "mat": "AgedBrass",
+   "start": 33813,
+   "end": 33827,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    -0.078765,
+    1.505645,
+    0.065743
+   ]
+  },
+  {
+   "name": "Accessories/CollarBuckle_BarLeft",
+   "mat": "AgedBrass",
+   "start": 33827,
+   "end": 33841,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    -0.069765,
+    1.516431,
+    0.063586
+   ]
+  },
+  {
+   "name": "Accessories/CollarBuckle_Spindle",
+   "mat": "AgedBrass",
+   "start": 33841,
+   "end": 33855,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    -0.078765,
+    1.516431,
+    0.063586
+   ]
+  },
+  {
+   "name": "Accessories/CollarBuckle_Prong",
+   "mat": "AgedBrass",
+   "start": 33855,
+   "end": 33869,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    -0.078765,
+    1.522493,
+    0.063607
+   ]
+  },
+  {
+   "name": "Accessories/CollarStud",
+   "mat": "AgedBrass",
+   "start": 33869,
+   "end": 33921,
+   "side": null,
+   "chain": "collar",
+   "bind": "stiff",
+   "centroid": [
+    -0.078241,
+    1.508314,
+    0.063066
+   ]
+  },
+  {
+   "name": "UpperClothing/ShoulderMantle",
+   "mat": "Cloth",
+   "start": 2622,
+   "end": 2832,
+   "side": null,
+   "chain": "torso"
+  },
+  {
+   "name": "Accessories/MantleHemPiping",
+   "mat": "BoneThread",
+   "start": 41897,
+   "end": 42037,
+   "side": null,
+   "chain": "torso"
+  },
+  {
+   "name": "Accessories/MantleHemStitch_d0",
+   "mat": "ClothAccent",
+   "start": 4916,
+   "end": 4930,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.304239,
+    1.397203,
+    -0.085199
+   ]
+  },
+  {
+   "name": "Accessories/MantleHemStitch_d1",
+   "mat": "ClothAccent",
+   "start": 4930,
+   "end": 4944,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.273889,
+    1.372927,
+    -0.112387
+   ]
+  },
+  {
+   "name": "Accessories/MantleHemStitch_d2",
+   "mat": "ClothAccent",
+   "start": 4944,
+   "end": 4958,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.235765,
+    1.344928,
+    -0.136262
+   ]
+  },
+  {
+   "name": "Accessories/MantleHemStitch_d3",
+   "mat": "ClothAccent",
+   "start": 4958,
+   "end": 4972,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.19252,
+    1.321331,
+    -0.15898
+   ]
+  },
+  {
+   "name": "Accessories/MantleHemStitch_d4",
+   "mat": "ClothAccent",
+   "start": 4972,
+   "end": 4986,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.144161,
+    1.305869,
+    -0.179979
+   ]
+  },
+  {
+   "name": "Accessories/MantleHemStitch_d5",
+   "mat": "ClothAccent",
+   "start": 4986,
+   "end": 5000,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.088876,
+    1.300743,
+    -0.193801
+   ]
+  },
+  {
+   "name": "Accessories/MantleHemStitch_d6",
+   "mat": "ClothAccent",
+   "start": 5000,
+   "end": 5014,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.029851,
+    1.302612,
+    -0.197981
+   ]
+  },
+  {
+   "name": "Accessories/MantleHemStitch_d7",
+   "mat": "ClothAccent",
+   "start": 5014,
+   "end": 5028,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.02946,
+    1.308862,
+    -0.194388
+   ]
+  },
+  {
+   "name": "Accessories/MantleHemStitch_d8",
+   "mat": "ClothAccent",
+   "start": 5028,
+   "end": 5042,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.087372,
+    1.317587,
+    -0.187883
+   ]
+  },
+  {
+   "name": "Accessories/MantleHemStitch_d9",
+   "mat": "ClothAccent",
+   "start": 5042,
+   "end": 5056,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.143763,
+    1.329067,
+    -0.179024
+   ]
+  },
+  {
+   "name": "Accessories/MantleHemStitch_d10",
+   "mat": "ClothAccent",
+   "start": 5056,
+   "end": 5070,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.19556,
+    1.345536,
+    -0.16334
+   ]
+  },
+  {
+   "name": "Accessories/MantleHemStitch_d11",
+   "mat": "ClothAccent",
+   "start": 5070,
+   "end": 5084,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.239378,
+    1.366996,
+    -0.14006
+   ]
+  },
+  {
+   "name": "Accessories/MantleHemStitch_d12",
+   "mat": "ClothAccent",
+   "start": 5084,
+   "end": 5098,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.272447,
+    1.391894,
+    -0.111476
+   ]
+  },
+  {
+   "name": "Accessories/MantleHemStitch_d13",
+   "mat": "ClothAccent",
+   "start": 5098,
+   "end": 5112,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.29859,
+    1.413975,
+    -0.082359
+   ]
+  },
+  {
+   "name": "Accessories/MantleClasp_R",
+   "mat": "AgedBrass",
+   "start": 33921,
+   "end": 34007,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.287301,
+    1.488111,
+    -0.073207
+   ]
+  },
+  {
+   "name": "Accessories/MantleClasp_R_Rim",
+   "mat": "AgedBrass",
+   "start": 34007,
+   "end": 34079,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.287705,
+    1.489236,
+    -0.07331
+   ]
+  },
+  {
+   "name": "Accessories/MantleClaspRing_R",
+   "mat": "AgedBrass",
+   "start": 34079,
+   "end": 34139,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.287301,
+    1.488111,
+    -0.073207
+   ]
+  },
+  {
+   "name": "Accessories/MantleClasp_L",
+   "mat": "AgedBrass",
+   "start": 34139,
+   "end": 34225,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.287301,
+    1.488874,
+    -0.073207
+   ]
+  },
+  {
+   "name": "Accessories/MantleClasp_L_Rim",
+   "mat": "AgedBrass",
+   "start": 34225,
+   "end": 34297,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.287705,
+    1.489999,
+    -0.07331
+   ]
+  },
+  {
+   "name": "Accessories/MantleClaspRing_L",
+   "mat": "AgedBrass",
+   "start": 34297,
+   "end": 34357,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.287301,
+    1.488874,
+    -0.073207
+   ]
+  },
+  {
+   "name": "Accessories/MantleChainSwag",
+   "mat": "AgedBrass",
+   "start": 34357,
+   "end": 34425,
+   "side": null,
+   "chain": "torso"
+  },
+  {
+   "name": "UpperClothing/CoatSleeve_L",
+   "mat": "Cloth",
+   "start": 2832,
+   "end": 3184,
+   "side": "L",
+   "chain": "armL"
+  },
+  {
+   "name": "UpperClothing/SleeveSeam_L",
+   "mat": "Cloth",
+   "start": 3184,
+   "end": 3234,
+   "side": "L",
+   "chain": "armL"
+  },
+  {
+   "name": "UpperClothing/SleeveSeamStitch_L_d0",
+   "mat": "BoneThread",
+   "start": 42037,
+   "end": 42051,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.315056,
+    1.44275,
+    -0.004063
+   ]
+  },
+  {
+   "name": "UpperClothing/SleeveSeamStitch_L_d1",
+   "mat": "BoneThread",
+   "start": 42051,
+   "end": 42065,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.348606,
+    1.399875,
+    0.003187
+   ]
+  },
+  {
+   "name": "UpperClothing/SleeveSeamStitch_L_d2",
+   "mat": "BoneThread",
+   "start": 42065,
+   "end": 42079,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.381406,
+    1.3435,
+    0.009125
+   ]
+  },
+  {
+   "name": "UpperClothing/SleeveSeamStitch_L_d3",
+   "mat": "BoneThread",
+   "start": 42079,
+   "end": 42093,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.401844,
+    1.266562,
+    0.014375
+   ]
+  },
+  {
+   "name": "UpperClothing/SleeveSeamStitch_L_d4",
+   "mat": "BoneThread",
+   "start": 42093,
+   "end": 42107,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.420656,
+    1.190438,
+    0.019625
+   ]
+  },
+  {
+   "name": "UpperClothing/SleeveSeamStitch_L_d5",
+   "mat": "BoneThread",
+   "start": 42107,
+   "end": 42121,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.434594,
+    1.141938,
+    0.025687
+   ]
+  },
+  {
+   "name": "UpperClothing/SleeveSeamStitch_L_d6",
+   "mat": "BoneThread",
+   "start": 42121,
+   "end": 42135,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.442656,
+    1.085937,
+    0.030437
+   ]
+  },
+  {
+   "name": "UpperClothing/SleeveSeamStitch_L_d7",
+   "mat": "BoneThread",
+   "start": 42135,
+   "end": 42149,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.446687,
+    1.035188,
+    0.03425
+   ]
+  },
+  {
+   "name": "UpperClothing/ElbowPatch_L",
+   "mat": "ClothAccent",
+   "start": 5112,
+   "end": 5198,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.416,
+    1.185,
+    0.022
+   ]
+  },
+  {
+   "name": "Accessories/ElbowPatchStitch_L_d0",
+   "mat": "BoneThread",
+   "start": 42149,
+   "end": 42163,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.424,
+    1.224304,
+    0.03258
+   ]
+  },
+  {
+   "name": "Accessories/ElbowPatchStitch_L_d1",
+   "mat": "BoneThread",
+   "start": 42163,
+   "end": 42177,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.424,
+    1.212263,
+    0.050597
+   ]
+  },
+  {
+   "name": "Accessories/ElbowPatchStitch_L_d2",
+   "mat": "BoneThread",
+   "start": 42177,
+   "end": 42191,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.424,
+    1.191644,
+    0.060042
+   ]
+  },
+  {
+   "name": "Accessories/ElbowPatchStitch_L_d3",
+   "mat": "BoneThread",
+   "start": 42191,
+   "end": 42205,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.424,
+    1.168487,
+    0.057863
+   ]
+  },
+  {
+   "name": "Accessories/ElbowPatchStitch_L_d4",
+   "mat": "BoneThread",
+   "start": 42205,
+   "end": 42219,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.424,
+    1.149802,
+    0.044336
+   ]
+  },
+  {
+   "name": "Accessories/ElbowPatchStitch_L_d5",
+   "mat": "BoneThread",
+   "start": 42219,
+   "end": 42233,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.424,
+    1.142411,
+    0.023176
+   ]
+  },
+  {
+   "name": "Accessories/ElbowPatchStitch_L_d6",
+   "mat": "BoneThread",
+   "start": 42233,
+   "end": 42247,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.424,
+    1.14898,
+    0.002015
+   ]
+  },
+  {
+   "name": "Accessories/ElbowPatchStitch_L_d7",
+   "mat": "BoneThread",
+   "start": 42247,
+   "end": 42261,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.424,
+    1.166337,
+    -0.01241
+   ]
+  },
+  {
+   "name": "Accessories/ElbowPatchStitch_L_d8",
+   "mat": "BoneThread",
+   "start": 42261,
+   "end": 42275,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.424,
+    1.188986,
+    -0.016042
+   ]
+  },
+  {
+   "name": "Accessories/ElbowPatchStitch_L_d9",
+   "mat": "BoneThread",
+   "start": 42275,
+   "end": 42289,
+   "side": "L",
+   "chain": "armL",
+   "bind": "stiff",
+   "centroid": [
+    -0.424,
+    1.210113,
+    -0.00805
+   ]
+  },
+  {
+   "name": "UpperClothing/CoatSleeve_R",
+   "mat": "Cloth",
+   "start": 3234,
+   "end": 3586,
+   "side": "R",
+   "chain": "armR"
+  },
+  {
+   "name": "UpperClothing/SleeveSeam_R",
+   "mat": "Cloth",
+   "start": 3586,
+   "end": 3636,
+   "side": "R",
+   "chain": "armR"
+  },
+  {
+   "name": "UpperClothing/SleeveSeamStitch_R_d0",
+   "mat": "BoneThread",
+   "start": 42289,
+   "end": 42303,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.315056,
+    1.44275,
+    -0.004062
+   ]
+  },
+  {
+   "name": "UpperClothing/SleeveSeamStitch_R_d1",
+   "mat": "BoneThread",
+   "start": 42303,
+   "end": 42317,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.348606,
+    1.399875,
+    0.003188
+   ]
+  },
+  {
+   "name": "UpperClothing/SleeveSeamStitch_R_d2",
+   "mat": "BoneThread",
+   "start": 42317,
+   "end": 42331,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.381406,
+    1.3435,
+    0.009125
+   ]
+  },
+  {
+   "name": "UpperClothing/SleeveSeamStitch_R_d3",
+   "mat": "BoneThread",
+   "start": 42331,
+   "end": 42345,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.401844,
+    1.266562,
+    0.014375
+   ]
+  },
+  {
+   "name": "UpperClothing/SleeveSeamStitch_R_d4",
+   "mat": "BoneThread",
+   "start": 42345,
+   "end": 42359,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.420656,
+    1.190438,
+    0.019625
+   ]
+  },
+  {
+   "name": "UpperClothing/SleeveSeamStitch_R_d5",
+   "mat": "BoneThread",
+   "start": 42359,
+   "end": 42373,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.434594,
+    1.141938,
+    0.025687
+   ]
+  },
+  {
+   "name": "UpperClothing/SleeveSeamStitch_R_d6",
+   "mat": "BoneThread",
+   "start": 42373,
+   "end": 42387,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.442656,
+    1.085937,
+    0.030437
+   ]
+  },
+  {
+   "name": "UpperClothing/SleeveSeamStitch_R_d7",
+   "mat": "BoneThread",
+   "start": 42387,
+   "end": 42401,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.446687,
+    1.035188,
+    0.03425
+   ]
+  },
+  {
+   "name": "Accessories/CuffStrap_R",
+   "mat": "Leather",
+   "start": 8314,
+   "end": 8358,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.393864,
+    1.048,
+    0.034
+   ]
+  },
+  {
+   "name": "Accessories/CuffBuckle_R_BarTop",
+   "mat": "AgedBrass",
+   "start": 34425,
+   "end": 34439,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.4564,
+    1.059,
+    0.034
+   ]
+  },
+  {
+   "name": "Accessories/CuffBuckle_R_BarRight",
+   "mat": "AgedBrass",
+   "start": 34439,
+   "end": 34453,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.4564,
+    1.048,
+    0.043
+   ]
+  },
+  {
+   "name": "Accessories/CuffBuckle_R_BarBot",
+   "mat": "AgedBrass",
+   "start": 34453,
+   "end": 34467,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.4564,
+    1.037,
+    0.034
+   ]
+  },
+  {
+   "name": "Accessories/CuffBuckle_R_BarLeft",
+   "mat": "AgedBrass",
+   "start": 34467,
+   "end": 34481,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.4564,
+    1.048,
+    0.025
+   ]
+  },
+  {
+   "name": "Accessories/CuffBuckle_R_Spindle",
+   "mat": "AgedBrass",
+   "start": 34481,
+   "end": 34495,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.4564,
+    1.048,
+    0.034
+   ]
+  },
+  {
+   "name": "Accessories/CuffBuckle_R_Prong",
+   "mat": "AgedBrass",
+   "start": 34495,
+   "end": 34509,
+   "side": "R",
+   "chain": "armR",
+   "bind": "stiff",
+   "centroid": [
+    0.45772,
+    1.05394,
+    0.034
+   ]
+  },
+  {
+   "name": "Accessories/Belt",
+   "mat": "Leather",
+   "start": 8358,
+   "end": 8490,
+   "side": null,
+   "chain": "torso"
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d0",
+   "mat": "BoneThread",
+   "start": 42401,
+   "end": 42415,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.029548,
+    1.066768,
+    0.174577
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d1",
+   "mat": "BoneThread",
+   "start": 42415,
+   "end": 42429,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.08778,
+    1.066884,
+    0.166183
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d2",
+   "mat": "BoneThread",
+   "start": 42429,
+   "end": 42443,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.141557,
+    1.066277,
+    0.149466
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d3",
+   "mat": "BoneThread",
+   "start": 42443,
+   "end": 42457,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.188159,
+    1.065052,
+    0.125604
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d4",
+   "mat": "BoneThread",
+   "start": 42457,
+   "end": 42471,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.225672,
+    1.06343,
+    0.096123
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d5",
+   "mat": "BoneThread",
+   "start": 42471,
+   "end": 42485,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.252051,
+    1.061725,
+    0.062413
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d6",
+   "mat": "BoneThread",
+   "start": 42485,
+   "end": 42499,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.267072,
+    1.060278,
+    0.026289
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d7",
+   "mat": "BoneThread",
+   "start": 42499,
+   "end": 42513,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.27031,
+    1.059343,
+    -0.010851
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d8",
+   "mat": "BoneThread",
+   "start": 42513,
+   "end": 42527,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.26134,
+    1.059079,
+    -0.047611
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d9",
+   "mat": "BoneThread",
+   "start": 42527,
+   "end": 42541,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.240113,
+    1.05953,
+    -0.082439
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d10",
+   "mat": "BoneThread",
+   "start": 42541,
+   "end": 42555,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.20725,
+    1.060619,
+    -0.113658
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d11",
+   "mat": "BoneThread",
+   "start": 42555,
+   "end": 42569,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.164196,
+    1.062155,
+    -0.139645
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d12",
+   "mat": "BoneThread",
+   "start": 42569,
+   "end": 42583,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.113129,
+    1.063862,
+    -0.159051
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d13",
+   "mat": "BoneThread",
+   "start": 42583,
+   "end": 42597,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.056667,
+    1.065427,
+    -0.170936
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d14",
+   "mat": "BoneThread",
+   "start": 42597,
+   "end": 42611,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.00244,
+    1.066533,
+    -0.174434
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d15",
+   "mat": "BoneThread",
+   "start": 42611,
+   "end": 42625,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.061211,
+    1.066954,
+    -0.169469
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d16",
+   "mat": "BoneThread",
+   "start": 42625,
+   "end": 42639,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.11705,
+    1.066642,
+    -0.156702
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d17",
+   "mat": "BoneThread",
+   "start": 42639,
+   "end": 42653,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.167558,
+    1.065655,
+    -0.136689
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d18",
+   "mat": "BoneThread",
+   "start": 42653,
+   "end": 42667,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.210355,
+    1.064179,
+    -0.110254
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d19",
+   "mat": "BoneThread",
+   "start": 42667,
+   "end": 42681,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.243189,
+    1.062487,
+    -0.07858
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d20",
+   "mat": "BoneThread",
+   "start": 42681,
+   "end": 42695,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.26425,
+    1.06089,
+    -0.043229
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d21",
+   "mat": "BoneThread",
+   "start": 42695,
+   "end": 42709,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.272493,
+    1.059677,
+    -0.006011
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d22",
+   "mat": "BoneThread",
+   "start": 42709,
+   "end": 42723,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.267787,
+    1.059064,
+    0.031241
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d23",
+   "mat": "BoneThread",
+   "start": 42723,
+   "end": 42737,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.250629,
+    1.059172,
+    0.066857
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d24",
+   "mat": "BoneThread",
+   "start": 42737,
+   "end": 42751,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.221622,
+    1.060024,
+    0.099214
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d25",
+   "mat": "BoneThread",
+   "start": 42751,
+   "end": 42765,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.182962,
+    1.061411,
+    0.127327
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d26",
+   "mat": "BoneThread",
+   "start": 42765,
+   "end": 42779,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.136024,
+    1.063082,
+    0.150065
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_L_d27",
+   "mat": "BoneThread",
+   "start": 42779,
+   "end": 42793,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.082495,
+    1.064731,
+    0.166189
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d0",
+   "mat": "BoneThread",
+   "start": 42793,
+   "end": 42807,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.029884,
+    1.006769,
+    0.174545
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d1",
+   "mat": "BoneThread",
+   "start": 42807,
+   "end": 42821,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.087543,
+    1.006886,
+    0.166356
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d2",
+   "mat": "BoneThread",
+   "start": 42821,
+   "end": 42835,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.140757,
+    1.006289,
+    0.150258
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d3",
+   "mat": "BoneThread",
+   "start": 42835,
+   "end": 42849,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.1871,
+    1.005083,
+    0.127197
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d4",
+   "mat": "BoneThread",
+   "start": 42849,
+   "end": 42863,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.224706,
+    1.00348,
+    0.098362
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d5",
+   "mat": "BoneThread",
+   "start": 42863,
+   "end": 42877,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.251443,
+    1.001776,
+    0.064799
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d6",
+   "mat": "BoneThread",
+   "start": 42877,
+   "end": 42891,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.266859,
+    1.00031,
+    0.028217
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d7",
+   "mat": "BoneThread",
+   "start": 42891,
+   "end": 42905,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.270321,
+    0.999353,
+    -0.009856
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d8",
+   "mat": "BoneThread",
+   "start": 42905,
+   "end": 42919,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.261284,
+    0.999081,
+    -0.047732
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d9",
+   "mat": "BoneThread",
+   "start": 42919,
+   "end": 42933,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.23971,
+    0.999542,
+    -0.083507
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d10",
+   "mat": "BoneThread",
+   "start": 42933,
+   "end": 42947,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.206352,
+    1.000647,
+    -0.115233
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d11",
+   "mat": "BoneThread",
+   "start": 42947,
+   "end": 42961,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.162859,
+    1.00219,
+    -0.141187
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d12",
+   "mat": "BoneThread",
+   "start": 42961,
+   "end": 42975,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.111606,
+    1.003891,
+    -0.160126
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d13",
+   "mat": "BoneThread",
+   "start": 42975,
+   "end": 42989,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.055324,
+    1.005444,
+    -0.17138
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d14",
+   "mat": "BoneThread",
+   "start": 42989,
+   "end": 43003,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.003243,
+    1.006538,
+    -0.174431
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d15",
+   "mat": "BoneThread",
+   "start": 43003,
+   "end": 43017,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.061292,
+    1.006955,
+    -0.169469
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d16",
+   "mat": "BoneThread",
+   "start": 43017,
+   "end": 43031,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.116473,
+    1.006647,
+    -0.157171
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d17",
+   "mat": "BoneThread",
+   "start": 43031,
+   "end": 43045,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.166586,
+    1.005677,
+    -0.137911
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d18",
+   "mat": "BoneThread",
+   "start": 43045,
+   "end": 43059,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.209335,
+    1.00422,
+    -0.112201
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d19",
+   "mat": "BoneThread",
+   "start": 43059,
+   "end": 43073,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.242422,
+    1.002537,
+    -0.080907
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d20",
+   "mat": "BoneThread",
+   "start": 43073,
+   "end": 43087,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.263874,
+    1.000931,
+    -0.04539
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d21",
+   "mat": "BoneThread",
+   "start": 43087,
+   "end": 43101,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.272441,
+    0.999695,
+    -0.007459
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d22",
+   "mat": "BoneThread",
+   "start": 43101,
+   "end": 43115,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.26782,
+    0.999066,
+    0.030865
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d23",
+   "mat": "BoneThread",
+   "start": 43115,
+   "end": 43129,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.250434,
+    0.999177,
+    0.067577
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d24",
+   "mat": "BoneThread",
+   "start": 43129,
+   "end": 43143,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.220953,
+    1.000045,
+    0.100669
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d25",
+   "mat": "BoneThread",
+   "start": 43143,
+   "end": 43157,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.181794,
+    1.001445,
+    0.128975
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d26",
+   "mat": "BoneThread",
+   "start": 43157,
+   "end": 43171,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.134547,
+    1.003116,
+    0.151396
+   ]
+  },
+  {
+   "name": "Accessories/BeltStitch_R_d27",
+   "mat": "BoneThread",
+   "start": 43171,
+   "end": 43185,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.080951,
+    1.004756,
+    0.166954
+   ]
+  },
+  {
+   "name": "Accessories/MainBeltBuckle_BarTop",
+   "mat": "AgedBrass",
+   "start": 34509,
+   "end": 34523,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.086691,
+    1.07798,
+    0.179752
+   ]
+  },
+  {
+   "name": "Accessories/MainBeltBuckle_BarRight",
+   "mat": "AgedBrass",
+   "start": 34523,
+   "end": 34537,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.065074,
+    1.03698,
+    0.190178
+   ]
+  },
+  {
+   "name": "Accessories/MainBeltBuckle_BarBot",
+   "mat": "AgedBrass",
+   "start": 34537,
+   "end": 34551,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.086691,
+    0.99598,
+    0.179752
+   ]
+  },
+  {
+   "name": "Accessories/MainBeltBuckle_BarLeft",
+   "mat": "AgedBrass",
+   "start": 34551,
+   "end": 34565,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.108308,
+    1.03698,
+    0.169327
+   ]
+  },
+  {
+   "name": "Accessories/MainBeltBuckle_Spindle",
+   "mat": "AgedBrass",
+   "start": 34565,
+   "end": 34579,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.086691,
+    1.03698,
+    0.179752
+   ]
+  },
+  {
+   "name": "Accessories/MainBeltBuckle_Prong",
+   "mat": "AgedBrass",
+   "start": 34579,
+   "end": 34593,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.087766,
+    1.05912,
+    0.181982
+   ]
+  },
+  {
+   "name": "Accessories/BeltKeeper_1",
+   "mat": "Leather",
+   "start": 8490,
+   "end": 8522,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.145059,
+    1.036222,
+    0.148438
+   ]
+  },
+  {
+   "name": "Accessories/BeltKeeperStitch_1_d0",
+   "mat": "BoneThread",
+   "start": 43185,
+   "end": 43199,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.126045,
+    1.036592,
+    0.156243
+   ]
+  },
+  {
+   "name": "Accessories/BeltKeeperStitch_1_d1",
+   "mat": "BoneThread",
+   "start": 43199,
+   "end": 43213,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.139092,
+    1.036377,
+    0.151397
+   ]
+  },
+  {
+   "name": "Accessories/BeltKeeperStitch_1_d2",
+   "mat": "BoneThread",
+   "start": 43213,
+   "end": 43227,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.151688,
+    1.036121,
+    0.1461
+   ]
+  },
+  {
+   "name": "Accessories/BeltKeeperStitch_1_d3",
+   "mat": "BoneThread",
+   "start": 43227,
+   "end": 43241,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.163799,
+    1.035829,
+    0.140375
+   ]
+  },
+  {
+   "name": "Accessories/BeltKeeper_2",
+   "mat": "Leather",
+   "start": 8522,
+   "end": 8554,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.01372,
+    1.036646,
+    0.17574
+   ]
+  },
+  {
+   "name": "Accessories/BeltKeeperStitch_2_d0",
+   "mat": "BoneThread",
+   "start": 43241,
+   "end": 43255,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.008931,
+    1.036378,
+    0.176212
+   ]
+  },
+  {
+   "name": "Accessories/BeltKeeperStitch_2_d1",
+   "mat": "BoneThread",
+   "start": 43255,
+   "end": 43269,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.006188,
+    1.036591,
+    0.176345
+   ]
+  },
+  {
+   "name": "Accessories/BeltKeeperStitch_2_d2",
+   "mat": "BoneThread",
+   "start": 43269,
+   "end": 43283,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.021299,
+    1.036763,
+    0.175922
+   ]
+  },
+  {
+   "name": "Accessories/BeltKeeperStitch_2_d3",
+   "mat": "BoneThread",
+   "start": 43283,
+   "end": 43297,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.036352,
+    1.036889,
+    0.174944
+   ]
+  },
+  {
+   "name": "Accessories/BeltTip",
+   "mat": "Leather",
+   "start": 8554,
+   "end": 8566,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.059184,
+    0.980316,
+    0.175242
+   ]
+  },
+  {
+   "name": "Accessories/BeltTipStitch_L_d0",
+   "mat": "BoneThread",
+   "start": 43297,
+   "end": 43311,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.083446,
+    1.007521,
+    0.169831
+   ]
+  },
+  {
+   "name": "Accessories/BeltTipStitch_L_d1",
+   "mat": "BoneThread",
+   "start": 43311,
+   "end": 43325,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.078218,
+    0.987883,
+    0.171149
+   ]
+  },
+  {
+   "name": "Accessories/BeltTipStitch_L_d2",
+   "mat": "BoneThread",
+   "start": 43325,
+   "end": 43339,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.07362,
+    0.966982,
+    0.172261
+   ]
+  },
+  {
+   "name": "Accessories/BeltTipStitch_L_d3",
+   "mat": "BoneThread",
+   "start": 43339,
+   "end": 43353,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.06965,
+    0.944817,
+    0.173168
+   ]
+  },
+  {
+   "name": "Accessories/BeltTipStitch_R_d0",
+   "mat": "BoneThread",
+   "start": 43353,
+   "end": 43367,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.050881,
+    1.016473,
+    0.182247
+   ]
+  },
+  {
+   "name": "Accessories/BeltTipStitch_R_d1",
+   "mat": "BoneThread",
+   "start": 43367,
+   "end": 43381,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.045135,
+    0.996098,
+    0.182674
+   ]
+  },
+  {
+   "name": "Accessories/BeltTipStitch_R_d2",
+   "mat": "BoneThread",
+   "start": 43381,
+   "end": 43395,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.040095,
+    0.974479,
+    0.182988
+   ]
+  },
+  {
+   "name": "Accessories/BeltTipStitch_R_d3",
+   "mat": "BoneThread",
+   "start": 43395,
+   "end": 43409,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.03576,
+    0.951618,
+    0.183188
+   ]
+  },
+  {
+   "name": "Accessories/BeltHole_1",
+   "mat": "BootSole",
+   "start": 47641,
+   "end": 47683,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.063835,
+    0.992236,
+    0.178486
+   ]
+  },
+  {
+   "name": "Accessories/BeltHole_2",
+   "mat": "BootSole",
+   "start": 47683,
+   "end": 47725,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.057993,
+    0.966725,
+    0.179361
+   ]
+  },
+  {
+   "name": "Accessories/BeltHole_3",
+   "mat": "BootSole",
+   "start": 47725,
+   "end": 47767,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.052149,
+    0.941213,
+    0.180234
+   ]
+  },
+  {
+   "name": "Accessories/BeltEyelet",
+   "mat": "AgedBrass",
+   "start": 34593,
+   "end": 34653,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.065491,
+    0.996488,
+    0.180219
+   ]
+  },
+  {
+   "name": "Accessories/FieldPouch",
+   "mat": "Leather",
+   "start": 8566,
+   "end": 8712,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.230647,
+    0.979135,
+    -0.119437
+   ]
+  },
+  {
+   "name": "Accessories/PouchFlap",
+   "mat": "Leather",
+   "start": 8712,
+   "end": 8736,
+   "side": null,
+   "chain": "torso"
+  },
+  {
+   "name": "Accessories/PouchFlapStitch_d0",
+   "mat": "BoneThread",
+   "start": 43409,
+   "end": 43423,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.143286,
+    0.961533,
+    -0.178337
+   ]
+  },
+  {
+   "name": "Accessories/PouchFlapStitch_d1",
+   "mat": "BoneThread",
+   "start": 43423,
+   "end": 43437,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.189923,
+    0.960795,
+    -0.163031
+   ]
+  },
+  {
+   "name": "Accessories/PouchFlapStitch_d2",
+   "mat": "BoneThread",
+   "start": 43437,
+   "end": 43451,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.23086,
+    0.959747,
+    -0.141515
+   ]
+  },
+  {
+   "name": "Accessories/PouchFlapStitch_d3",
+   "mat": "BoneThread",
+   "start": 43451,
+   "end": 43465,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.262419,
+    0.958477,
+    -0.114145
+   ]
+  },
+  {
+   "name": "Accessories/PouchFlapStitch_d4",
+   "mat": "BoneThread",
+   "start": 43465,
+   "end": 43479,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.282901,
+    0.957166,
+    -0.08319
+   ]
+  },
+  {
+   "name": "Accessories/PouchFlapStitch_d5",
+   "mat": "BoneThread",
+   "start": 43479,
+   "end": 43493,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.293763,
+    0.955963,
+    -0.0509
+   ]
+  },
+  {
+   "name": "Accessories/PouchStud",
+   "mat": "AgedBrass",
+   "start": 34653,
+   "end": 34705,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.236238,
+    0.941874,
+    -0.149453
+   ]
+  },
+  {
+   "name": "Accessories/PouchRivet_1",
+   "mat": "AgedBrass",
+   "start": 34705,
+   "end": 34757,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.156213,
+    1.010999,
+    -0.142873
+   ]
+  },
+  {
+   "name": "Accessories/PouchRivet_2",
+   "mat": "AgedBrass",
+   "start": 34757,
+   "end": 34809,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.252242,
+    1.006924,
+    -0.068251
+   ]
+  },
+  {
+   "name": "Accessories/HangerStrap",
+   "mat": "Leather",
+   "start": 8736,
+   "end": 8748,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.186883,
+    0.973068,
+    -0.13086
+   ]
+  },
+  {
+   "name": "Accessories/HangerStrapStitch_d0",
+   "mat": "BoneThread",
+   "start": 43493,
+   "end": 43507,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.193967,
+    1.024647,
+    -0.126621
+   ]
+  },
+  {
+   "name": "Accessories/HangerStrapStitch_d1",
+   "mat": "BoneThread",
+   "start": 43507,
+   "end": 43521,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.18797,
+    0.987863,
+    -0.130307
+   ]
+  },
+  {
+   "name": "Accessories/HangerStrapStitch_d2",
+   "mat": "BoneThread",
+   "start": 43521,
+   "end": 43535,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.183407,
+    0.953777,
+    -0.133024
+   ]
+  },
+  {
+   "name": "Accessories/HangerStrapStitch_d3",
+   "mat": "BoneThread",
+   "start": 43535,
+   "end": 43549,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.180277,
+    0.922389,
+    -0.134775
+   ]
+  },
+  {
+   "name": "Accessories/HangerDRing",
+   "mat": "AgedBrass",
+   "start": 34809,
+   "end": 34881,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.186677,
+    0.906695,
+    -0.141697
+   ]
+  },
+  {
+   "name": "Accessories/MourningTassel",
+   "mat": "ClothAccent",
+   "start": 5198,
+   "end": 5230,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.194643,
+    0.863414,
+    -0.147743
+   ]
+  },
+  {
+   "name": "Accessories/TasselWrap",
+   "mat": "BoneThread",
+   "start": 43549,
+   "end": 43563,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.192253,
+    0.890695,
+    -0.145929
+   ]
+  },
+  {
+   "name": "Accessories/ToolClipRing",
+   "mat": "AgedBrass",
+   "start": 34881,
+   "end": 34941,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.186677,
+    0.881695,
+    -0.129697
+   ]
+  },
+  {
+   "name": "Accessories/Baldric",
+   "mat": "Leather",
+   "start": 8748,
+   "end": 8776,
+   "side": null,
+   "chain": "torso"
+  },
+  {
+   "name": "Accessories/BaldricStitch_L_d0",
+   "mat": "BoneThread",
+   "start": 43563,
+   "end": 43577,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.306666,
+    1.431927,
+    0.028533
+   ]
+  },
+  {
+   "name": "Accessories/BaldricStitch_L_d1",
+   "mat": "BoneThread",
+   "start": 43577,
+   "end": 43591,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.291151,
+    1.387782,
+    0.070021
+   ]
+  },
+  {
+   "name": "Accessories/BaldricStitch_L_d2",
+   "mat": "BoneThread",
+   "start": 43591,
+   "end": 43605,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.23229,
+    1.34554,
+    0.116854
+   ]
+  },
+  {
+   "name": "Accessories/BaldricStitch_L_d3",
+   "mat": "BoneThread",
+   "start": 43605,
+   "end": 43619,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.1616,
+    1.304195,
+    0.159503
+   ]
+  },
+  {
+   "name": "Accessories/BaldricStitch_L_d4",
+   "mat": "BoneThread",
+   "start": 43619,
+   "end": 43633,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.075108,
+    1.265422,
+    0.175881
+   ]
+  },
+  {
+   "name": "Accessories/BaldricStitch_L_d5",
+   "mat": "BoneThread",
+   "start": 43633,
+   "end": 43647,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.014484,
+    1.22797,
+    0.177877
+   ]
+  },
+  {
+   "name": "Accessories/BaldricStitch_L_d6",
+   "mat": "BoneThread",
+   "start": 43647,
+   "end": 43661,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.107177,
+    1.191838,
+    0.165493
+   ]
+  },
+  {
+   "name": "Accessories/BaldricStitch_L_d7",
+   "mat": "BoneThread",
+   "start": 43661,
+   "end": 43675,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.17781,
+    1.152978,
+    0.131453
+   ]
+  },
+  {
+   "name": "Accessories/BaldricStitch_L_d8",
+   "mat": "BoneThread",
+   "start": 43675,
+   "end": 43689,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.237307,
+    1.115319,
+    0.092859
+   ]
+  },
+  {
+   "name": "Accessories/BaldricStitch_L_d9",
+   "mat": "BoneThread",
+   "start": 43689,
+   "end": 43703,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.263184,
+    1.086387,
+    0.053153
+   ]
+  },
+  {
+   "name": "Accessories/BaldricStitch_R_d0",
+   "mat": "BoneThread",
+   "start": 43703,
+   "end": 43717,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.328049,
+    1.429815,
+    0.038479
+   ]
+  },
+  {
+   "name": "Accessories/BaldricStitch_R_d1",
+   "mat": "BoneThread",
+   "start": 43717,
+   "end": 43731,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.310661,
+    1.381445,
+    0.082212
+   ]
+  },
+  {
+   "name": "Accessories/BaldricStitch_R_d2",
+   "mat": "BoneThread",
+   "start": 43731,
+   "end": 43745,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.24605,
+    1.33148,
+    0.119187
+   ]
+  },
+  {
+   "name": "Accessories/BaldricStitch_R_d3",
+   "mat": "BoneThread",
+   "start": 43745,
+   "end": 43759,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.170013,
+    1.283016,
+    0.152209
+   ]
+  },
+  {
+   "name": "Accessories/BaldricStitch_R_d4",
+   "mat": "BoneThread",
+   "start": 43759,
+   "end": 43773,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.084074,
+    1.243648,
+    0.172222
+   ]
+  },
+  {
+   "name": "Accessories/BaldricStitch_R_d5",
+   "mat": "BoneThread",
+   "start": 43773,
+   "end": 43787,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.005473,
+    1.20603,
+    0.178397
+   ]
+  },
+  {
+   "name": "Accessories/BaldricStitch_R_d6",
+   "mat": "BoneThread",
+   "start": 43787,
+   "end": 43801,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.098628,
+    1.170162,
+    0.170733
+   ]
+  },
+  {
+   "name": "Accessories/BaldricStitch_R_d7",
+   "mat": "BoneThread",
+   "start": 43801,
+   "end": 43815,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.170906,
+    1.132022,
+    0.1403
+   ]
+  },
+  {
+   "name": "Accessories/BaldricStitch_R_d8",
+   "mat": "BoneThread",
+   "start": 43815,
+   "end": 43829,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.232311,
+    1.095081,
+    0.104697
+   ]
+  },
+  {
+   "name": "Accessories/BaldricStitch_R_d9",
+   "mat": "BoneThread",
+   "start": 43829,
+   "end": 43843,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.260224,
+    1.066413,
+    0.066007
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBack",
+   "mat": "Leather",
+   "start": 8776,
+   "end": 8796,
+   "side": null,
+   "chain": "torso"
+  },
+  {
+   "name": "Accessories/BaldricBackStitch_L_d0",
+   "mat": "BoneThread",
+   "start": 43843,
+   "end": 43857,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.333154,
+    1.432322,
+    -0.01039
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBackStitch_L_d1",
+   "mat": "BoneThread",
+   "start": 43857,
+   "end": 43871,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.324787,
+    1.388966,
+    -0.050745
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBackStitch_L_d2",
+   "mat": "BoneThread",
+   "start": 43871,
+   "end": 43885,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.294843,
+    1.343282,
+    -0.085839
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBackStitch_L_d3",
+   "mat": "BoneThread",
+   "start": 43885,
+   "end": 43899,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.243321,
+    1.295269,
+    -0.115674
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBackStitch_L_d4",
+   "mat": "BoneThread",
+   "start": 43899,
+   "end": 43913,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.189182,
+    1.245997,
+    -0.140317
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBackStitch_L_d5",
+   "mat": "BoneThread",
+   "start": 43913,
+   "end": 43927,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.132426,
+    1.195467,
+    -0.159768
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBackStitch_L_d6",
+   "mat": "BoneThread",
+   "start": 43927,
+   "end": 43941,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.055602,
+    1.145075,
+    -0.171026
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBackStitch_L_d7",
+   "mat": "BoneThread",
+   "start": 43941,
+   "end": 43955,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.041291,
+    1.094822,
+    -0.174091
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBackStitch_R_d0",
+   "mat": "BoneThread",
+   "start": 43955,
+   "end": 43969,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.31017,
+    1.434603,
+    -0.005299
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBackStitch_R_d1",
+   "mat": "BoneThread",
+   "start": 43969,
+   "end": 43983,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.302856,
+    1.395808,
+    -0.045125
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBackStitch_R_d2",
+   "mat": "BoneThread",
+   "start": 43983,
+   "end": 43997,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.27656,
+    1.354493,
+    -0.084882
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBackStitch_R_d3",
+   "mat": "BoneThread",
+   "start": 43997,
+   "end": 44011,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.231281,
+    1.310656,
+    -0.124569
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBackStitch_R_d4",
+   "mat": "BoneThread",
+   "start": 44011,
+   "end": 44025,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.179479,
+    1.264003,
+    -0.152392
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBackStitch_R_d5",
+   "mat": "BoneThread",
+   "start": 44025,
+   "end": 44039,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.121156,
+    1.214533,
+    -0.168349
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBackStitch_R_d6",
+   "mat": "BoneThread",
+   "start": 44039,
+   "end": 44053,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.043869,
+    1.164925,
+    -0.174668
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBackStitch_R_d7",
+   "mat": "BoneThread",
+   "start": 44053,
+   "end": 44067,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    0.052383,
+    1.115178,
+    -0.171349
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBuckle_BarTop",
+   "mat": "AgedBrass",
+   "start": 34941,
+   "end": 34955,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.175092,
+    1.317352,
+    0.159112
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBuckle_BarRight",
+   "mat": "AgedBrass",
+   "start": 34955,
+   "end": 34969,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.189018,
+    1.306134,
+    0.14371
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBuckle_BarBot",
+   "mat": "AgedBrass",
+   "start": 34969,
+   "end": 34983,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.187086,
+    1.283023,
+    0.148084
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBuckle_BarLeft",
+   "mat": "AgedBrass",
+   "start": 34983,
+   "end": 34997,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.17316,
+    1.29424,
+    0.163485
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBuckle_Spindle",
+   "mat": "AgedBrass",
+   "start": 34997,
+   "end": 35011,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.181089,
+    1.300187,
+    0.153598
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBuckle_Prong",
+   "mat": "AgedBrass",
+   "start": 35011,
+   "end": 35025,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.179191,
+    1.309559,
+    0.157712
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBackSlider_BarTop",
+   "mat": "AgedBrass",
+   "start": 35025,
+   "end": 35039,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.210265,
+    1.296674,
+    -0.143742
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBackSlider_BarRight",
+   "mat": "AgedBrass",
+   "start": 35039,
+   "end": 35053,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.207412,
+    1.275103,
+    -0.148163
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBackSlider_BarBot",
+   "mat": "AgedBrass",
+   "start": 35053,
+   "end": 35067,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.217617,
+    1.263326,
+    -0.132347
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBackSlider_BarLeft",
+   "mat": "AgedBrass",
+   "start": 35067,
+   "end": 35081,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.22047,
+    1.284897,
+    -0.127926
+   ]
+  },
+  {
+   "name": "Accessories/BaldricBackSlider_Spindle",
+   "mat": "AgedBrass",
+   "start": 35081,
+   "end": 35095,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.213941,
+    1.28,
+    -0.138044
+   ]
+  },
+  {
+   "name": "Accessories/CompassDrop",
+   "mat": "Leather",
+   "start": 8796,
+   "end": 8808,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.036932,
+    1.219,
+    0.185439
+   ]
+  },
+  {
+   "name": "Accessories/CompassDropStitch_d0",
+   "mat": "BoneThread",
+   "start": 44067,
+   "end": 44081,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.036289,
+    1.229667,
+    0.182168
+   ]
+  },
+  {
+   "name": "Accessories/CompassDropStitch_d1",
+   "mat": "BoneThread",
+   "start": 44081,
+   "end": 44095,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.036679,
+    1.219,
+    0.18413
+   ]
+  },
+  {
+   "name": "Accessories/CompassDropStitch_d2",
+   "mat": "BoneThread",
+   "start": 44095,
+   "end": 44109,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.03707,
+    1.208333,
+    0.186091
+   ]
+  },
+  {
+   "name": "Accessories/CompassFace",
+   "mat": "ClothAccent",
+   "start": 5230,
+   "end": 5376,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.03961,
+    1.165,
+    0.198841
+   ]
+  },
+  {
+   "name": "Accessories/CompassRingOuter",
+   "mat": "AgedBrass",
+   "start": 35095,
+   "end": 35287,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.03961,
+    1.165,
+    0.198841
+   ]
+  },
+  {
+   "name": "Accessories/CompassRingInner",
+   "mat": "AgedBrass",
+   "start": 35287,
+   "end": 35395,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.03961,
+    1.165,
+    0.198841
+   ]
+  },
+  {
+   "name": "Accessories/CompassNeedle",
+   "mat": "AgedBrass",
+   "start": 35395,
+   "end": 35415,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.03972,
+    1.165416,
+    0.199393
+   ]
+  },
+  {
+   "name": "Accessories/CompassStud",
+   "mat": "AgedBrass",
+   "start": 35415,
+   "end": 35501,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.040866,
+    1.169758,
+    0.205148
+   ]
+  },
+  {
+   "name": "Accessories/CompassStud_Rim",
+   "mat": "AgedBrass",
+   "start": 35501,
+   "end": 35573,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.041031,
+    1.170383,
+    0.205976
+   ]
+  },
+  {
+   "name": "Accessories/CompassLoop",
+   "mat": "AgedBrass",
+   "start": 35573,
+   "end": 35633,
+   "side": null,
+   "chain": "torso",
+   "bind": "stiff",
+   "centroid": [
+    -0.037265,
+    1.207,
+    0.187072
+   ]
+  },
+  {
+   "name": "Boots/Sole_R",
+   "mat": "BootSole",
+   "start": 47767,
+   "end": 47993,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Heel1_R",
+   "mat": "BootSole",
+   "start": 47993,
+   "end": 48083,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Heel2_R",
+   "mat": "BootSole",
+   "start": 48083,
+   "end": 48173,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Heel3_R",
+   "mat": "BootSole",
+   "start": 48173,
+   "end": 48263,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/HeelPlate_R",
+   "mat": "AgedBrass",
+   "start": 35633,
+   "end": 35851,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/HeelNails_R",
+   "mat": "AgedBrass",
+   "start": 35851,
+   "end": 35929,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Welt_R",
+   "mat": "Leather",
+   "start": 8808,
+   "end": 9290,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/WeltStitch_R",
+   "mat": "BoneThread",
+   "start": 44109,
+   "end": 44529,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Vamp_R",
+   "mat": "Leather",
+   "start": 9290,
+   "end": 9916,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/ToeCap_R",
+   "mat": "Leather",
+   "start": 9916,
+   "end": 10186,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/ToeCapStitch1_R",
+   "mat": "BoneThread",
+   "start": 44529,
+   "end": 44711,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/ToeCapStitch2_R",
+   "mat": "BoneThread",
+   "start": 44711,
+   "end": 44879,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Counter_R",
+   "mat": "Leather",
+   "start": 10186,
+   "end": 10314,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/CounterStitch_R",
+   "mat": "BoneThread",
+   "start": 44879,
+   "end": 45103,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/ThroatSeam_R",
+   "mat": "BoneThread",
+   "start": 45103,
+   "end": 45355,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/ShaftAnkle_R",
+   "mat": "Leather",
+   "start": 10314,
+   "end": 10554,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/Shaft_R",
+   "mat": "Leather",
+   "start": 10554,
+   "end": 11082,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/FacingOut_R",
+   "mat": "Leather",
+   "start": 11082,
+   "end": 11202,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/FacingIn_R",
+   "mat": "Leather",
+   "start": 11202,
+   "end": 11322,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/Tongue_R",
+   "mat": "Leather",
+   "start": 11322,
+   "end": 11382,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/EyeletRow1_R",
+   "mat": "AgedBrass",
+   "start": 35929,
+   "end": 35981,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/EyeletRow2_R",
+   "mat": "AgedBrass",
+   "start": 35981,
+   "end": 36033,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/EyeletRow3_R",
+   "mat": "AgedBrass",
+   "start": 36033,
+   "end": 36085,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/EyeletRow4_R",
+   "mat": "AgedBrass",
+   "start": 36085,
+   "end": 36137,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/HookRow1_R",
+   "mat": "AgedBrass",
+   "start": 36137,
+   "end": 36297,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/HookRow2_R",
+   "mat": "AgedBrass",
+   "start": 36297,
+   "end": 36457,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/HookRow3_R",
+   "mat": "AgedBrass",
+   "start": 36457,
+   "end": 36617,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/Laces_R",
+   "mat": "BoneThread",
+   "start": 45355,
+   "end": 45679,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/LaceBow_R",
+   "mat": "ClothAccent",
+   "start": 5376,
+   "end": 5614,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/CuffFold_R",
+   "mat": "ClothAccent",
+   "start": 5614,
+   "end": 5806,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/CuffLining_R",
+   "mat": "ClothAccent",
+   "start": 5806,
+   "end": 5950,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/PullTab_R",
+   "mat": "Leather",
+   "start": 11382,
+   "end": 11396,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/PullTabRivet_R",
+   "mat": "AgedBrass",
+   "start": 36617,
+   "end": 36643,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/InstepStrap_R",
+   "mat": "Leather",
+   "start": 11396,
+   "end": 11450,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/InstepStrapStitch_R",
+   "mat": "BoneThread",
+   "start": 45679,
+   "end": 45875,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/InstepBuckle_R",
+   "mat": "AgedBrass",
+   "start": 36643,
+   "end": 36727,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/InstepKeeper_R",
+   "mat": "AgedBrass",
+   "start": 36727,
+   "end": 36781,
+   "side": "R",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/CuffStrap_R",
+   "mat": "Leather",
+   "start": 11450,
+   "end": 11546,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/CuffBuckle_R",
+   "mat": "AgedBrass",
+   "start": 36781,
+   "end": 36865,
+   "side": "R",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/Sole_L",
+   "mat": "BootSole",
+   "start": 48263,
+   "end": 48489,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Heel1_L",
+   "mat": "BootSole",
+   "start": 48489,
+   "end": 48579,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Heel2_L",
+   "mat": "BootSole",
+   "start": 48579,
+   "end": 48669,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Heel3_L",
+   "mat": "BootSole",
+   "start": 48669,
+   "end": 48759,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/HeelPlate_L",
+   "mat": "AgedBrass",
+   "start": 36865,
+   "end": 37083,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/HeelNails_L",
+   "mat": "AgedBrass",
+   "start": 37083,
+   "end": 37161,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Welt_L",
+   "mat": "Leather",
+   "start": 11546,
+   "end": 12028,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/WeltStitch_L",
+   "mat": "BoneThread",
+   "start": 45875,
+   "end": 46295,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Vamp_L",
+   "mat": "Leather",
+   "start": 12028,
+   "end": 12654,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/ToeCap_L",
+   "mat": "Leather",
+   "start": 12654,
+   "end": 12924,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/ToeCapStitch1_L",
+   "mat": "BoneThread",
+   "start": 46295,
+   "end": 46477,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/ToeCapStitch2_L",
+   "mat": "BoneThread",
+   "start": 46477,
+   "end": 46645,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/Counter_L",
+   "mat": "Leather",
+   "start": 12924,
+   "end": 13052,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/CounterStitch_L",
+   "mat": "BoneThread",
+   "start": 46645,
+   "end": 46869,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/ThroatSeam_L",
+   "mat": "BoneThread",
+   "start": 46869,
+   "end": 47121,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/ShaftAnkle_L",
+   "mat": "Leather",
+   "start": 13052,
+   "end": 13292,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/Shaft_L",
+   "mat": "Leather",
+   "start": 13292,
+   "end": 13820,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/FacingOut_L",
+   "mat": "Leather",
+   "start": 13820,
+   "end": 13940,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/FacingIn_L",
+   "mat": "Leather",
+   "start": 13940,
+   "end": 14060,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/Tongue_L",
+   "mat": "Leather",
+   "start": 14060,
+   "end": 14120,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/EyeletRow1_L",
+   "mat": "AgedBrass",
+   "start": 37161,
+   "end": 37213,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/EyeletRow2_L",
+   "mat": "AgedBrass",
+   "start": 37213,
+   "end": 37265,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/EyeletRow3_L",
+   "mat": "AgedBrass",
+   "start": 37265,
+   "end": 37317,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/EyeletRow4_L",
+   "mat": "AgedBrass",
+   "start": 37317,
+   "end": 37369,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/HookRow1_L",
+   "mat": "AgedBrass",
+   "start": 37369,
+   "end": 37529,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/HookRow2_L",
+   "mat": "AgedBrass",
+   "start": 37529,
+   "end": 37689,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/HookRow3_L",
+   "mat": "AgedBrass",
+   "start": 37689,
+   "end": 37849,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/Laces_L",
+   "mat": "BoneThread",
+   "start": 47121,
+   "end": 47445,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/LaceBow_L",
+   "mat": "ClothAccent",
+   "start": 5950,
+   "end": 6188,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/CuffFold_L",
+   "mat": "ClothAccent",
+   "start": 6188,
+   "end": 6380,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/CuffLining_L",
+   "mat": "ClothAccent",
+   "start": 6380,
+   "end": 6524,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/PullTab_L",
+   "mat": "Leather",
+   "start": 14120,
+   "end": 14134,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/PullTabRivet_L",
+   "mat": "AgedBrass",
+   "start": 37849,
+   "end": 37875,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/InstepStrap_L",
+   "mat": "Leather",
+   "start": 14134,
+   "end": 14188,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/InstepStrapStitch_L",
+   "mat": "BoneThread",
+   "start": 47445,
+   "end": 47641,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/InstepBuckle_L",
+   "mat": "AgedBrass",
+   "start": 37875,
+   "end": 37959,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/InstepKeeper_L",
+   "mat": "AgedBrass",
+   "start": 37959,
+   "end": 38013,
+   "side": "L",
+   "chain": "foot"
+  },
+  {
+   "name": "Boots/CuffStrap_L",
+   "mat": "Leather",
+   "start": 14188,
+   "end": 14284,
+   "side": "L",
+   "chain": "shaft"
+  },
+  {
+   "name": "Boots/CuffBuckle_L",
+   "mat": "AgedBrass",
+   "start": 38013,
+   "end": 38097,
+   "side": "L",
+   "chain": "shaft"
+  }
+ ],
+ "metrics": {
+  "Root": {
+   "length": 0.9450761874050154
+  },
+  "Pelvis": {
+   "length": 0.10001999800039987
+  },
+  "Spine1": {
+   "length": 0.12001666550942008
+  },
+  "Spine2": {
+   "length": 0.12501599897613105
+  },
+  "Chest": {
+   "length": 0.14201408380861377
+  },
+  "Neck": {
+   "length": 0.07610519036176186
+  },
+  "Head": {
+   "length": 0.30000000000000004
+  },
+  "HeadEnd": {
+   "length": 0.0
+  },
+  "RClavicle": {
+   "length": 0.1757299063904605
+  },
+  "LClavicle": {
+   "length": 0.1757299063904605
+  },
+  "RShoulder": {
+   "length": 0.3167238544852597
+  },
+  "RElbow": {
+   "length": 0.100024996875781
+  },
+  "RForearm": {
+   "length": 0.09891410415102599
+  },
+  "RWrist": {
+   "length": 0.04800000000000004
+  },
+  "RHand": {
+   "length": 0.03989987468652004
+  },
+  "RThumbCMC": {
+   "length": 0.03725587202039433
+  },
+  "RThumbMCP": {
+   "length": 0.029223278392404916
+  },
+  "RThumbIP": {
+   "length": 0.0
+  },
+  "RIndexMCP": {
+   "length": 0.03799999999999998
+  },
+  "RIndexPIP": {
+   "length": 0.021999999999999967
+  },
+  "RIndexDIP": {
+   "length": 0.0
+  },
+  "RMiddleMCP": {
+   "length": 0.041000000000000036
+  },
+  "RMiddlePIP": {
+   "length": 0.02499999999999997
+  },
+  "RMiddleDIP": {
+   "length": 0.0
+  },
+  "RRingMCP": {
+   "length": 0.038999999999999924
+  },
+  "RRingPIP": {
+   "length": 0.024000000000000094
+  },
+  "RRingDIP": {
+   "length": 0.0
+  },
+  "RLittleMCP": {
+   "length": 0.030000000000000106
+  },
+  "RLittlePIP": {
+   "length": 0.017999999999999936
+  },
+  "RLittleDIP": {
+   "length": 0.0
+  },
+  "LShoulder": {
+   "length": 0.3167238544852597
+  },
+  "LElbow": {
+   "length": 0.100024996875781
+  },
+  "LForearm": {
+   "length": 0.09891410415102599
+  },
+  "LWrist": {
+   "length": 0.04800000000000004
+  },
+  "LHand": {
+   "length": 0.03989987468652004
+  },
+  "LThumbCMC": {
+   "length": 0.03725587202039433
+  },
+  "LThumbMCP": {
+   "length": 0.029223278392404916
+  },
+  "LThumbIP": {
+   "length": 0.0
+  },
+  "LIndexMCP": {
+   "length": 0.03799999999999998
+  },
+  "LIndexPIP": {
+   "length": 0.021999999999999967
+  },
+  "LIndexDIP": {
+   "length": 0.0
+  },
+  "LMiddleMCP": {
+   "length": 0.041000000000000036
+  },
+  "LMiddlePIP": {
+   "length": 0.02499999999999997
+  },
+  "LMiddleDIP": {
+   "length": 0.0
+  },
+  "LRingMCP": {
+   "length": 0.038999999999999924
+  },
+  "LRingPIP": {
+   "length": 0.024000000000000094
+  },
+  "LRingDIP": {
+   "length": 0.0
+  },
+  "LLittleMCP": {
+   "length": 0.030000000000000106
+  },
+  "LLittlePIP": {
+   "length": 0.017999999999999936
+  },
+  "LLittleDIP": {
+   "length": 0.0
+  },
+  "RHip": {
+   "length": 0.41338722766916736
+  },
+  "RKnee": {
+   "length": 0.38927753595603226
+  },
+  "RAnkle": {
+   "length": 0.16368261972488102
+  },
+  "RBall": {
+   "length": 0.06419501538281612
+  },
+  "RToe": {
+   "length": 0.0
+  },
+  "LHip": {
+   "length": 0.41338722766916736
+  },
+  "LKnee": {
+   "length": 0.38927753595603226
+  },
+  "LAnkle": {
+   "length": 0.16368261972488102
+  },
+  "LBall": {
+   "length": 0.06419501538281612
+  },
+  "LToe": {
+   "length": 0.0
+  },
+  "bind_angles": {
+   "R_elbow_angle": 18.655863208005684,
+   "R_arm_from_vertical": 22.295716813053602,
+   "R_thigh_from_vertical": 2.4801400241063036,
+   "L_elbow_angle": 18.655863208005684,
+   "L_arm_from_vertical": 22.295716813053602,
+   "L_thigh_from_vertical": 2.4801400241063036
+  }
+ }
+}

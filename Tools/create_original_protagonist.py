@@ -49,6 +49,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import hand_rig
 import boot_rig
+import body_rig
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "Assets/Models/Characters")
@@ -116,6 +117,25 @@ def add_mesh(mat, name, points, polys):
         groups[mat].append((len(faces[mat]), name))
         active_group[mat] = name
     faces[mat].extend(tuple(base+i for i in face) for face in polys)
+    # Every part is registered with its vertex range in its material buffer, so
+    # the full-body rig (Tools/body_rig.py) can bind each part through its own
+    # weight chain. Parts added in several calls under the same name (a left /
+    # right pair, a repeated ornament) keep a list of ranges.
+    _record_mesh_part(mat, name, base - 1, len(verts[mat]))
+
+
+MESH_PARTS = []          # [{"name", "mat", "ranges": [(start, end), ...]}]
+_MESH_PART_INDEX = {}
+
+
+def _record_mesh_part(mat, name, start, end):
+    key = (mat, name)
+    part = _MESH_PART_INDEX.get(key)
+    if part is None:
+        part = {"name": name, "mat": mat, "ranges": []}
+        _MESH_PART_INDEX[key] = part
+        MESH_PARTS.append(part)
+    part["ranges"].append((start, end))
 
 # ---------------------------------------------------------------------------
 # Solid-surface construction kit
@@ -1659,7 +1679,8 @@ for side, label in ((-1, "L"), (1, "R")):
 
 thick_ring_shell("Trouser", "LowerBody/TrouserYoke",
     [(lambda a, y=y, rx=rx, rz=rz, zc=zc: (y, rx, rz, zc)) for y, rx, rz, zc in
-     ((1.005, .256, .152, 0.0), (.955, .247, .147, 0.0), (.905, .242, .144, 0.0))],
+     ((1.005, .256, .152, 0.0), (0.980, .2515, .1495, 0.0), (.955, .247, .147, 0.0),
+      (0.930, .2445, .1455, 0.0), (.905, .242, .144, 0.0))],
     thick=.007, sides=26, a0=0.0, a1=2*math.pi, wrap=True, rim_start=False, rim_end=False)
 ellipsoid("Trouser", "LowerBody/Seat", (0, .895, 0), (.225, .130, .138), 12, 20)
 
@@ -1670,21 +1691,43 @@ def trouser_fold(i, s_idx, a):
     return knee + ankle
 
 # Leg profile: (world x offset from the leg axis, y, z centre, rx, rz).
+#
+# Station density follows the rig: the wool leg needs rings on *both* sides of
+# the hip joint (0.905) and the knee (0.492), otherwise a lifted knee or a bent
+# hip folds one triangle through itself. The added stations sit exactly on the
+# original straight taper, so the silhouette is unchanged - only the joint
+# creases gain loops (verified by Tools/verify_rig.py).
+#
 # The three lowest stations are the boot_rig trouser tuck: the wool leg is
 # compressed inside the shaft (the shaft's inner wall clears it by >= 2 mm
 # everywhere below the cuff opening, checked by Tools/verify_boots.py) and
 # flares back out above the opening so the cloth drapes over the boot cuff.
-LEG_PROFILE = [(0.113, 0.915, -0.002, 0.102, 0.106),
-               (0.117, 0.660, -0.004, 0.084, 0.088)]
+LEG_PROFILE = [(0.113, 0.915, -0.002, 0.1020, 0.1060),   # hip joint
+               (0.114, 0.880, -0.002, 0.1000, 0.1040),
+               (0.115, 0.830, -0.003, 0.0969, 0.1009),
+               (0.116, 0.780, -0.003, 0.0938, 0.0977),
+               (0.116, 0.730, -0.004, 0.0906, 0.0946),
+               (0.117, 0.690, -0.004, 0.0873, 0.0913),
+               (0.117, 0.660, -0.004, 0.0840, 0.0880),
+               (0.117, 0.610, -0.004, 0.0835, 0.0874),
+               (0.118, 0.560, -0.004, 0.0829, 0.0869),
+               (0.118, 0.520, -0.004, 0.0824, 0.0863)]   # above the knee flare
 # boot_rig.TROUSER_TUCK starts at the knee flare (y = 0.485), so the stations
 # stay strictly monotonic - a duplicated station folds the tube onto itself
 LEG_PROFILE += [(0.118, y, zc, rx, rz) for (y, rx, rz, zc) in boot_rig.TROUSER_TUCK]
+
+# The knee crease and ankle wrinkles are driven by height, not by station
+# index, so adding loops never moves them.
+ANKLE_WRINKLE_Y = 0.365
 
 
 def trouser_fold_tuck(i, s_idx, a):
     """Knee / ankle creases, faded out where the leg is inside the boot."""
     y = LEG_PROFILE[max(0, min(len(LEG_PROFILE) - 1, int(round(i))))][1]
-    return trouser_fold(i, s_idx, a) * smoothstep(0.470, 0.560, y)
+    back = 0.5 + 0.5 * math.cos(a - 1.5 * math.pi)
+    knee = -0.0055 * math.exp(-((y - boot_rig.KNEE[1]) / 0.075) ** 2) * back
+    ankle = 0.0028 * math.sin(5 * a) * math.exp(-((y - ANKLE_WRINKLE_Y) / 0.055) ** 2)
+    return (knee + ankle) * smoothstep(0.470, 0.560, y)
 
 
 for side, label in ((-1, "L"), (1, "R")):
@@ -2268,9 +2311,12 @@ strap_band("BoneThread", "Accessories/CravatTailR",
 # brass frog clasps down torso, side pocket welts with button flaps.
 # =========================================================================
 
+# Rows at 1.42 and 1.475 are loops for the shoulder region; they lie exactly on
+# the original surface, so coat_inner()/coat_surf() interpolation is unchanged.
 BODICE_ROWS = [(1.00, .272, .168), (1.03, .254, .157),
                (1.16, .262, .158), (1.28, .290, .162), (1.38, .312, .160),
-               (1.455, .302, .148), (1.495, .266, .125)]
+               (1.420, .306667, .1536), (1.455, .302, .148),
+               (1.475, .284, .1365), (1.495, .266, .125)]
 COAT_T = 0.011
 
 def coat_inner(y):
@@ -2602,23 +2648,40 @@ tube("AgedBrass", "Accessories/MantleChainSwag", chain_pts, [.0022]*11, 6, (0, 1
 # left stitched elbow reinforcement patch, right cuff strap & buckle.
 # =========================================================================
 
+# Sleeve stations: (x offset, y, z, rx, rz). The extra rings at 1.418 and
+# 1.272 flank the shoulder joint, the ones at 1.132 flank the elbow. They are
+# interpolated onto the original five-station taper, so the silhouette is
+# identical - a single ring at a joint has nothing to fold into and inverts.
+SLEEVE_STATIONS = [
+    (0.201, 1.462, -0.008, 0.0970, 0.1000),   # sleeve head / shoulder joint
+    (0.245, 1.418,  0.001, 0.0897, 0.0931),
+    (0.296, 1.360,  0.008, 0.0800, 0.0840),
+    (0.325, 1.272,  0.014, 0.0745, 0.0785),
+    (0.352, 1.185,  0.020, 0.0690, 0.0730),   # elbow
+    (0.371, 1.132,  0.027, 0.0655, 0.0690),
+    (0.383, 1.065,  0.032, 0.0610, 0.0640),
+    (0.389, 1.012,  0.036, 0.0580, 0.0610),   # cuff
+]
+SLEEVE_ELBOW_Y = 1.185
+
+
 def sleeve_fold_factory(side):
     def fold(i, s_idx, a):
+        y = SLEEVE_STATIONS[max(0, min(len(SLEEVE_STATIONS) - 1, int(round(i))))][1]
         dr = 0.0
-        dr += 0.005 * math.sin(3*a + 1.7*side) * max(0.0, 1.0 - i)
-        dr -= 0.0065 * math.exp(-((i - 2.05)/0.55)**2) * (0.55 + 0.45*math.cos(2*a + side))
+        dr += 0.005 * math.sin(3*a + 1.7*side) * smoothstep(1.462, 1.380, y)
+        dr -= 0.0065 * math.exp(-((y - SLEEVE_ELBOW_Y)/0.085)**2) * (0.55 + 0.45*math.cos(2*a + side))
         return dr
     return fold
 
 for side, label in ((-1, "L"), (1, "R")):
     x = side
-    sleeve_pts = [(x*.201, 1.462, -.008), (x*.296, 1.360, .008), (x*.352, 1.185, .020),
-                  (x*.383, 1.065, .032), (x*.389, 1.012, .036)]
+    sleeve_pts = [(x*dx, y, z) for (dx, y, z, _rx, _rz) in SLEEVE_STATIONS]
     thick_tube("Cloth", f"UpperClothing/CoatSleeve_{label}", sleeve_pts,
-        [(.097, .100), (.080, .084), (.069, .073), (.061, .064), (.058, .061)],
+        [(rx, rz) for (_dx, _y, _z, rx, rz) in SLEEVE_STATIONS],
         sides=22, thick=.009, fold=sleeve_fold_factory(side), rim_start=True, rim_end=True)
-    outer_seam = [(x*(.201 + .098), 1.462, -.008), (x*(.296 + .082), 1.360, .008),
-                  (x*(.352 + .070), 1.185, .020), (x*(.383 + .062), 1.065, .032), (x*(.389 + .059), 1.012, .036)]
+    outer_seam = [(x*(dx + rx + 0.001), y, z)
+                  for (dx, y, z, rx, rz) in SLEEVE_STATIONS]
     welt_seam("Cloth", f"UpperClothing/SleeveSeam_{label}", outer_seam, radius=0.0034)
     stitch_dashes("BoneThread", f"UpperClothing/SleeveSeamStitch_{label}", outer_seam, 8, r=0.0020, length=0.011)
 
@@ -3505,6 +3568,86 @@ boot_rig_data = {
 }
 with open(boot_path, "w", encoding="utf-8") as f:
     json.dump(boot_rig_data, f, indent=1)
+
+# --- full-body rig sidecar: one humanoid skeleton for the whole character --
+# Bones: the arm/hand chain from Tools/hand_rig.py and the leg/foot chain from
+# Tools/boot_rig.py (unchanged names and anchors) joined under a new
+# pelvis/root, spine, neck, head and clavicle chain. Parts: every add_mesh
+# range in the OBJ bound to a weight chain (see Tools/body_rig.py), so no
+# vertex is left on the root. Tools/verify_rig.py re-derives all weights from
+# these tables and poses the rig with the existing idle/walk/run/attack/dodge
+# vocabulary.
+fullrig_path = os.path.join(OUT, f"SM_Character_VeilboundWayfarer{SUFFIX}.rig.json")
+part_records = body_rig.classify_parts(MESH_PARTS, RIG_PARTS,
+                                        vertex_of=lambda mat, i: verts[mat][i])
+body_rig_data = {
+    "format": "vespershade.rig/1",
+    "mesh": os.path.basename(obj_path),
+    "units": "metres", "up": "Y", "character_faces": "+Z",
+    "bind_pose": "identity (mesh authored in bind pose; zero-rotation FK "
+                 "reproduces the OBJ exactly)",
+    "skeleton": {
+        "root": "Root",
+        "bones": [
+            {"name": name, "parent": parent,
+             "head": [round(c, 6) for c in head],
+             "group": group,
+             "side": ("R" if name[0] == "R" and group != "root" else
+                      "L" if name[0] == "L" and group != "root" else None),
+             "humanoid": body_rig.humanoid_bone_map().get(name),
+             **({"axes": {k: [round(c, 6) for c in v] for k, v in axes.items()}}
+                if axes else {})}
+            for (name, parent, head, axes, group) in body_rig.joint_list()
+        ],
+        "axis_convention": "torso/neck/head flex + = bend forward, abd + = bend "
+                           "left, twist + = turn right; clavicle flex + = "
+                           "shoulder forward, abd + = shrug up; arm flex + = "
+                           "swing forward, abd + = outboard, twist + = segment "
+                           "roll; leg flex + = hip forward / knee folds back, "
+                           "abd + = outboard; foot flex + = dorsiflexion",
+    },
+    "humanoid": {
+        "avatar_mapping": [{"bone": b, "human": h}
+                           for (b, h) in body_rig.HUMANOID_MAP],
+        "required": body_rig.HUMANOID_REQUIRED,
+        "optional": body_rig.HUMANOID_OPTIONAL,
+        "helpers": ["RForearm", "LForearm", "RWrist", "LWrist",
+                    "RThumbCMC", "LThumbCMC", "RToe", "LToe", "HeadEnd"],
+        "helper_note": "helper bones stay in the hierarchy but map to no "
+                       "humanoid slot; the forearm is split in two so wrist "
+                       "roll is distributed and the toe rides the ball",
+        "pose_note": "bind pose is a relaxed A-pose: the arm hangs 22 deg off "
+                     "vertical, elbows gently bent (18.7 deg), legs straight; "
+                     "Unity's AvatarBuilder solves the T-pose from it",
+    },
+    "weights": "computed deterministically from the bind position by "
+               "Tools/body_rig.py:weights_for(side, chain, point); the hands "
+               "delegate to Tools/hand_rig.py, the boots to Tools/boot_rig.py",
+    "detail_binding": "parts with `bind: stiff` are small solids (stitch "
+                      "dashes, buttons, buckles, rivets, rings, patches, "
+                      "straps, ears, eyes) up to "
+                      "Tools/body_rig.py:DETAIL_MAX_DIAGONAL across: all their "
+                      "vertices share the weights of the part `centroid`, so "
+                      "they keep their shape instead of folding through "
+                      "themselves or shearing across a joint",
+    "parts": [
+        {"name": name, "mat": mat,
+         "start": offsets[mat] + start, "end": offsets[mat] + end,
+         "side": ("R" if side == 1 else "L" if side == -1 else None) if side
+                 else None,
+         "chain": chain,
+         **({"bind": bind} if bind else {}),
+         **({"centroid": [round(c, 6) for c in centroid]}
+            if bind == "stiff" else {})}
+        for (name, mat, start, end, side, chain, bind, centroid) in part_records
+    ],
+    "metrics": body_rig.metrics(),
+}
+with open(fullrig_path, "w", encoding="utf-8") as f:
+    json.dump(body_rig_data, f, indent=1)
+print(f"  rig: {len(body_rig_data['skeleton']['bones'])} bones, "
+      f"{len(body_rig_data['parts'])} bound part ranges "
+      f"({len({p['chain'] for p in body_rig_data['parts']})} chains)")
 
 # --- hair sidecar: "Vigil Sweep" section ranges + design contract ----------
 # Vertex ranges are global OBJ indices, 0-based, end-exclusive. The verify and

@@ -22,7 +22,7 @@ PREFAB_MATERIAL_FILES = [
     "M_Char_Gloves.mat", "M_Char_Eyes.mat",
 ]
 EXPECTED_MESH_COUNTS = {
-    "": (50065, 95590), "_L1": (31147, 58889), "_L2": (26012, 49358),
+    "": (51469, 98398), "_L1": (32027, 60649), "_L2": (26532, 50398),
 }
 
 REQUIRED_CATEGORIES = {

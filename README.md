@@ -110,8 +110,9 @@ with a bound tail, shaded by an object-space anisotropic hair shader. It
 streams through a three-level `LODGroup`. See
 [Docs/CHARACTER_WARDROBE.md](Docs/CHARACTER_WARDROBE.md) for the layer map,
 [Docs/CHARACTER_HAIR.md](Docs/CHARACTER_HAIR.md) for the hairstyle design and
-verification, and the regeneration commands for the offline multi-angle
-preview tools.
+verification, [Docs/RIGGING.md](Docs/RIGGING.md) for the 60-bone rig, the
+Unity humanoid mapping and the deformation QA, and the regeneration commands
+for the offline multi-angle preview tools.
 
 See [Docs/FOUNDATION.md](Docs/FOUNDATION.md) for core architecture and
 [Docs/ARENA_Lighting.md](Docs/ARENA_Lighting.md) for lighting controls.
@@ -133,6 +134,9 @@ python3 Tools/render_character_previews.py    # offline multi-angle wardrobe ren
 python3 Tools/verify_boots.py           # boots: anatomy, floor contact, rig poses (all LODs)
 python3 Tools/render_boot_previews.py   # pose the boots (idle/walk/run/dodge) over a floor
 python3 Tools/verify_hair.py            # hair: sections, solids, silhouette, zoning (all LODs)
+python3 Tools/verify_rig.py --structure # rig: hierarchy, humanoid map, weights, bind identity
+python3 Tools/verify_rig.py --sweeps    # rig: 45 joint/animation deformation cases
+python3 Tools/render_rig_previews.py    # pose the mesh through the rig and render it
 python3 Tools/render_hair_previews.py   # hair renders: close + normal gameplay distance
 ```
 

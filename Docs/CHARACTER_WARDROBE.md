@@ -12,9 +12,10 @@ figure, its costume and every ornament are original to Vespershade.
 | --- | --- |
 | `Tools/create_original_protagonist.py` | Procedural generator: writes the OBJ + MTL (wardrobe, head and the sectioned "Vigil Sweep" hairstyle; see [CHARACTER_HAIR.md](CHARACTER_HAIR.md)) |
 | `Tools/render_character_previews.py` | Offline 12-angle preview renderer (numpy z-buffer rasterizer) used for multi-angle QA; also writes `Docs/CharacterPreviews/` |
-| `Assets/Models/Characters/SM_Character_VeilboundWayfarer.obj` | Base mesh, 95,590 triangles, 11 material submeshes (original nine slots preserved; existing glove and eye geometry use two appended slots) |
-| `Assets/Models/Characters/SM_Character_VeilboundWayfarer_L1.obj` | LOD1, 58,889 triangles |
-| `Assets/Models/Characters/SM_Character_VeilboundWayfarer_L2.obj` | LOD2, 49,358 triangles |
+| `Assets/Models/Characters/SM_Character_VeilboundWayfarer.obj` | Base mesh, 98,398 triangles, 11 material submeshes (original nine slots preserved; existing glove and eye geometry use two appended slots) |
+| `Assets/Models/Characters/SM_Character_VeilboundWayfarer_L1.obj` | LOD1, 60,649 triangles |
+| `Assets/Models/Characters/SM_Character_VeilboundWayfarer_L2.obj` | LOD2, 50,398 triangles |
+| `Assets/Models/Characters/SM_Character_VeilboundWayfarer*.rig.json` | Full-body rig sidecar per LOD (skeleton, humanoid map, per-part chain ids); see [RIGGING.md](RIGGING.md) |
 | `Assets/Prefabs/Player/Player.prefab` | Base renderer + LOD1/LOD2 renderers driven by a `LODGroup` (50% / 18% / 6% screen height) |
 | `Docs/CharacterPreviews/` | Rendered verification images (`sheet.jpg`, per-angle PNGs, `PC_lod_comparison.png`) |
 
