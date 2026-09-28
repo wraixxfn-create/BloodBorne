@@ -25,17 +25,17 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _GlossVar: 0.16
-    - _Glossiness: 0.33
+    - _GlossVar: 0.11
+    - _Glossiness: 0.27
     - _Metallic: 0
-    - _OcclusionStrength: 0.75
+    - _OcclusionStrength: 0.68
     - _PoreScale: 165
-    - _PoreStrength: 0.18
-    - _RednessAmount: 0.28
-    - _SSSAmount: 0.34
+    - _PoreStrength: 0.12
+    - _RednessAmount: 0.18
+    - _SSSAmount: 0.24
     m_Colors:
-    - _Color: {r: 0.52, g: 0.37, b: 0.30, a: 1}
+    - _Color: {r: 0.52, g: 0.37, b: 0.3, a: 1}
     - _ColorVar: {r: 0.58, g: 0.43, b: 0.36, a: 1}
-    - _RednessColor: {r: 0.64, g: 0.34, b: 0.30, a: 1}
-    - _SSSColor: {r: 0.68, g: 0.36, b: 0.32, a: 1}
+    - _RednessColor: {r: 0.63, g: 0.36, b: 0.32, a: 1}
+    - _SSSColor: {r: 0.64, g: 0.38, b: 0.34, a: 1}
   m_BuildTextureStacks: []

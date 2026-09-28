@@ -2,30 +2,34 @@ Shader "Vespershade/CharacterEye"
 {
     Properties
     {
-        _IrisColor ("Iris Color", Color) = (0.22, 0.36, 0.48, 1)
-        _IrisVar ("Iris Variation", Color) = (0.28, 0.44, 0.55, 1)
-        _ScleraColor ("Sclera", Color) = (0.92, 0.905, 0.87, 1)
-        _PupilColor ("Pupil", Color) = (0.04, 0.045, 0.06, 1)
-        _CorneaColor ("Cornea Tint", Color) = (0.85, 0.90, 0.98, 1)
+        _IrisColor ("Iris Color", Color) = (0.18, 0.31, 0.42, 1)
+        _IrisVar ("Iris Variation", Color) = (0.27, 0.39, 0.47, 1)
+        _ScleraColor ("Warm Sclera", Color) = (0.76, 0.73, 0.68, 1)
+        _PupilColor ("Pupil", Color) = (0.025, 0.03, 0.04, 1)
+        _LimbalColor ("Limbal Ring", Color) = (0.055, 0.085, 0.11, 1)
+        _VeinColor ("Faint Vein Tint", Color) = (0.38, 0.19, 0.17, 1)
+        _CorneaColor ("Cornea Tint", Color) = (0.84, 0.89, 0.94, 1)
         _Metallic ("Metallic", Range(0,0.1)) = 0.0
-        _Glossiness ("Smoothness", Range(0,1)) = 0.92
-        _IrisScale ("Iris Detail Scale", Float) = 18
-        _PupilSize ("Pupil Size", Range(0.1,0.6)) = 0.32
-        _IrisDepth ("Iris Depth", Range(0,1)) = 0.35
-        _OcclusionStrength ("Occlusion", Range(0,1)) = 0.6
+        _Glossiness ("Eye Moisture", Range(0,1)) = 0.72
+        _IrisScale ("Iris Fiber Count", Float) = 36
+        _PupilSize ("Pupil Size", Range(0.1,0.6)) = 0.30
+        _IrisDepth ("Iris Recess", Range(0,1)) = 0.30
+        _OcclusionStrength ("Occlusion", Range(0,1)) = 0.38
     }
     SubShader
     {
         Tags { "RenderType"="Opaque" }
         LOD 300
         CGPROGRAM
-        #pragma surface surf Standard fullforwardshadows
+        #pragma surface surf Standard fullforwardshadows vertex:vert
         #pragma target 3.0
 
         fixed4 _IrisColor;
         fixed4 _IrisVar;
         fixed4 _ScleraColor;
         fixed4 _PupilColor;
+        fixed4 _LimbalColor;
+        fixed4 _VeinColor;
         fixed4 _CorneaColor;
         half _Metallic;
         half _Glossiness;
@@ -36,87 +40,91 @@ Shader "Vespershade/CharacterEye"
 
         struct Input
         {
-            float3 worldPos;
-            float3 worldNormal;
+            float3 objPos;
             INTERNAL_DATA
         };
 
-        float Hash21(float2 p){ p=frac(p*float2(123.34,456.21)); p+=dot(p,p+45.32); return frac(p.x*p.y); }
-        float ValueNoise(float2 p){
-            float2 i=floor(p); float2 f=frac(p); f=f*f*(3-2*f);
-            float a=Hash21(i); float b=Hash21(i+float2(1,0)); float c=Hash21(i+float2(0,1)); float d=Hash21(i+float2(1,1));
-            return lerp(lerp(a,b,f.x), lerp(c,d,f.x), f.y);
+        // The source OBJ has no UVs. Its authored local eye centres are stable
+        // under the player transform, and a generated TBN supports the normal output.
+        void vert(inout appdata_full v, out Input o)
+        {
+            UNITY_INITIALIZE_OUTPUT(Input, o);
+            o.objPos = v.vertex.xyz;
+            float3 n = normalize(v.normal);
+            float3 axis = abs(n.y) < 0.92 ? float3(0.0, 1.0, 0.0) : float3(1.0, 0.0, 0.0);
+            v.tangent = float4(normalize(cross(axis, n)), 1.0);
         }
-        float FBM(float2 p){ float v=0; float amp=0.5; for(int j=0;j<4;j++){ v+=ValueNoise(p)*amp; p=p*2.17+float2(2.7,1.9); amp*=0.5; } return v; }
+
+        float Hash21(float2 p)
+        {
+            p = frac(p * float2(123.34, 456.21));
+            p += dot(p, p + 45.32);
+            return frac(p.x * p.y);
+        }
+        float ValueNoise(float2 p)
+        {
+            float2 i = floor(p);
+            float2 f = frac(p);
+            f = f * f * (3.0 - 2.0 * f);
+            float a = Hash21(i);
+            float b = Hash21(i + float2(1, 0));
+            float c = Hash21(i + float2(0, 1));
+            float d = Hash21(i + float2(1, 1));
+            return lerp(lerp(a, b, f.x), lerp(c, d, f.x), f.y);
+        }
 
         void surf(Input IN, inout SurfaceOutputStandard o)
         {
-            float3 wp = IN.worldPos;
-            // Approximate eye center at head ~1.70m, use local offset from world
-            // For procedural iris, use polar coordinates around eye forward (approx +Z)
-            // Use worldNormal to orient: front of eye is where normal Z is high
-            float3 wn = normalize(IN.worldNormal);
-            // Use spherical mapping: project onto plane perpendicular to forward
-            float2 irisUV = float2(wp.x, wp.y) * 12.0;
-            // Actually use worldPos relative to approximate eye socket positions
-            // Two eyes: left/right at x ~ +/-0.03, y ~1.70, z ~0.06
-            float eyeCenterX = sign(wp.x) * 0.032;
-            float2 delta = float2(wp.x - eyeCenterX, wp.y - 1.705);
-            float r = length(delta);
+            float3 p = IN.objPos;
+            float eyeCenterX = p.x < 0.0 ? -0.033 : 0.033;
+            float2 delta = float2(p.x - eyeCenterX, p.y - 1.692);
+            float radius = length(delta);
             float angle = atan2(delta.y, delta.x);
 
-            // Sclera vs iris: iris radius ~0.011, sclera larger
-            float irisRadius = 0.0115;
+            // The existing inset eye spheres are ~10.5 mm radius. Keep the iris
+            // and pupil within that surface, leaving a visible warm scleral rim.
+            float irisRadius = 0.0052;
             float pupilRadius = irisRadius * _PupilSize;
+            float irisMask = 1.0 - smoothstep(irisRadius * 0.94, irisRadius * 1.06, radius);
+            float pupilMask = 1.0 - smoothstep(pupilRadius * 0.82, pupilRadius * 1.10, radius);
+            float radialT = saturate(radius / irisRadius);
 
-            float irisMask = 1.0 - smoothstep(irisRadius*0.92, irisRadius, r);
-            float pupilMask = 1.0 - smoothstep(pupilRadius*0.85, pupilRadius, r);
+            // Fine, subdued radial fibers with a little asymmetry; no emissive or
+            // painted-on white highlight, so the eye reflects the actual scene.
+            float fiberWave = sin(angle * _IrisScale + radialT * 17.0 + sin(angle * 7.0) * 0.55);
+            float fibers = 0.5 + 0.5 * fiberWave;
+            float irisNoise = ValueNoise(float2(cos(angle) * 6.0, sin(angle) * 6.0) + radialT * 3.0);
+            fixed3 iris = lerp(_IrisColor.rgb, _IrisVar.rgb,
+                               saturate(0.22 + fibers * 0.36 + irisNoise * 0.28));
+            float innerShadow = 1.0 - smoothstep(0.08, 0.72, radialT);
+            iris *= lerp(0.74, 1.0, innerShadow);
+            float limbal = smoothstep(0.76, 0.99, radialT) * irisMask;
+            iris = lerp(iris, _LimbalColor.rgb, limbal * 0.72);
 
-            // Iris detail - radial fibers + subtle color variation
-            float radial = frac(angle * 6.0 / 6.28318 + r*22.0);
-            float fiber = sin(angle * _IrisScale + r*85.0) * 0.5 + 0.5;
-            float fiber2 = ValueNoise(float2(angle*3.0, r*55.0));
-            float irisNoise = FBM(float2(angle*2.0, r*18.0));
+            float scleraNoise = ValueNoise(p.xy * 180.0 + p.z * 23.0);
+            fixed3 sclera = _ScleraColor.rgb * (0.97 + scleraNoise * 0.045);
+            float vesselWave = pow(saturate(0.5 + 0.5 * sin(angle * 5.0 + radialT * 18.0)), 14.0);
+            float vein = vesselWave * smoothstep(0.68, 0.98, radialT) * (1.0 - irisMask) * 0.08;
+            sclera = lerp(sclera, _VeinColor.rgb, vein);
 
-            fixed3 irisCol = lerp(_IrisColor.rgb, _IrisVar.rgb, saturate(fiber*0.5 + irisNoise*0.5));
-            // Darken iris towards pupil and limb
-            float limbDark = pow(saturate(r/irisRadius), 2.2)*0.35;
-            irisCol *= lerp(1.0, 0.65, limbDark);
-            // Slight radial dark streaks
-            irisCol *= lerp(1.0, 0.85, pow(fiber, 4.0)*0.5);
+            fixed3 albedo = lerp(sclera, iris, irisMask);
+            albedo = lerp(albedo, _PupilColor.rgb, pupilMask * irisMask);
+            albedo = lerp(albedo, albedo * _CorneaColor.rgb, 0.035);
 
-            fixed3 sclera = _ScleraColor.rgb * (0.92 + ValueNoise(wp.xz*45.0)*0.08);
-            // Subtle vein tint near edges
-            float vein = ValueNoise(wp.xy*28.0) * 0.04 * (1.0-irisMask);
+            float aoMask = irisMask * _IrisDepth * 0.22 + pupilMask * 0.08;
+            float ao = lerp(1.0, 1.0 - aoMask, _OcclusionStrength);
+            half smoothness = lerp(0.48, _Glossiness, 0.42 + irisMask * 0.30);
+            smoothness = lerp(smoothness, _Glossiness * 0.92, pupilMask * irisMask * 0.35);
+            smoothness += (ValueNoise(p.xy * 320.0) - 0.5) * 0.025;
 
-            fixed3 albedo = lerp(sclera, irisCol, irisMask);
-            albedo = lerp(albedo, _PupilColor.rgb, pupilMask*irisMask);
-
-            // Cornea highlight - not albedo but smoothness and subtle tint
-            float cornea = saturate(irisMask*0.6 + (1.0-irisMask)*0.15);
-            albedo = lerp(albedo, _CorneaColor.rgb*albedo, cornea*0.08);
-
-            // AO - iris depth
-            float ao = lerp(1.0, 1.0 - irisMask* _IrisDepth *0.35 - pupilMask*0.15, _OcclusionStrength);
-
-            // Smoothness - cornea very smooth, sclera less, iris medium
-            half smoothness = lerp(0.35, _Glossiness, cornea);
-            smoothness = lerp(smoothness, _Glossiness*0.92, irisMask*0.7);
-            smoothness = lerp(smoothness, 0.15, pupilMask*0.8);
-            // Add tiny variation to avoid uniform roughness
-            smoothness += (ValueNoise(wp.xz*65.0)-0.5)*0.04;
-            smoothness = saturate(smoothness);
-
-            // Normal - slight iris concave + cornea convex
-            float irisConcave = irisMask * (1.0-pupilMask) * -0.18;
-            float3 n = normalize(float3(delta.x* irisConcave * 18.0, delta.y* irisConcave * 18.0, 1.0));
-
-            o.Albedo = albedo * ao + vein*0.02;
+            // Preserve the sphere's authored curvature; its wet corneal response
+            // comes from restrained smoothness under the real arena lights.
+            o.Albedo = albedo;
             o.Metallic = _Metallic;
-            o.Smoothness = smoothness;
-            o.Normal = n;
+            o.Smoothness = saturate(smoothness);
+            o.Normal = float3(0.0, 0.0, 1.0);
             o.Occlusion = ao;
-            o.Alpha = 1;
+            o.Alpha = 1.0;
         }
         ENDCG
     }

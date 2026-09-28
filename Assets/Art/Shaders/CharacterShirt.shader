@@ -6,19 +6,19 @@ Shader "Vespershade/CharacterShirt"
         _ColorVar ("Variation", Color) = (0.66, 0.57, 0.43, 1)
         _ThreadColor ("Thread Tint", Color) = (0.52, 0.45, 0.33, 1)
         _Metallic ("Metallic", Range(0,0.12)) = 0.02
-        _Glossiness ("Smoothness", Range(0,1)) = 0.31
-        _GlossVar ("Roughness Variation", Range(0,0.5)) = 0.14
+        _Glossiness ("Smoothness", Range(0,1)) = 0.27
+        _GlossVar ("Roughness Variation", Range(0,0.5)) = 0.10
         _WeaveScale ("Weave Scale", Float) = 105
-        _WeaveStrength ("Weave Strength", Range(0,1)) = 0.28
-        _WearAmount ("Wear Amount", Range(0,1)) = 0.12
-        _OcclusionStrength ("Occlusion", Range(0,1)) = 0.82
+        _WeaveStrength ("Weave Strength", Range(0,1)) = 0.18
+        _WearAmount ("Wear Amount", Range(0,1)) = 0.10
+        _OcclusionStrength ("Occlusion", Range(0,1)) = 0.72
     }
     SubShader
     {
         Tags { "RenderType"="Opaque" }
         LOD 300
         CGPROGRAM
-        #pragma surface surf Standard fullforwardshadows
+        #pragma surface surf Standard fullforwardshadows vertex:vert
         #pragma target 3.0
 
         fixed4 _Color;
@@ -32,7 +32,18 @@ Shader "Vespershade/CharacterShirt"
         half _WearAmount;
         half _OcclusionStrength;
 
-        struct Input { float3 worldPos; INTERNAL_DATA };
+        struct Input { float3 objPos; INTERNAL_DATA };
+
+        // The mesh has no UVs or imported tangents. Build a stable local TBN so
+        // procedural micro-normal detail is well-defined and stays attached.
+        void vert(inout appdata_full v, out Input o)
+        {
+            UNITY_INITIALIZE_OUTPUT(Input, o);
+            o.objPos = v.vertex.xyz;
+            float3 n = normalize(v.normal);
+            float3 axis = abs(n.y) < 0.92 ? float3(0.0, 1.0, 0.0) : float3(1.0, 0.0, 0.0);
+            v.tangent = float4(normalize(cross(axis, n)), 1.0);
+        }
 
         float Hash21(float2 p){ p=frac(p*float2(123.34,456.21)); p+=dot(p,p+45.32); return frac(p.x*p.y); }
         float ValueNoise(float2 p){
@@ -44,7 +55,7 @@ Shader "Vespershade/CharacterShirt"
 
         void surf(Input IN, inout SurfaceOutputStandard o)
         {
-            float3 wp = IN.worldPos;
+            float3 wp = IN.objPos;
             float2 uvA = wp.xz*0.75 + wp.y*0.18;
             float2 uvB = wp.xy*0.6;
 
@@ -74,7 +85,7 @@ Shader "Vespershade/CharacterShirt"
             float ny = (ValueNoise(weaveUV*_WeaveScale*0.24+3.1)-0.5)*_WeaveStrength;
             float3 n = normalize(float3(nx, ny, 1.0));
 
-            o.Albedo = albedo * ao;
+            o.Albedo = albedo;
             o.Metallic = _Metallic;
             o.Smoothness = smoothness;
             o.Normal = n;

@@ -12,9 +12,9 @@ figure, its costume and every ornament are original to Vespershade.
 | --- | --- |
 | `Tools/create_original_protagonist.py` | Procedural generator: writes the OBJ + MTL (wardrobe, head and the sectioned "Vigil Sweep" hairstyle; see [CHARACTER_HAIR.md](CHARACTER_HAIR.md)) |
 | `Tools/render_character_previews.py` | Offline 12-angle preview renderer (numpy z-buffer rasterizer) used for multi-angle QA; also writes `Docs/CharacterPreviews/` |
-| `Assets/Models/Characters/SM_Character_VeilboundWayfarer.obj` | Base mesh, ~68.5k triangles, 9 material submeshes (path and GUID unchanged, so the prefab keeps working) |
-| `Assets/Models/Characters/SM_Character_VeilboundWayfarer_L1.obj` | LOD1, ~45.5k triangles |
-| `Assets/Models/Characters/SM_Character_VeilboundWayfarer_L2.obj` | LOD2, ~38.9k triangles |
+| `Assets/Models/Characters/SM_Character_VeilboundWayfarer.obj` | Base mesh, 95,590 triangles, 11 material submeshes (original nine slots preserved; existing glove and eye geometry use two appended slots) |
+| `Assets/Models/Characters/SM_Character_VeilboundWayfarer_L1.obj` | LOD1, 58,889 triangles |
+| `Assets/Models/Characters/SM_Character_VeilboundWayfarer_L2.obj` | LOD2, 49,358 triangles |
 | `Assets/Prefabs/Player/Player.prefab` | Base renderer + LOD1/LOD2 renderers driven by a `LODGroup` (50% / 18% / 6% screen height) |
 | `Docs/CharacterPreviews/` | Rendered verification images (`sheet.jpg`, per-angle PNGs, `PC_lod_comparison.png`) |
 
@@ -122,9 +122,10 @@ flap saddle stitching.
 
 ## Rig / gameplay integration
 
-- Same file name, same 9 submesh order (Cloth, ClothAccent, Trouser, Leather,
-  Skin, Hair, AgedBrass, BoneThread, BootSole) and same material GUIDs - the
-  existing `Player.prefab` wiring keeps working untouched.
+- Same file path and original 9 submesh slots in the same order (Cloth,
+  ClothAccent, Trouser, Leather, Skin, Hair, AgedBrass, BoneThread, BootSole).
+  Two appended slots isolate the existing glove shells and eye spheres for
+  their dedicated materials; the original material GUIDs remain unchanged.
 - The player is intentionally still a static mesh child of the capsule
   (this foundation has no animation rig yet); the wardrobe adds no bones,
   no scripts, no physics and no input changes. `CharacterController`,

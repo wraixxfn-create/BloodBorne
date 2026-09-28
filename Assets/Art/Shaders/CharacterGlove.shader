@@ -6,12 +6,12 @@ Shader "Vespershade/CharacterGlove"
         _ColorVar ("Variation", Color) = (0.18, 0.115, 0.078, 1)
         _WearColor ("Wear Highlight", Color) = (0.22, 0.15, 0.10, 1)
         _Metallic ("Metallic", Range(0,0.12)) = 0.02
-        _Glossiness ("Smoothness", Range(0,1)) = 0.34
-        _GlossVar ("Roughness Variation", Range(0,0.5)) = 0.20
+        _Glossiness ("Smoothness", Range(0,1)) = 0.28
+        _GlossVar ("Roughness Variation", Range(0,0.5)) = 0.14
         _GrainScale ("Grain Scale", Float) = 58
-        _FuzzAmount ("Fuzz / Suede", Range(0,1)) = 0.32
+        _FuzzAmount ("Fuzz / Suede", Range(0,1)) = 0.18
         _FuzzColor ("Fuzz Color", Color) = (0.24, 0.18, 0.13, 1)
-        _WearAmount ("Wear Amount", Range(0,1)) = 0.16
+        _WearAmount ("Wear Amount", Range(0,1)) = 0.12
         _OcclusionStrength ("Occlusion", Range(0,1)) = 0.88
     }
     SubShader
@@ -19,8 +19,10 @@ Shader "Vespershade/CharacterGlove"
         Tags { "RenderType"="Opaque" }
         LOD 300
         CGPROGRAM
-        #pragma surface surf StandardGlove fullforwardshadows
+        #pragma surface surf StandardGlove fullforwardshadows vertex:vert
         #pragma target 3.0
+
+        #include "UnityLightingCommon.cginc"
 
         fixed4 _Color;
         fixed4 _ColorVar;
@@ -36,10 +38,21 @@ Shader "Vespershade/CharacterGlove"
 
         struct Input
         {
-            float3 worldPos;
+            float3 objPos;
             float3 worldNormal;
             INTERNAL_DATA
         };
+        // The mesh has no UVs or imported tangents. Build a stable local TBN so
+        // procedural micro-normal detail is well-defined and stays attached.
+        void vert(inout appdata_full v, out Input o)
+        {
+            UNITY_INITIALIZE_OUTPUT(Input, o);
+            o.objPos = v.vertex.xyz;
+            float3 n = normalize(v.normal);
+            float3 axis = abs(n.y) < 0.92 ? float3(0.0, 1.0, 0.0) : float3(1.0, 0.0, 0.0);
+            v.tangent = float4(normalize(cross(axis, n)), 1.0);
+        }
+
 
         float Hash21(float2 p){ p=frac(p*float2(123.34,456.21)); p+=dot(p,p+45.32); return frac(p.x*p.y); }
         float ValueNoise(float2 p){
@@ -53,8 +66,9 @@ Shader "Vespershade/CharacterGlove"
         {
             half4 c = LightingStandard(s, lightDir, viewDir, atten);
             half NdotV = saturate(dot(s.Normal, viewDir));
-            half fuzz = pow(1.0 - NdotV, 2.8) * _FuzzAmount * 0.45;
-            c.rgb += _FuzzColor.rgb * fuzz * atten;
+            half NdotL = saturate(dot(s.Normal, lightDir) * 0.7 + 0.3);
+            half fuzz = pow(1.0 - NdotV, 3.2) * _FuzzAmount * 0.16;
+            c.rgb += _LightColor0.rgb * _FuzzColor.rgb * fuzz * NdotL * atten;
             return c;
         }
         void LightingStandardGlove_GI(SurfaceOutputStandard s, UnityGIInput data, inout UnityGI gi)
@@ -64,7 +78,7 @@ Shader "Vespershade/CharacterGlove"
 
         void surf(Input IN, inout SurfaceOutputStandard o)
         {
-            float3 wp = IN.worldPos;
+            float3 wp = IN.objPos;
             float2 uvA = wp.xz*0.7 + wp.y*0.2;
             float2 uvB = wp.xy*0.6;
 
@@ -93,7 +107,7 @@ Shader "Vespershade/CharacterGlove"
             float ny = (ValueNoise(grainUV*_GrainScale*0.29+3.4)-0.5)*0.32;
             float3 n = normalize(float3(nx, ny, 1.0));
 
-            o.Albedo = albedo * ao;
+            o.Albedo = albedo;
             o.Metallic = _Metallic;
             o.Smoothness = smoothness;
             o.Normal = n;

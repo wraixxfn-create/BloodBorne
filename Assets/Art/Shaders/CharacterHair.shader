@@ -34,10 +34,11 @@ Shader "Vespershade/CharacterHair"
 
         CGPROGRAM
         // custom lighting: Kajiya-Kay two-lobe anisotropic on SurfaceOutputHair
-        #pragma surface surf Hair fullforwardshadows
+        #pragma surface surf Hair fullforwardshadows vertex:vert
         #pragma target 3.0
 
         #include "UnityLightingCommon.cginc"   // _LightColor0
+        #include "UnityPBSLighting.cginc"    // UnityGlobalIllumination
 
         fixed4 _Color;
         fixed4 _ColorVar;
@@ -76,6 +77,9 @@ Shader "Vespershade/CharacterHair"
         {
             UNITY_INITIALIZE_OUTPUT( Input, o );
             o.objPos = v.vertex.xyz;
+            float3 n = normalize( v.normal );
+            float3 axis = abs( n.y ) < 0.92 ? float3( 0, 1, 0 ) : float3( 1, 0, 0 );
+            v.tangent = float4( normalize( cross( axis, n ) ), 1.0 );
         }
 
         // ------------------------------------------------------------------ noise
@@ -103,7 +107,7 @@ Shader "Vespershade/CharacterHair"
         float3 StrandFlow ( float3 p, float3 nObj )
         {
             float upness = smoothstep( 1.60, 1.72, p.y );          // crown vs nape
-            float backness = smoothstep( 0.01, -0.05, p.z );       // behind the ear line
+            float backness = 1.0 - smoothstep( -0.05, 0.01, p.z );       // behind the ear line
 
             // crown: flow sideways away from the part line, biased backwards
             float partX = 0.006 + 0.010 * ( 1.0 - upness );
@@ -125,39 +129,50 @@ Shader "Vespershade/CharacterHair"
         }
 
         // ------------------------------------------------------- Kajiya-Kay light
-        half4 LightingHair ( SurfaceOutputHair s, half3 lightDir, half3 viewDir, half atten )
+        half3 HairLightResponse ( SurfaceOutputHair s, half3 lightDir, half3 viewDir, half3 lightColor )
         {
             half3 T = normalize( s.StrandTangent );
-
-            // wrapped diffuse: hair self-shadows softly
             half NdotL = dot( s.Normal, lightDir );
-            half diff = saturate( ( NdotL + 0.45 ) / 1.45 );
+            half diff = saturate( ( NdotL + 0.35 ) / 1.35 );
 
-            // Kajiya-Kay: sin(angle) between the strand tangent and L / H
-            half TL = dot( T, lightDir );
-            half sinTL = sqrt( saturate( 1.0 - TL * TL ) );
+            // Kajiya-Kay: two broad, restrained lobes follow the groomed flow.
             half3 H = normalize( lightDir + viewDir );
             half TH = dot( T, H );
             half sinTH = sqrt( saturate( 1.0 - TH * TH ) );
-
-            // two lobes: tight primary shifted toward the root, wider tinted secondary
-            half spec1 = pow( saturate( sinTH + 0.10 ), 96.0 );
-            half spec2 = pow( saturate( max( sinTH - 0.06, 0.0 ) ), 22.0 );
-            half3 spec = ( spec1 * 0.55 + spec2 * 0.45 * _AnisoAmount )
+            half spec1 = pow( saturate( sinTH + 0.08 ), 88.0 );
+            half spec2 = pow( saturate( max( sinTH - 0.07, 0.0 ) ), 20.0 );
+            half3 spec = ( spec1 * 0.50 + spec2 * 0.38 * _AnisoAmount )
                        * _HighlightColor.rgb * s.Smoothness;
+            return s.Albedo * diff * lightColor + lightColor * spec;
+        }
 
+        // Additional forward lights use the per-light surface-shader path.
+        half4 LightingHair ( SurfaceOutputHair s, half3 lightDir, half3 viewDir, half atten )
+        {
             half4 c;
-            c.rgb = s.Albedo * diff * _LightColor0.rgb + _LightColor0.rgb * spec;
-            c.rgb *= atten;
+            c.rgb = HairLightResponse( s, lightDir, viewDir, _LightColor0.rgb ) * atten + s.Emission;
             c.a = s.Alpha;
             return c;
         }
 
-        half4 LightingHair_GI ( SurfaceOutputHair s, UnityGIInput data, inout UnityGI gi )
+        // The base pass includes the same anisotropic key response plus indirect
+        // diffuse/probe light. Nothing is emitted when the scene is unlit.
+        half4 LightingHair ( SurfaceOutputHair s, half3 viewDir, UnityGI gi )
         {
-            // indirect/ambient keeps the standard packing; direct light is KK above
+            half4 c;
+            c.rgb = HairLightResponse( s, gi.light.dir, viewDir, gi.light.color );
+            #ifdef UNITY_LIGHT_FUNCTION_APPLY_INDIRECT
+                c.rgb += s.Albedo * gi.indirect.diffuse;
+                c.rgb += gi.indirect.specular * ( s.Smoothness * 0.08 );
+            #endif
+            c.rgb += s.Emission;
+            c.a = s.Alpha;
+            return c;
+        }
+
+        void LightingHair_GI ( SurfaceOutputHair s, UnityGIInput data, inout UnityGI gi )
+        {
             gi = UnityGlobalIllumination( data, s.Occlusion, s.Normal );
-            return half4( 0, 0, 0, 0 );
         }
 
         void surf ( Input IN, inout SurfaceOutputHair o )
@@ -217,7 +232,8 @@ Shader "Vespershade/CharacterHair"
             o.Metallic = _Metallic;
             o.Smoothness = smoothness;
             o.StrandTangent = normalize( mul( ( float3x3 ) unity_ObjectToWorld, T ) );
-            o.Occlusion = saturate( ao * 0.4 + 0.6 );
+            // Root/valley shading is already folded into Albedo; don't darken GI twice.
+            o.Occlusion = 1.0;
             o.Emission = 0;
             o.Alpha = 1;
         }

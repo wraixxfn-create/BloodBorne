@@ -25,16 +25,18 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _Glossiness: 0.92
-    - _IrisDepth: 0.35
-    - _IrisScale: 18
+    - _Glossiness: 0.72
+    - _IrisDepth: 0.30
+    - _IrisScale: 36
     - _Metallic: 0
-    - _OcclusionStrength: 0.6
-    - _PupilSize: 0.32
+    - _OcclusionStrength: 0.38
+    - _PupilSize: 0.30
     m_Colors:
-    - _CorneaColor: {r: 0.85, g: 0.90, b: 0.98, a: 1}
-    - _IrisColor: {r: 0.22, g: 0.36, b: 0.48, a: 1}
-    - _IrisVar: {r: 0.28, g: 0.44, b: 0.55, a: 1}
-    - _PupilColor: {r: 0.04, g: 0.045, b: 0.06, a: 1}
-    - _ScleraColor: {r: 0.92, g: 0.905, b: 0.87, a: 1}
+    - _CorneaColor: {r: 0.84, g: 0.89, b: 0.94, a: 1}
+    - _IrisColor: {r: 0.18, g: 0.31, b: 0.42, a: 1}
+    - _IrisVar: {r: 0.27, g: 0.39, b: 0.47, a: 1}
+    - _LimbalColor: {r: 0.055, g: 0.085, b: 0.11, a: 1}
+    - _PupilColor: {r: 0.025, g: 0.03, b: 0.04, a: 1}
+    - _VeinColor: {r: 0.38, g: 0.19, b: 0.17, a: 1}
+    - _ScleraColor: {r: 0.76, g: 0.73, b: 0.68, a: 1}
   m_BuildTextureStacks: []

@@ -162,7 +162,8 @@ the orbit camera at 1.8 m - 8 m, and check the LOD transitions
 
 ## Gameplay systems untouched
 
-No script, prefab wiring, material GUID, submesh order, input, camera or
-scene behaviour changed. The hair rides the existing player mesh and its
-existing `LODGroup`; `M_Char_Hair` keeps GUID `c17c22c2...` and its shader
-GUID is unchanged.
+The hair geometry, its original submesh slot, `LODGroup`, input, camera and
+scene behaviour are unchanged. Two appended material slots now route the
+already-existing glove and eye surfaces to their dedicated shaders. The hair
+rides the same player mesh; `M_Char_Hair` keeps GUID `c17c22c2...` and its
+shader GUID is unchanged.

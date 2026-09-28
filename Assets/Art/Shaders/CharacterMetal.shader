@@ -5,12 +5,12 @@ Shader "Vespershade/CharacterMetal"
         _Color ("Base Color (Brass)", Color) = (0.48, 0.33, 0.135, 1)
         _PatinaColor ("Patina Tint", Color) = (0.30, 0.36, 0.30, 1)
         _WearColor ("Polished Highlight", Color) = (0.62, 0.46, 0.20, 1)
-        _Metallic ("Metallic", Range(0.5,1)) = 0.78
-        _Glossiness ("Smoothness", Range(0,1)) = 0.62
-        _GlossVar ("Smoothness Variation", Range(0,0.5)) = 0.16
+        _Metallic ("Metallic", Range(0.5,1)) = 0.72
+        _Glossiness ("Smoothness", Range(0,1)) = 0.56
+        _GlossVar ("Smoothness Variation", Range(0,0.5)) = 0.12
         _ScratchScale ("Scratch Scale", Float) = 240
         _PatinaAmount ("Patina Amount", Range(0,1)) = 0.22
-        _WearAmount ("Wear Amount", Range(0,1)) = 0.18
+        _WearAmount ("Wear Amount", Range(0,1)) = 0.14
         _OcclusionStrength ("Occlusion", Range(0,1)) = 0.92
     }
     SubShader
@@ -18,7 +18,7 @@ Shader "Vespershade/CharacterMetal"
         Tags { "RenderType"="Opaque" }
         LOD 300
         CGPROGRAM
-        #pragma surface surf Standard fullforwardshadows
+        #pragma surface surf Standard fullforwardshadows vertex:vert
         #pragma target 3.0
 
         fixed4 _Color;
@@ -34,10 +34,21 @@ Shader "Vespershade/CharacterMetal"
 
         struct Input
         {
-            float3 worldPos;
+            float3 objPos;
             float3 worldNormal;
             INTERNAL_DATA
         };
+        // The mesh has no UVs or imported tangents. Build a stable local TBN so
+        // procedural micro-normal detail is well-defined and stays attached.
+        void vert(inout appdata_full v, out Input o)
+        {
+            UNITY_INITIALIZE_OUTPUT(Input, o);
+            o.objPos = v.vertex.xyz;
+            float3 n = normalize(v.normal);
+            float3 axis = abs(n.y) < 0.92 ? float3(0.0, 1.0, 0.0) : float3(1.0, 0.0, 0.0);
+            v.tangent = float4(normalize(cross(axis, n)), 1.0);
+        }
+
 
         float Hash21(float2 p){ p=frac(p*float2(123.34,456.21)); p+=dot(p,p+45.32); return frac(p.x*p.y); }
         float ValueNoise(float2 p){
@@ -49,7 +60,7 @@ Shader "Vespershade/CharacterMetal"
 
         void surf(Input IN, inout SurfaceOutputStandard o)
         {
-            float3 wp = IN.worldPos;
+            float3 wp = IN.objPos;
             float2 uvA = wp.xz*0.6 + wp.y*0.2;
             float2 uvB = wp.xy*0.5 + wp.z*0.3;
 
@@ -87,7 +98,7 @@ Shader "Vespershade/CharacterMetal"
             float nDetail = (ValueNoise(wp.xz*120.0)-0.5)*0.08;
             float3 n = normalize(float3(nx + nDetail, ny + nDetail, 1.0));
 
-            o.Albedo = albedo * ao;
+            o.Albedo = albedo;
             o.Metallic = saturate(_Metallic - patinaMask*0.35); // patina reduces metallic slightly
             o.Smoothness = smoothness;
             o.Normal = n;
