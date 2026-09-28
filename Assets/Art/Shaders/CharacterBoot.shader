@@ -7,10 +7,10 @@ Shader "Vespershade/CharacterBoot"
         _ScuffColor ("Scuff Highlight", Color) = (0.18, 0.15, 0.11, 1)
         _SoleColor ("Sole Base", Color) = (0.055, 0.045, 0.04, 1)
         _Metallic ("Metallic", Range(0,0.12)) = 0.02
-        _Glossiness ("Smoothness", Range(0,1)) = 0.22
-        _GlossVar ("Roughness Variation", Range(0,0.5)) = 0.16
+        _Glossiness ("Smoothness", Range(0,1)) = 0.20
+        _GlossVar ("Roughness Variation", Range(0,0.5)) = 0.13
         _GrainScale ("Grain Scale", Float) = 32
-        _ScuffAmount ("Scuff Amount", Range(0,1)) = 0.26
+        _ScuffAmount ("Scuff Amount", Range(0,1)) = 0.18
         _OcclusionStrength ("Occlusion", Range(0,1)) = 0.92
     }
     SubShader
@@ -18,7 +18,7 @@ Shader "Vespershade/CharacterBoot"
         Tags { "RenderType"="Opaque" }
         LOD 300
         CGPROGRAM
-        #pragma surface surf Standard fullforwardshadows
+        #pragma surface surf Standard fullforwardshadows vertex:vert
         #pragma target 3.0
 
         fixed4 _Color;
@@ -34,10 +34,21 @@ Shader "Vespershade/CharacterBoot"
 
         struct Input
         {
-            float3 worldPos;
+            float3 objPos;
             float3 worldNormal;
             INTERNAL_DATA
         };
+        // The mesh has no UVs or imported tangents. Build a stable local TBN so
+        // procedural micro-normal detail is well-defined and stays attached.
+        void vert(inout appdata_full v, out Input o)
+        {
+            UNITY_INITIALIZE_OUTPUT(Input, o);
+            o.objPos = v.vertex.xyz;
+            float3 n = normalize(v.normal);
+            float3 axis = abs(n.y) < 0.92 ? float3(0.0, 1.0, 0.0) : float3(1.0, 0.0, 0.0);
+            v.tangent = float4(normalize(cross(axis, n)), 1.0);
+        }
+
 
         float Hash21(float2 p){ p=frac(p*float2(123.34,456.21)); p+=dot(p,p+45.32); return frac(p.x*p.y); }
         float ValueNoise(float2 p){
@@ -49,7 +60,7 @@ Shader "Vespershade/CharacterBoot"
 
         void surf(Input IN, inout SurfaceOutputStandard o)
         {
-            float3 wp = IN.worldPos;
+            float3 wp = IN.objPos;
             float2 uvA = wp.xz*0.9 + wp.y*0.2;
             float2 uvB = wp.xy*0.7;
 
@@ -86,7 +97,7 @@ Shader "Vespershade/CharacterBoot"
             float ny = (ValueNoise(grainUV*_GrainScale*0.31+2.7)-0.5)*0.38;
             float3 n = normalize(float3(nx, ny, 1.0));
 
-            o.Albedo = albedo * ao;
+            o.Albedo = albedo;
             o.Metallic = _Metallic * (1.0 - isSole*0.5);
             o.Smoothness = smoothness;
             o.Normal = n;

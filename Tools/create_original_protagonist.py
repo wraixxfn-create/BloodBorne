@@ -40,7 +40,8 @@ hand-rig sidecar SM_Character_VeilboundWayfarer.handrig.json (skeleton joints
 plus the rigged hand/glove part ranges; see Tools/hand_rig.py).
 
 Material order is also the order of submeshes assigned by Player.prefab;
-the nine Unity materials are referenced by GUID and never change here.
+the original nine slots stay in place, with fitted gloves and eyeballs split
+into dedicated appended material regions (no vertex positions or silhouettes change).
 """
 import math
 import os
@@ -60,7 +61,7 @@ def _segs(n, lo=4):
     return max(lo, int(round(n * DETAIL)))
 
 # Material order is also the order of submeshes assigned by Player.prefab.
-MATERIALS = ["Cloth", "ClothAccent", "Trouser", "Leather", "Skin", "Hair", "AgedBrass", "BoneThread", "BootSole"]
+MATERIALS = ["Cloth", "ClothAccent", "Trouser", "Leather", "Skin", "Hair", "AgedBrass", "BoneThread", "BootSole", "Gloves", "Eyes"]
 colors = {
     "Cloth": ((0.055, 0.075, 0.105), 0.16),
     "ClothAccent": ((0.16, 0.045, 0.065), 0.16),
@@ -71,6 +72,8 @@ colors = {
     "AgedBrass": ((0.32, 0.20, 0.075), 0.58),
     "BoneThread": ((0.46, 0.38, 0.25), 0.3),
     "BootSole": ((0.035, 0.030, 0.028), 0.12),
+    "Gloves": ((0.105, 0.067, 0.046), 0.12),
+    "Eyes": ((0.52, 0.48, 0.42), 0.06),
 }
 
 # Each material has a separate vertex/face buffer and keeps OBJ groups readable.
@@ -1037,7 +1040,7 @@ def generate_eyeballs():
     return eye_verts, eye_polys
 
 eye_pts, eye_polys = generate_eyeballs()
-add_mesh("Skin", "Head/Eyes", eye_pts, eye_polys)
+add_mesh("Eyes", "Head/Eyes", eye_pts, eye_polys)
 
 # 4. Sculpted Arched Eyebrows
 def generate_eyebrows():
@@ -2010,12 +2013,12 @@ for side, label in ((-1, "L"), (1, "R")):
         button_disc("AgedBrass", f"UpperClothing/CuffButton_{label}_{bi+1}", (bx, by, bz), (x*1.0, 0, 0), radius=.0048, thick=.0025, thread_mat=None)
 
     # --- flared leather gauntlet over the coat cuff (rigid on the wrist) ---
-    base = len(verts["Leather"])
-    thick_tube("Leather", f"Accessories/Gauntlet_{label}",
+    base = len(verts["Gloves"])
+    thick_tube("Gloves", f"Accessories/Gauntlet_{label}",
         [(x*.387, 1.062, .035), (x*.385, 1.034, .038), (x*.384, 1.008, .040)],
         [(.072, .076), (.0695, .0735), (.0675, .0715)],
         sides=20, thick=.005, rim_start=True, rim_end=True)
-    _record_part("Leather", f"Hand/Glove/Gauntlet_{label}", side, "cuff", base)
+    _record_part("Gloves", f"Hand/Glove/Gauntlet_{label}", side, "cuff", base)
     base = len(verts["BoneThread"])
     g_rim = [(x*.387 + .0718*math.cos(2*math.pi*k/10), 1.058, .035 + .0758*math.sin(2*math.pi*k/10)) for k in range(10)]
     stitch_dashes("BoneThread", f"Accessories/GauntletStitch_{label}", g_rim, 8, r=0.0020, length=0.010)
@@ -2036,24 +2039,24 @@ for side, label in ((-1, "L"), (1, "R")):
     # --- fitted glove: palm stall, individual finger stalls, thumb stall ---
     pts, polys = build_palm_local(True)
     wpts, wpolys = place_local(pts, polys, side)
-    add_part("Leather", f"Hand/Glove/PalmStall_{label}", wpts, wpolys, side, "palm")
+    add_part("Gloves", f"Hand/Glove/PalmStall_{label}", wpts, wpolys, side, "palm")
     for di, dig in enumerate(ana["digits"]):
         pts, polys = build_digit_local(dig, True)
         wpts, wpolys = place_local(pts, polys, side)
-        add_part("Leather", f"Hand/Glove/{dig['key']}Stall_{label}", wpts, wpolys, side, f"digit{di}")
+        add_part("Gloves", f"Hand/Glove/{dig['key']}Stall_{label}", wpts, wpolys, side, f"digit{di}")
     pts, polys = build_thumb_local(True)
     wpts, wpolys = place_local(pts, polys, side)
-    add_part("Leather", f"Hand/Glove/ThumbStall_{label}", wpts, wpolys, side, "thumb")
+    add_part("Gloves", f"Hand/Glove/ThumbStall_{label}", wpts, wpolys, side, "thumb")
 
     # glove wrist bridge: flares up inside the gauntlet, seals the cuff gap
     fr = hand_rig.frame(side)
     Cw, Dw = fr["wrist"], fr["D"]
-    base = len(verts["Leather"])
-    thick_tube("Leather", f"Accessories/GloveBridge_{label}",
+    base = len(verts["Gloves"])
+    thick_tube("Gloves", f"Accessories/GloveBridge_{label}",
         [vsub(Cw, vmul(Dw, u)) for u in (.006, .018, .032, .048)],
         [(.0345, .0245), (.040, .029), (.047, .035), (.053, .0415)],
         sides=16, thick=.0025, rim_start=True, rim_end=True)
-    _record_part("Leather", f"Hand/Glove/Bridge_{label}", side, "bridge", base)
+    _record_part("Gloves", f"Hand/Glove/Bridge_{label}", side, "bridge", base)
 
     # dorsal seams along every stall (bulge-aware, so they ride the knuckles)
     for di, dig in enumerate(ana["digits"]):
@@ -2075,7 +2078,7 @@ for side, label in ((-1, "L"), (1, "R")):
                                  (l1+.006, l1+l2*.55, l1+l2+.004, ltip-.006)],
                                 [.0011, .0011, .0011, .0011], 5)
         wpts, wpolys = place_local(pts, polys, side)
-        add_part("Leather", f"Hand/Glove/{dig['key']}Seam_{label}", wpts, wpolys, side, f"digit{di}")
+        add_part("Gloves", f"Hand/Glove/{dig['key']}Seam_{label}", wpts, wpolys, side, f"digit{di}")
     tchain = ana["thumb"]
     tl = [math.dist(tchain[0], tchain[1]), math.dist(tchain[1], tchain[2]),
           math.dist(tchain[2], tchain[3])]
@@ -2094,7 +2097,7 @@ for side, label in ((-1, "L"), (1, "R")):
                              (tl[0]+.006, tl[0]+tl[1]*.6, tl[0]+tl[1]+tl[2]-.007)],
                             [.0011, .0011, .0011], 5)
     wpts, wpolys = place_local(pts, polys, side)
-    add_part("Leather", f"Hand/Glove/ThumbSeam_{label}", wpts, wpolys, side, "thumb")
+    add_part("Gloves", f"Hand/Glove/ThumbSeam_{label}", wpts, wpolys, side, "thumb")
 
     # webbing gussets: leather Vs filling the valley between adjacent stalls
     for wi in range(3):
@@ -2107,7 +2110,7 @@ for side, label in ((-1, "L"), (1, "R")):
             [(.0040, .0017), (.0036, .0015), (.0032, .0013)], 6,
             preferred=(0, 0, -1))
         wpts, wpolys = place_local(pts, polys, side)
-        add_part("Leather", f"Hand/Glove/Web{wi}_{label}", wpts, wpolys, side, f"web{wi}")
+        add_part("Gloves", f"Hand/Glove/Web{wi}_{label}", wpts, wpolys, side, f"web{wi}")
     # thumb web (thenar span between the thumb metacarpal and the index base)
     iw = ana["digits"][0]["chain"][0]
     tbpt = ((hand_rig.THUMB["mcp"][0] + iw[0])*0.5,
@@ -2118,7 +2121,7 @@ for side, label in ((-1, "L"), (1, "R")):
         [(.0046, .0020), (.0041, .0018), (.0036, .0015)], 6,
         preferred=(0, 0, -1))
     wpts, wpolys = place_local(pts, polys, side)
-    add_part("Leather", f"Hand/Glove/ThumbWeb_{label}", wpts, wpolys, side, "webT")
+    add_part("Gloves", f"Hand/Glove/ThumbWeb_{label}", wpts, wpolys, side, "webT")
 
     # reinforced knuckle guard riding the MCP bumps, one ridge per knuckle
     krow = [(dig["chain"][0][0], dig["chain"][0][1], _knuckle_surface_n(dig))
@@ -2138,10 +2141,10 @@ for side, label in ((-1, "L"), (1, "R")):
         best = min(ana["digits"], key=lambda d: abs(d["chain"][0][0]-loc[0]))
         m = hand_rig.to_world(best["chain"][0], side)
         return norm(vsub(p, m))
-    base = len(verts["Leather"])
-    strap_band("Leather", f"Accessories/KnuckleGuard_{label}", guard_pts,
+    base = len(verts["Gloves"])
+    strap_band("Gloves", f"Accessories/KnuckleGuard_{label}", guard_pts,
         width=.016, thick=.0028, normal_fn=guard_normal, closed=False)
-    _record_part("Leather", f"Hand/Glove/KnuckleGuard_{label}", side, "guard", base)
+    _record_part("Gloves", f"Hand/Glove/KnuckleGuard_{label}", side, "guard", base)
     for edge in (-0.0072, 0.0072):
         stitch_path = [hand_rig.to_world((p[0], p[1]+edge, p[2]+0.0015), side)
                        for p in guard_local]
@@ -2157,16 +2160,16 @@ for side, label in ((-1, "L"), (1, "R")):
              (mp[0]+0.0060, mp[1]+0.0015, nn)],
             [.0023, .0026, .0023], 5)
         wpts, wpolys = place_local(pts, polys, side)
-        add_part("Leather", f"Hand/Glove/KnuckleRidge_{dig['key']}_{label}",
+        add_part("Gloves", f"Hand/Glove/KnuckleRidge_{dig['key']}_{label}",
                  wpts, wpolys, side, "guard")
 
     # wrist cinch strap over the gauntlet: buckle right, brass button left
-    base = len(verts["Leather"])
+    base = len(verts["Gloves"])
     ring_pts = [(x*.3847 + .0693*math.cos(2*math.pi*k/12), 1.030, .0383 + .0733*math.sin(2*math.pi*k/12)*0.9) for k in range(12)]
     ring_pts.append(ring_pts[0])
-    strap_band("Leather", f"Accessories/WristStrap_{label}", ring_pts, width=.014, thick=.003,
+    strap_band("Gloves", f"Accessories/WristStrap_{label}", ring_pts, width=.014, thick=.003,
         normal_fn=lambda p, t: norm((p[0]-x*.3847, 0, p[2]-.0383)), closed=True)
-    _record_part("Leather", f"Hand/Glove/WristStrap_{label}", side, "cuff", base)
+    _record_part("Gloves", f"Hand/Glove/WristStrap_{label}", side, "cuff", base)
     if side > 0:
         base = len(verts["AgedBrass"])
         buckle_frame("AgedBrass", f"Accessories/WristBuckle_{label}", (x*(.3847+.0705), 1.030, .0383),

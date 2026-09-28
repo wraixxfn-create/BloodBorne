@@ -10,6 +10,21 @@ ROOT = Path(__file__).resolve().parent.parent
 SHADER_DIR = ROOT / "Assets/Art/Shaders"
 MAT_DIR = ROOT / "Assets/Materials/Character"
 
+
+OBJ_MATERIAL_ORDER = [
+    "Cloth", "ClothAccent", "Trouser", "Leather", "Skin", "Hair",
+    "AgedBrass", "BoneThread", "BootSole", "Gloves", "Eyes",
+]
+PREFAB_MATERIAL_FILES = [
+    "M_Char_Cloth.mat", "M_Char_ClothAccent.mat", "M_Char_Trouser.mat",
+    "M_Char_Leather.mat", "M_Char_Skin.mat", "M_Char_Hair.mat",
+    "M_Char_AgedBrass.mat", "M_Char_BoneThread.mat", "M_Char_BootSole.mat",
+    "M_Char_Gloves.mat", "M_Char_Eyes.mat",
+]
+EXPECTED_MESH_COUNTS = {
+    "": (50065, 95590), "_L1": (31147, 58889), "_L2": (26012, 49358),
+}
+
 REQUIRED_CATEGORIES = {
     "cloth": ["CharacterCloth", "CharacterShirt"],
     "leather": ["CharacterLeather"],
@@ -27,6 +42,11 @@ def read_shader(name):
     return p.read_text()
 
 def check_shader_pbr(name, content):
+    # No-UV meshes need an explicit, stable object-space frame for variation.
+    assert "vertex:vert" in content and "o.objPos = v.vertex.xyz" in content, f"{name}: missing object-space vertex frame"
+    assert "IN.worldPos" not in content, f"{name}: procedural detail must not swim in world space"
+    if name in {"CharacterCloth", "CharacterGlove", "CharacterHair", "CharacterSkin"}:
+        assert "_LightColor0" in content and "atten" in content, f"{name}: custom response must follow scene light colour/attenuation"
     # Must set albedo, metallic, smoothness, normal
     assert "o.Albedo" in content, f"{name}: missing Albedo"
     assert "o.Metallic" in content, f"{name}: missing Metallic"
@@ -41,6 +61,52 @@ def check_shader_pbr(name, content):
     else:
         assert "_GlossVar" in content or "roughVar" in content or "GlossVar" in content, f"{name}: no roughness variation"
     print(f"  [OK] {name}: PBR channels + variation present")
+
+def check_mesh_material_wiring():
+    """Confirm appended eye/glove regions map to the matching prefab slots."""
+    models = ROOT / "Assets/Models/Characters"
+    for suffix, expected_counts in EXPECTED_MESH_COUNTS.items():
+        obj = models / f"SM_Character_VeilboundWayfarer{suffix}.obj"
+        text = obj.read_text()
+        regions = re.findall(r"^usemtl\s+(\S+)\s*$", text, re.MULTILINE)
+        assert regions == OBJ_MATERIAL_ORDER, f"{obj.name}: material order {regions}"
+        vertex_count = sum(line.startswith("v ") for line in text.splitlines())
+        triangle_count = sum(line.startswith("f ") for line in text.splitlines())
+        assert (vertex_count, triangle_count) == expected_counts, (
+            f"{obj.name}: geometry counts {(vertex_count, triangle_count)} "
+            f"!= {expected_counts}; material pass must not alter the mesh")
+        print(f"  [OK] {obj.name}: same geometry counts, 11 ordered material regions")
+
+    expected_guids = []
+    for filename in PREFAB_MATERIAL_FILES:
+        meta = (MAT_DIR / (filename + ".meta")).read_text()
+        guid = re.search(r"guid:\s*([0-9a-f]{32})", meta)
+        assert guid, f"{filename}: missing material GUID"
+        expected_guids.append(guid.group(1))
+
+    prefab = (ROOT / "Assets/Prefabs/Player/Player.prefab").read_text()
+    material_blocks = re.findall(
+        r"(?m)^  m_Materials:\n((?:^  - \{fileID: 2100000, guid: [0-9a-f]{32}, type: 2\}\n)+)",
+        prefab,
+    )
+    assert len(material_blocks) == 3, f"Expected base + two LOD renderers, found {len(material_blocks)}"
+    for index, block in enumerate(material_blocks):
+        guids = re.findall(r"guid:\s*([0-9a-f]{32})", block)
+        assert guids == expected_guids, f"Player renderer {index}: material slot order mismatch"
+        assert len(guids) == len(OBJ_MATERIAL_ORDER), f"Player renderer {index}: slot count mismatch"
+    print("  [OK] Player base/L1/L2 material slots match all 11 OBJ regions")
+
+    eye_text = (MAT_DIR / "M_Char_Eyes.mat").read_text()
+    sclera = re.search(r"_ScleraColor: \{r: ([0-9.]+), g: ([0-9.]+), b: ([0-9.]+)", eye_text)
+    assert sclera and max(map(float, sclera.groups())) <= 0.85, "Eye sclera is too close to pure white"
+    eye_gloss = re.search(r"_Glossiness:\s*([0-9.]+)", eye_text)
+    assert eye_gloss and float(eye_gloss.group(1)) <= 0.80, "Eye moisture is too glossy"
+    assert "Emission" not in read_shader("CharacterEye"), "Eye shader must not glow"
+    cloth = (MAT_DIR / "M_Char_Cloth.mat").read_text()
+    sheen = re.search(r"_FabricSheen:\s*([0-9.]+)", cloth)
+    assert sheen and float(sheen.group(1)) <= 0.18, "Cloth sheen exceeds the subtle range"
+    print("  [OK] Eye whites/gloss and cloth sheen stay restrained")
+
 
 def check_materials():
     mats = list(MAT_DIR.glob("M_Char_*.mat"))
@@ -175,19 +241,15 @@ def main():
 
     check_materials()
 
-    # Geometry unchanged
-    obj_path = ROOT / "Assets/Models/Characters/SM_Character_VeilboundWayfarer.obj"
-    assert obj_path.exists()
-    text = obj_path.read_text()[:5000]
-    assert "usemtl" in obj_path.read_text(), "OBJ missing materials"
-    # Count tris via quick grep
-    print(f"  [OK] Geometry file exists: {obj_path}")
+    # Geometry counts, material region order and prefab wiring are explicit pass gates.
+    check_mesh_material_wiring()
 
     print("\nPBR MATERIAL VERIFICATION PASSED")
     print(" - Distinct PBR for cloth, leather, metal, boots, gloves, skin, hair, eyes")
     print(" - No flat solid colors, procedural variation present")
     print(" - Roughness varied, metallic correct, fabric sheen, skin SSS, etc.")
-    print(" - Tested under existing arena lighting (validation passed earlier)")
+    print(" - Eye and glove materials are wired on base, L1 and L2")
+    print(" - No arena lighting or character geometry changes")
 
 if __name__ == "__main__":
     main()

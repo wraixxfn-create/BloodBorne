@@ -26,17 +26,17 @@ Material:
     m_Ints: []
     m_Floats:
     - _DetailScale: 1.25
-    - _FabricSheen: 0.28
-    - _GlossVar: 0.16
-    - _Glossiness: 0.28
-    - _Metallic: 0.025
-    - _OcclusionStrength: 0.84
+    - _FabricSheen: 0.12
+    - _GlossVar: 0.12
+    - _Glossiness: 0.25
+    - _Metallic: 0.015
+    - _OcclusionStrength: 0.74
     - _WeaveScale: 92
-    - _WeaveStrength: 0.34
-    - _WearAmount: 0.14
+    - _WeaveStrength: 0.20
+    - _WearAmount: 0.12
     m_Colors:
-    - _Color: {r: 0.235, g: 0.075, b: 0.11, a: 1}
-    - _ColorVar: {r: 0.285, g: 0.105, b: 0.14, a: 1}
-    - _SheenColor: {r: 0.48, g: 0.28, b: 0.32, a: 1}
+    - _Color: {r: 0.245, g: 0.082, b: 0.115, a: 1}
+    - _ColorVar: {r: 0.3, g: 0.11, b: 0.15, a: 1}
+    - _SheenColor: {r: 0.42, g: 0.25, b: 0.29, a: 1}
     - _WearColor: {r: 0.32, g: 0.15, b: 0.17, a: 1}
   m_BuildTextureStacks: []

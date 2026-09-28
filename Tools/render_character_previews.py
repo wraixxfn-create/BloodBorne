@@ -24,15 +24,17 @@ OBJ_PATH = os.path.join(ROOT, "Assets/Models/Characters/SM_Character_VeilboundWa
 
 # Match the in-game material palette (Tools/create_original_protagonist.py).
 PALETTE = {
-    "Cloth":       ((0.105, 0.140, 0.195), 0.35),
-    "ClothAccent": ((0.255, 0.075, 0.110), 0.35),
-    "Trouser":     ((0.125, 0.140, 0.165), 0.30),
-    "Leather":     ((0.150, 0.088, 0.058), 0.55),
-    "Skin":        ((0.48, 0.32, 0.24), 0.25),
-    "Hair":        ((0.12, 0.135, 0.165), 0.40),
-    "AgedBrass":   ((0.47, 0.30, 0.115), 0.90),
-    "BoneThread":  ((0.63, 0.53, 0.36), 0.45),
-    "BootSole":    ((0.06, 0.05, 0.045), 0.25),
+    "Cloth":       ((0.125, 0.150, 0.195), 0.24),
+    "ClothAccent": ((0.245, 0.082, 0.115), 0.25),
+    "Trouser":     ((0.140, 0.155, 0.180), 0.20),
+    "Leather":     ((0.170, 0.110, 0.077), 0.40),
+    "Skin":        ((0.520, 0.370, 0.300), 0.27),
+    "Hair":        ((0.140, 0.155, 0.185), 0.34),
+    "AgedBrass":   ((0.450, 0.310, 0.130), 0.56),
+    "BoneThread":  ((0.600, 0.520, 0.390), 0.27),
+    "BootSole":    ((0.105, 0.074, 0.056), 0.20),
+    "Gloves":      ((0.135, 0.088, 0.061), 0.28),
+    "Eyes":        ((0.760, 0.730, 0.680), 0.68),
 }
 MATERIALS = list(PALETTE.keys())
 
@@ -158,8 +160,39 @@ def render_view(verts, tris, mat_ids, vnorm, yaw, pitch, target, dist, fov_deg, 
         lam_key = np.clip(n @ key_dir, 0.0, None)
         lam_fill = np.clip(n @ fill_dir, 0.0, None)
         rim = (1.0 - np.abs(n @ view)) ** 3
-        base, gloss = PALETTE.get(MATERIALS[mat_ids[i]], ((0.5, 0.5, 0.5), 0.3))
+        material = MATERIALS[mat_ids[i]]
+        base, gloss = PALETTE.get(material, ((0.5, 0.5, 0.5), 0.3))
         base = np.asarray(base)
+        if material == "Eyes":
+            # Approximate CharacterEye.shader per pixel in local mesh space:
+            # subdued blue-grey iris, dark pupil/limbal ring and warm sclera.
+            persp = w0 / za + w1 / zb + w2 / zc
+            p = (w0[:, :, None] * verts[ia] / za
+                 + w1[:, :, None] * verts[ib] / zb
+                 + w2[:, :, None] * verts[ic] / zc) / np.maximum(persp[:, :, None], 1e-8)
+            center_x = np.where(p[:, :, 0] < 0.0, -0.033, 0.033)
+            dx = p[:, :, 0] - center_x
+            dy = p[:, :, 1] - 1.692
+            radius = np.sqrt(dx * dx + dy * dy)
+            angle = np.arctan2(dy, dx)
+            iris_radius = 0.0052
+            pupil_radius = iris_radius * 0.30
+            smooth = lambda lo, hi, x: np.clip((x - lo) / (hi - lo), 0.0, 1.0) ** 2 * (3.0 - 2.0 * np.clip((x - lo) / (hi - lo), 0.0, 1.0))
+            iris_mask = 1.0 - smooth(iris_radius * 0.94, iris_radius * 1.06, radius)
+            pupil_mask = 1.0 - smooth(pupil_radius * 0.82, pupil_radius * 1.10, radius)
+            radial_t = np.clip(radius / iris_radius, 0.0, 1.0)
+            fibers = 0.5 + 0.5 * np.sin(angle * 36.0 + radial_t * 17.0 + np.sin(angle * 7.0) * 0.55)
+            iris_noise = 0.5 + 0.5 * np.sin(np.cos(angle) * 31.0 + np.sin(angle) * 37.0 + radial_t * 9.0)
+            iris_col = np.array([0.18, 0.31, 0.42]) + (np.array([0.27, 0.39, 0.47]) - np.array([0.18, 0.31, 0.42])) * np.clip(0.22 + fibers * 0.36 + iris_noise * 0.28, 0.0, 1.0)[:, :, None]
+            inner_shadow = 1.0 - smooth(0.08, 0.72, radial_t)
+            iris_col *= (0.74 + 0.26 * inner_shadow)[:, :, None]
+            limbal = smooth(0.76, 0.99, radial_t) * iris_mask
+            iris_col = iris_col * (1.0 - limbal[:, :, None] * 0.72) + np.array([0.055, 0.085, 0.11]) * (limbal[:, :, None] * 0.72)
+            sclera_noise = 0.97 + (0.5 + 0.5 * np.sin(p[:, :, 0] * 180.0 + p[:, :, 1] * 230.0)) * 0.045
+            sclera = np.array([0.76, 0.73, 0.68]) * sclera_noise[:, :, None]
+            eye_base = sclera * (1.0 - iris_mask[:, :, None]) + iris_col * iris_mask[:, :, None]
+            eye_base = eye_base * (1.0 - pupil_mask[:, :, None] * iris_mask[:, :, None]) + np.array([0.025, 0.03, 0.04]) * (pupil_mask[:, :, None] * iris_mask[:, :, None])
+            base = eye_base
         col = base * (ambient + key_color * lam_key[:, :, None] + fill_color * lam_fill[:, :, None])
         col += base * rim[:, :, None] * 0.10
         half = key_dir + view

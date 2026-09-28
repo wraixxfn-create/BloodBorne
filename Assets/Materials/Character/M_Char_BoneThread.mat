@@ -25,13 +25,13 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _GlossVar: 0.14
-    - _Glossiness: 0.31
-    - _Metallic: 0.02
-    - _OcclusionStrength: 0.82
+    - _GlossVar: 0.10
+    - _Glossiness: 0.27
+    - _Metallic: 0.01
+    - _OcclusionStrength: 0.72
     - _WeaveScale: 105
-    - _WeaveStrength: 0.28
-    - _WearAmount: 0.12
+    - _WeaveStrength: 0.18
+    - _WearAmount: 0.10
     m_Colors:
     - _Color: {r: 0.60, g: 0.52, b: 0.39, a: 1}
     - _ColorVar: {r: 0.66, g: 0.57, b: 0.43, a: 1}

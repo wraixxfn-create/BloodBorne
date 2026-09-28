@@ -6,20 +6,20 @@ Shader "Vespershade/CharacterLeather"
         _ColorVar ("Color Variation", Color) = (0.205, 0.13, 0.085, 1)
         _WearColor ("Wear Highlight", Color) = (0.26, 0.18, 0.12, 1)
         _Metallic ("Metallic", Range(0,0.15)) = 0.03
-        _Glossiness ("Smoothness", Range(0,1)) = 0.48
-        _GlossVar ("Roughness Variation", Range(0,0.6)) = 0.24
+        _Glossiness ("Smoothness", Range(0,1)) = 0.40
+        _GlossVar ("Roughness Variation", Range(0,0.6)) = 0.16
         _GrainScale ("Grain Scale", Float) = 42
-        _GrainStrength ("Grain Strength", Range(0,1)) = 0.42
+        _GrainStrength ("Grain Strength", Range(0,1)) = 0.32
         _ScratchScale ("Scratch Scale", Float) = 165
-        _WearAmount ("Wear Amount", Range(0,1)) = 0.20
-        _OcclusionStrength ("Occlusion", Range(0,1)) = 0.9
+        _WearAmount ("Wear Amount", Range(0,1)) = 0.16
+        _OcclusionStrength ("Occlusion", Range(0,1)) = 0.82
     }
     SubShader
     {
         Tags { "RenderType"="Opaque" }
         LOD 300
         CGPROGRAM
-        #pragma surface surf Standard fullforwardshadows
+        #pragma surface surf Standard fullforwardshadows vertex:vert
         #pragma target 3.0
 
         fixed4 _Color;
@@ -36,10 +36,21 @@ Shader "Vespershade/CharacterLeather"
 
         struct Input
         {
-            float3 worldPos;
+            float3 objPos;
             float3 worldNormal;
             INTERNAL_DATA
         };
+        // The mesh has no UVs or imported tangents. Build a stable local TBN so
+        // procedural micro-normal detail is well-defined and stays attached.
+        void vert(inout appdata_full v, out Input o)
+        {
+            UNITY_INITIALIZE_OUTPUT(Input, o);
+            o.objPos = v.vertex.xyz;
+            float3 n = normalize(v.normal);
+            float3 axis = abs(n.y) < 0.92 ? float3(0.0, 1.0, 0.0) : float3(1.0, 0.0, 0.0);
+            v.tangent = float4(normalize(cross(axis, n)), 1.0);
+        }
+
 
         float Hash21(float2 p)
         {
@@ -67,7 +78,7 @@ Shader "Vespershade/CharacterLeather"
 
         void surf(Input IN, inout SurfaceOutputStandard o)
         {
-            float3 wp = IN.worldPos;
+            float3 wp = IN.objPos;
             float2 uvA = wp.xz * 0.8 + wp.y * 0.18;
             float2 uvB = wp.xy * 0.7 + wp.z * 0.2;
 
@@ -110,7 +121,7 @@ Shader "Vespershade/CharacterLeather"
             float sx = (ValueNoise(scratchUV*float2(6,0.5))-0.5)*0.18 * saturate(scratch*3);
             float3 n = normalize(float3(nx+sx, ny, 1.0));
 
-            o.Albedo = albedo * ao;
+            o.Albedo = albedo;
             o.Metallic = _Metallic;
             o.Smoothness = smoothness;
             o.Normal = n;

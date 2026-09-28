@@ -2,27 +2,29 @@ Shader "Vespershade/CharacterCloth"
 {
     Properties
     {
-        _Color ("Base Color", Color) = (0.11, 0.135, 0.175, 1)
-        _ColorVar ("Color Variation", Color) = (0.14, 0.165, 0.215, 1)
+        _Color ("Base Color", Color) = (0.125, 0.15, 0.195, 1)
+        _ColorVar ("Color Variation", Color) = (0.155, 0.18, 0.23, 1)
         _WearColor ("Wear Highlight", Color) = (0.16, 0.18, 0.235, 1)
-        _Metallic ("Metallic", Range(0, 0.15)) = 0.02
-        _Glossiness ("Smoothness", Range(0,1)) = 0.26
-        _GlossVar ("Roughness Variation", Range(0,0.5)) = 0.18
+        _Metallic ("Metallic", Range(0, 0.15)) = 0.015
+        _Glossiness ("Smoothness", Range(0,1)) = 0.24
+        _GlossVar ("Roughness Variation", Range(0,0.5)) = 0.13
         _WeaveScale ("Weave Scale", Float) = 88
-        _WeaveStrength ("Weave Normal Strength", Range(0,1)) = 0.38
-        _FabricSheen ("Fabric Sheen", Range(0,1)) = 0.32
+        _WeaveStrength ("Weave Normal Strength", Range(0,1)) = 0.22
+        _FabricSheen ("Fabric Sheen", Range(0,1)) = 0.15
         _SheenColor ("Sheen Tint", Color) = (0.36, 0.40, 0.48, 1)
         _DetailScale ("Detail Noise Scale", Float) = 1.35
-        _WearAmount ("Wear Amount", Range(0,1)) = 0.18
-        _OcclusionStrength ("Occlusion Strength", Range(0,1)) = 0.85
+        _WearAmount ("Wear Amount", Range(0,1)) = 0.12
+        _OcclusionStrength ("Occlusion Strength", Range(0,1)) = 0.72
     }
     SubShader
     {
         Tags { "RenderType"="Opaque" }
         LOD 300
         CGPROGRAM
-        #pragma surface surf StandardFabric fullforwardshadows
+        #pragma surface surf StandardFabric fullforwardshadows vertex:vert
         #pragma target 3.0
+
+        #include "UnityLightingCommon.cginc"
 
         #include "UnityCG.cginc"
 
@@ -42,10 +44,21 @@ Shader "Vespershade/CharacterCloth"
 
         struct Input
         {
-            float3 worldPos;
+            float3 objPos;
             float3 worldNormal;
             INTERNAL_DATA
         };
+        // The mesh has no UVs or imported tangents. Build a stable local TBN so
+        // procedural micro-normal detail is well-defined and stays attached.
+        void vert(inout appdata_full v, out Input o)
+        {
+            UNITY_INITIALIZE_OUTPUT(Input, o);
+            o.objPos = v.vertex.xyz;
+            float3 n = normalize(v.normal);
+            float3 axis = abs(n.y) < 0.92 ? float3(0.0, 1.0, 0.0) : float3(1.0, 0.0, 0.0);
+            v.tangent = float4(normalize(cross(axis, n)), 1.0);
+        }
+
 
         // --- Procedural noise ---
         float Hash21(float2 p)
@@ -91,11 +104,11 @@ Shader "Vespershade/CharacterCloth"
             half4 c = LightingStandard(s, lightDir, viewDir, atten);
             // Fabric sheen - grazing retroreflection, tinted
             half NdotV = saturate(dot(s.Normal, viewDir));
-            half sheen = pow(1.0 - NdotV, 3.5) * _FabricSheen;
-            // Wrap sheen with light to keep it subtle under arena moon
             half NdotL = saturate(dot(s.Normal, lightDir));
-            half sheenLight = pow(saturate(NdotL*0.5+0.5), 1.5);
-            c.rgb += _SheenColor.rgb * sheen * sheenLight * atten * 0.55;
+            half grazing = pow(saturate(1.0 - NdotV), 4.0);
+            half lit = pow(NdotL, 0.8);
+            // A restrained, light-coloured grazing sheen; it cannot glow in darkness.
+            c.rgb += _LightColor0.rgb * _SheenColor.rgb * grazing * lit * _FabricSheen * atten * 0.30;
             return c;
         }
         void LightingStandardFabric_GI(SurfaceOutputStandard s, UnityGIInput data, inout UnityGI gi)
@@ -105,8 +118,8 @@ Shader "Vespershade/CharacterCloth"
 
         void surf(Input IN, inout SurfaceOutputStandard o)
         {
-            float3 wp = IN.worldPos;
-            // Try to get object space via inverse? Use worldNormal for variation
+            float3 wp = IN.objPos;
+            // Object-space projections keep the weave anchored while the player moves.
             float2 uvA = wp.xz * _DetailScale + wp.y * 0.22;
             float2 uvB = wp.xy * _DetailScale * 0.9 + wp.z * 0.18;
 
@@ -148,7 +161,7 @@ Shader "Vespershade/CharacterCloth"
             float nfY = (ValueNoise(wp.zy * 68.0)-0.5)*0.12;
             float3 fabricNormal = normalize(float3(nx + nfX, ny + nfY, 1.0));
 
-            o.Albedo = albedo * ao;
+            o.Albedo = albedo;
             o.Metallic = _Metallic;
             o.Smoothness = smoothness;
             o.Normal = fabricNormal;

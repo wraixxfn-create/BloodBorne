@@ -25,15 +25,15 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _GlossVar: 0.16
-    - _Glossiness: 0.62
-    - _Metallic: 0.78
-    - _OcclusionStrength: 0.92
-    - _PatinaAmount: 0.22
+    - _GlossVar: 0.12
+    - _Glossiness: 0.56
+    - _Metallic: 0.72
+    - _OcclusionStrength: 0.82
+    - _PatinaAmount: 0.24
     - _ScratchScale: 240
-    - _WearAmount: 0.18
+    - _WearAmount: 0.14
     m_Colors:
-    - _Color: {r: 0.48, g: 0.33, b: 0.135, a: 1}
-    - _PatinaColor: {r: 0.30, g: 0.36, b: 0.30, a: 1}
-    - _WearColor: {r: 0.62, g: 0.46, b: 0.20, a: 1}
+    - _Color: {r: 0.45, g: 0.31, b: 0.13, a: 1}
+    - _PatinaColor: {r: 0.27, g: 0.32, b: 0.27, a: 1}
+    - _WearColor: {r: 0.58, g: 0.43, b: 0.19, a: 1}
   m_BuildTextureStacks: []

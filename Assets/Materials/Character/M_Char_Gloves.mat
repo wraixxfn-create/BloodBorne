@@ -25,16 +25,16 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _FuzzAmount: 0.32
-    - _GlossVar: 0.20
-    - _Glossiness: 0.34
+    - _FuzzAmount: 0.18
+    - _GlossVar: 0.14
+    - _Glossiness: 0.28
     - _GrainScale: 58
-    - _Metallic: 0.02
-    - _OcclusionStrength: 0.88
-    - _WearAmount: 0.16
+    - _Metallic: 0.015
+    - _OcclusionStrength: 0.78
+    - _WearAmount: 0.12
     m_Colors:
-    - _Color: {r: 0.145, g: 0.095, b: 0.065, a: 1}
-    - _ColorVar: {r: 0.18, g: 0.115, b: 0.078, a: 1}
-    - _FuzzColor: {r: 0.24, g: 0.18, b: 0.13, a: 1}
-    - _WearColor: {r: 0.22, g: 0.15, b: 0.10, a: 1}
+    - _Color: {r: 0.135, g: 0.088, b: 0.061, a: 1}
+    - _ColorVar: {r: 0.17, g: 0.11, b: 0.078, a: 1}
+    - _FuzzColor: {r: 0.2, g: 0.15, b: 0.11, a: 1}
+    - _WearColor: {r: 0.205, g: 0.14, b: 0.1, a: 1}
   m_BuildTextureStacks: []

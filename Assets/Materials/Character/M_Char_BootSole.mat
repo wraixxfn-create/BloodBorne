@@ -25,15 +25,15 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _GlossVar: 0.16
-    - _Glossiness: 0.22
+    - _GlossVar: 0.13
+    - _Glossiness: 0.20
     - _GrainScale: 32
-    - _Metallic: 0.02
-    - _OcclusionStrength: 0.92
-    - _ScuffAmount: 0.26
+    - _Metallic: 0.015
+    - _OcclusionStrength: 0.84
+    - _ScuffAmount: 0.18
     m_Colors:
-    - _Color: {r: 0.095, g: 0.065, b: 0.05, a: 1}
-    - _ColorVar: {r: 0.125, g: 0.085, b: 0.065, a: 1}
-    - _ScuffColor: {r: 0.18, g: 0.15, b: 0.11, a: 1}
-    - _SoleColor: {r: 0.055, g: 0.045, b: 0.04, a: 1}
+    - _Color: {r: 0.105, g: 0.074, b: 0.056, a: 1}
+    - _ColorVar: {r: 0.14, g: 0.1, b: 0.075, a: 1}
+    - _ScuffColor: {r: 0.18, g: 0.15, b: 0.115, a: 1}
+    - _SoleColor: {r: 0.065, g: 0.053, b: 0.047, a: 1}
   m_BuildTextureStacks: []
