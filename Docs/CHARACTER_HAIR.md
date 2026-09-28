@@ -117,9 +117,9 @@ valleys read between them.
 
 | LOD | Hair triangles | Sections | Whole mesh |
 | --- | --- | --- | --- |
-| Base | 14,538 (15.2%) | 70 | 95,590 tris |
-| L1 | 6,553 (11.1%) | 56 | 58,889 tris |
-| L2 | 5,608 (11.4%) | 56 | 49,358 tris |
+| Base | 14,538 (14.8%) | 70 | 98,398 tris |
+| L1 | 6,553 (10.8%) | 56 | 60,649 tris |
+| L2 | 5,608 (11.1%) | 56 | 50,398 tris |
 
 LOD reductions: `WAYFARER_DETAIL` drops segment counts (cap ring/side
 density, lock sides/stations) and removes the wisps below detail 0.8; the
