@@ -1110,8 +1110,8 @@
   {
    "name": "Hand/Glove/GauntletStitch_L",
    "mat": "BoneThread",
-   "start": 24870,
-   "end": 24920,
+   "start": 26604,
+   "end": 26654,
    "side": "L",
    "chain": "cuff"
   },
@@ -1302,16 +1302,16 @@
   {
    "name": "Hand/Glove/KnuckleGuardStitch_L",
    "mat": "BoneThread",
-   "start": 24920,
-   "end": 24960,
+   "start": 26654,
+   "end": 26694,
    "side": "L",
    "chain": "guard"
   },
   {
    "name": "Hand/Glove/KnuckleGuardStitch_L",
    "mat": "BoneThread",
-   "start": 24960,
-   "end": 25000,
+   "start": 26694,
+   "end": 26734,
    "side": "L",
    "chain": "guard"
   },
@@ -1358,8 +1358,8 @@
   {
    "name": "Hand/Glove/WristButton_L",
    "mat": "AgedBrass",
-   "start": 20576,
-   "end": 20641,
+   "start": 22010,
+   "end": 22075,
    "side": "L",
    "chain": "cuff"
   },
@@ -1374,8 +1374,8 @@
   {
    "name": "Hand/Glove/GauntletStitch_R",
    "mat": "BoneThread",
-   "start": 25105,
-   "end": 25155,
+   "start": 26839,
+   "end": 26889,
    "side": "R",
    "chain": "cuff"
   },
@@ -1566,16 +1566,16 @@
   {
    "name": "Hand/Glove/KnuckleGuardStitch_R",
    "mat": "BoneThread",
-   "start": 25155,
-   "end": 25195,
+   "start": 26889,
+   "end": 26929,
    "side": "R",
    "chain": "guard"
   },
   {
    "name": "Hand/Glove/KnuckleGuardStitch_R",
    "mat": "BoneThread",
-   "start": 25195,
-   "end": 25235,
+   "start": 26929,
+   "end": 26969,
    "side": "R",
    "chain": "guard"
   },
@@ -1622,8 +1622,8 @@
   {
    "name": "Hand/Glove/WristBuckle_R",
    "mat": "AgedBrass",
-   "start": 20836,
-   "end": 20896,
+   "start": 22270,
+   "end": 22330,
    "side": "R",
    "chain": "cuff"
   }

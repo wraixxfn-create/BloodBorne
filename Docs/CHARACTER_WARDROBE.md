@@ -10,7 +10,7 @@ figure, its costume and every ornament are original to Vespershade.
 
 | File | Purpose |
 | --- | --- |
-| `Tools/create_original_protagonist.py` | Procedural generator: writes the OBJ + MTL (head/hair preserved from the previous revision, wardrobe rebuilt from scratch) |
+| `Tools/create_original_protagonist.py` | Procedural generator: writes the OBJ + MTL (wardrobe, head and the sectioned "Vigil Sweep" hairstyle; see [CHARACTER_HAIR.md](CHARACTER_HAIR.md)) |
 | `Tools/render_character_previews.py` | Offline 12-angle preview renderer (numpy z-buffer rasterizer) used for multi-angle QA; also writes `Docs/CharacterPreviews/` |
 | `Assets/Models/Characters/SM_Character_VeilboundWayfarer.obj` | Base mesh, ~68.5k triangles, 9 material submeshes (path and GUID unchanged, so the prefab keeps working) |
 | `Assets/Models/Characters/SM_Character_VeilboundWayfarer_L1.obj` | LOD1, ~45.5k triangles |
@@ -114,10 +114,11 @@ flap saddle stitching.
 - **Asymmetry**: left-over-right closure, deeper left shoulder mantle,
   broader left lapel, single baldric, one wrist buckle, unequal coat tails,
   offset button plackets. (The boots are a matched, properly buckled pair.)
-- **Budget discipline**: the head/hair (unchanged from the previous revision)
-  remains the densest region; garments use fewer segments where cloth is flat
-  or hidden; hidden body parts are absent entirely (the coat and gloves cover
-  them; the face, neck and forearms are the only visible skin).
+- **Budget discipline**: the head carries the sculpted face plus the sectioned
+  "Vigil Sweep" hairstyle (70 swept-solid sections, 14.5k tris on the base LOD -
+  see [CHARACTER_HAIR.md](CHARACTER_HAIR.md)); garments use fewer segments where
+  cloth is flat or hidden; hidden body parts are absent entirely (the coat and
+  gloves cover them; the face, neck and forearms are the only visible skin).
 
 ## Rig / gameplay integration
 

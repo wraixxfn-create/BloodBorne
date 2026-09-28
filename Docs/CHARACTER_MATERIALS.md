@@ -13,7 +13,7 @@ This pass upgrades the protagonist from flat Standard materials to 8 distinct pr
 | `CharacterBoot.shader` | Boots (Leather + BootSole) | Multi-zone: upper leather vs sole (isSole mask by worldPos.y), scuff highlights at toe/heel, grain 32, gloss 0.22 rougher than gloves, sole even rougher |
 | `CharacterMetal.shader` | AgedBrass fasteners | Metallic 0.78, patina in recesses (reduces metallic locally), micro-scratch anisotropic noise, smoothness 0.62 varied ±0.16, polished wear on exposed edges |
 | `CharacterSkin.shader` | Skin | SSS wrap lighting (`_SSSColor` added with pow(wrap,2.2)), low gloss 0.33 to avoid plastic, pore normal 0.18, redness mask for cheeks/nose, varied roughness via pore + FBM |
-| `CharacterHair.shader` | Hair | Anisotropic secondary highlight via `LightingStandardHair` (Kajiya-Kay-ish), strand sin pattern, gloss 0.34 with 0.22 var, highlight tint |
+| `CharacterHair.shader` | Hair | Object-space strand flow field (bind-pose stable, cannot swim in animation), Kajiya-Kay two-lobe anisotropic specular (`LightingHair` on a `SurfaceOutputHair` carrying the flow tangent), noise-warped strand banding, groove normals, root darkening, valley occlusion, roughness variation; gloss 0.38 with 0.22 var |
 | `CharacterEye.shader` | Eyes (new M_Char_Eyes) | Iris procedural: polar angle + radial fibers, pupil/iris/sclera masks, cornea high gloss 0.92 but sclera 0.35, iris concave normal, ValueNoise avoids uniform roughness |
 
 ## Material Assets (Assets/Materials/Character/)

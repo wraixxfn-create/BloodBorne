@@ -1085,157 +1085,558 @@ def generate_eyebrows():
 brow_pts, brow_polys = generate_eyebrows()
 add_mesh("Hair", "Head/Eyebrows", brow_pts, brow_polys)
 
-# 5. Volumetric Layered Gothic Hairstyle
-def generate_gothic_hair():
-    hair_verts = []
-    hair_polys = []
+# 5. Volumetric Layered Gothic Hairstyle - "the Vigil Sweep" (original design)
+# ---------------------------------------------------------------------------
+# Design intent: dark blue-black, mid-length hair swept back and across from
+# an offset part, collected low at the back of the crown into a bound tail,
+# with a layered nape draping over the greatcoat collar and face-framing
+# temple strands. Built as ~20 individually swept solid locks over a padded
+# scalp cap - never a single blob, never primitive geometry.
+#
+# Sections (each an independent swept solid, recorded in the .hairrig.json):
+#   CrownCap        scalp shell, padded volume, scalloped hairline (widow's
+#                   peak, temple peaks, ear notches, nape drop), part groove
+#   CrownSweep_*    tapered locks radiating from the part line
+#   Fringe_*        asymmetric forehead sweep + short part strands
+#   Temple_*        cheek-framing strands in front of the ears + tucked pair
+#   NapeLayer_*     staggered locks draping over the coat collar
+#   Gather          root bulge where the mass is collected
+#   TailRope_*      twisted rope strands of the bound tail (staggered tips)
+#   HairlineWisp_*  short rim wisps (base LOD only)
+#   (BoneThread)    HairTie* cord bound around the Gather
+#
+# Stability: the hair is rigid geometry parented to the player mesh (no
+# cloth/jiggle simulation to destabilise), every loose element keeps
+# clearance from the collar/mantle sweep envelope, and the hair shader's
+# flow pattern is evaluated in object space so nothing swims in motion.
 
-    def add_mesh_hair(points, faces):
-        base = len(hair_verts)
-        hair_verts.extend(points)
-        hair_polys.extend([(base + f[0], base + f[1], base + f[2]) for f in faces])
+HAIR_SECTIONS = []     # (name, role, start, end) ranges in the Hair buffer
+HAIR_TIE_SECTIONS = [] # (name, start, end) ranges in the BoneThread buffer
 
-    spline_y        = [1.440, 1.490, 1.530, 1.555, 1.580, 1.605, 1.635, 1.665, 1.695, 1.718, 1.745, 1.772, 1.792, 1.808, 1.815]
-    spline_rx       = [0.076, 0.068, 0.064, 0.065, 0.060, 0.068, 0.078, 0.086, 0.084, 0.082, 0.080, 0.074, 0.062, 0.038, 0.006]
-    spline_rz_back  = [0.072, 0.066, 0.066, 0.072, 0.082, 0.092, 0.102, 0.108, 0.112, 0.112, 0.108, 0.098, 0.082, 0.052, 0.010]
-    spline_rz_front = [0.076, 0.068, 0.064, 0.068, 0.074, 0.078, 0.082, 0.086, 0.084, 0.082, 0.078, 0.068, 0.056, 0.035, 0.006]
-    spline_cz       = [0.000, 0.002, 0.004, 0.005, 0.004, 0.000,-0.006,-0.010,-0.014,-0.016,-0.018,-0.018,-0.018,-0.018,-0.018]
+HAIR_PAD = 0.0075            # base scalp->cap offset (believable hair volume)
+HAIR_CROWN_TOP = 1.833       # padded crown apex
 
-    # Full Solid Cap Base
-    cap_rings = 36
-    cap_sides = 48
+# Part line (lon, y) walking front hairline -> over the crown -> back.
+HAIR_PART_2D = [(0.30, 1.742), (0.26, 1.772), (0.18, 1.800), (0.06, 1.820),
+                (-0.06, 1.812), (-0.16, 1.786), (-0.20, 1.758)]
+
+# Scalloped hairline: (lon, y) control pairs, mirrored on |lon|.
+#   centre dip = widow's peak, rise at the temples, a raised notch over the
+#   sculpted ears (they sit in open air), then a nape drop around the back.
+HAIRLINE_CTRL = [(0.00, 1.7285), (0.42, 1.7430), (0.78, 1.7255), (1.10, 1.7110),
+                 (1.30, 1.6985), (1.48, 1.7090), (1.62, 1.7125), (1.80, 1.7095),
+                 (1.98, 1.6990), (2.14, 1.6480), (2.42, 1.5940), (math.pi, 1.5660)]
+
+# Head splines (same values as generate_unified_head above) so the hair hugs
+# the sculpted skull exactly.
+_hair_spline_y        = [1.440, 1.490, 1.530, 1.555, 1.580, 1.605, 1.635, 1.665, 1.695, 1.718, 1.745, 1.772, 1.792, 1.808, 1.815]
+_hair_spline_rx       = [0.076, 0.068, 0.064, 0.065, 0.060, 0.068, 0.078, 0.086, 0.084, 0.082, 0.080, 0.074, 0.062, 0.038, 0.006]
+_hair_spline_rz_back  = [0.072, 0.066, 0.066, 0.072, 0.082, 0.092, 0.102, 0.108, 0.112, 0.112, 0.108, 0.098, 0.082, 0.052, 0.010]
+_hair_spline_rz_front = [0.076, 0.068, 0.064, 0.068, 0.074, 0.078, 0.082, 0.086, 0.084, 0.082, 0.078, 0.068, 0.056, 0.035, 0.006]
+_hair_spline_cz       = [0.000, 0.002, 0.004, 0.005, 0.004, 0.000,-0.006,-0.010,-0.014,-0.016,-0.018,-0.018,-0.018,-0.018,-0.018]
+
+
+def _hash1(n):
+    """Deterministic 0..1 hash (no random module - regeneration is stable)."""
+    x = math.sin(n * 127.1 + 311.7) * 43758.5453
+    return x - math.floor(x)
+
+
+def _cosy_interp(x, ctrl):
+    """Smooth (cosine-eased) interpolation over (x, value) control pairs."""
+    a = abs(x)
+    if a <= ctrl[0][0]:
+        return ctrl[0][1]
+    if a >= ctrl[-1][0]:
+        return ctrl[-1][1]
+    for k in range(len(ctrl) - 1):
+        x0, v0 = ctrl[k]
+        x1, v1 = ctrl[k + 1]
+        if x0 <= a <= x1:
+            t = (a - x0) / (x1 - x0)
+            te = 0.5 - 0.5 * math.cos(math.pi * t)
+            return v0 + (v1 - v0) * te
+    return ctrl[-1][1]
+
+
+def hairline_y(lon):
+    """Hairline height at longitude lon (0 = front, pi = back)."""
+    y = _cosy_interp(lon, HAIRLINE_CTRL)
+    # scallop ripple so the rim never reads as a machined edge (fades behind)
+    y += 0.0031 * math.sin(abs(lon) * 9.0 + 0.7) * max(0.0, 1.0 - abs(lon) / 2.3)
+    return y
+
+
+def scalp_point(y, lon, lift=0.0):
+    """Point on the hair-padded scalp surface at height y, longitude lon."""
+    rx = interp_val(y, _hair_spline_y, _hair_spline_rx) + HAIR_PAD + lift
+    rz_b = interp_val(y, _hair_spline_y, _hair_spline_rz_back) + HAIR_PAD + lift + 0.002
+    rz_f = interp_val(y, _hair_spline_y, _hair_spline_rz_front) + HAIR_PAD + lift
+    cz = interp_val(y, _hair_spline_y, _hair_spline_cz)
+    blend_t = 0.5 * (math.cos(lon) + 1.0)
+    rz = rz_b * (1.0 - blend_t) + rz_f * blend_t
+    return (rx * math.sin(lon), y, cz + rz * math.cos(lon))
+
+
+def _cap_pad(y, lon):
+    """Sculpted volume padding of the cap over the bare scalp offset."""
+    pad = 0.0045 * gauss(y, 1.800, 0.050)                              # crown dome
+    pad += 0.0042 * gauss(y, 1.788, 0.042) * gauss(lon, -0.52, 0.55)   # deep sweep ridge
+    pad += 0.0026 * gauss(y, 1.618, 0.055) * gauss(lon, math.pi, 0.9)  # occiput fullness
+    return pad
+
+
+_HAIR_PART_3D = None
+def _seg_dist(p, a, b):
+    ab = vsub(b, a)
+    tt = dot(vsub(p, a), ab) / max(dot(ab, ab), 1e-12)
+    tt = clamp(tt, 0.0, 1.0)
+    return math.sqrt(dot(vsub(p, vadd(a, vmul(ab, tt))), vsub(p, vadd(a, vmul(ab, tt)))))
+
+
+def _part_groove(y, lon):
+    """Downward displacement along the part line (a visible crown parting)."""
+    global _HAIR_PART_3D
+    if _HAIR_PART_3D is None:
+        _HAIR_PART_3D = [scalp_point(yy, ll, 0.0) for (ll, yy) in HAIR_PART_2D]
+    p = scalp_point(y, lon, 0.0)
+    d = min(_seg_dist(p, _HAIR_PART_3D[k], _HAIR_PART_3D[k + 1])
+            for k in range(len(_HAIR_PART_3D) - 1))
+    if d >= 0.010:
+        return 0.0
+    return -0.0034 * (1.0 - smoothstep(0.002, 0.010, d))
+
+
+def _catmull_sample(ctrl, count):
+    """Resample an open Catmull-Rom spline through ctrl points to `count` stations."""
+    pts = [tuple(map(float, c)) for c in ctrl]
+    if len(pts) < 2:
+        return pts
+    ext = [pts[0]] + pts + [pts[-1]]
+    segs = len(pts) - 1
+    out = []
+    for k in range(count):
+        s = k / (count - 1) * segs
+        i = min(int(s), segs - 1)
+        t = s - i
+        p0, p1, p2, p3 = ext[i], ext[i + 1], ext[i + 2], ext[i + 3]
+        t2, t3 = t * t, t * t * t
+        out.append(tuple(
+            0.5 * ((2 * p1[j]) + (-p0[j] + p2[j]) * t
+                   + (2 * p0[j] - 5 * p1[j] + 4 * p2[j] - p3[j]) * t2
+                   + (-p0[j] + 3 * p1[j] - 3 * p2[j] + p3[j]) * t3)
+            for j in range(3)))
+    return out
+
+
+def _lock_width_profile(t, root=0.62, mid=1.0, tip=0.16):
+    """Root swelling out of the cap -> full body -> long taper -> blunt tip."""
+    grow = root + (mid - root) * smoothstep(0.0, 0.14, t)
+    taper = 1.0 - (1.0 - tip) * smoothstep(0.58, 0.99, t)
+    pinch = 1.0 - 0.70 * smoothstep(0.99, 1.0, t)
+    return grow * taper * max(pinch, 0.30)
+
+
+def _hair_lock(mat, sections, name, role, ctrl, width, sides=8, stations=16,
+               flat=0.62, twist=0.35, grooves=2, groove_depth=0.10,
+               jitter=0.0016, seed=0.0, preferred=(0.0, 1.0, 0.0)):
+    """Sweep one solid hair lock: a smoothed centreline carries an elliptical,
+    flattened cross-section with longitudinal grooves, twist, organic jitter,
+    a swollen root sunk into the cap and a pinched fan tip. Records the
+    vertex range in `sections`."""
+    sides = _segs(sides, 6)
+    stations = _segs(stations, 8)
+    centers = _catmull_sample(ctrl, stations)
+    n = len(centers)
+    # low-frequency deterministic jitter so no two locks share one plane
+    j1, j2, j3 = _hash1(seed + 1.7), _hash1(seed + 5.3), _hash1(seed + 9.1)
+    ph1, ph2 = _hash1(seed + 2.9) * 6.283, _hash1(seed + 4.1) * 6.283
+    for i in range(n):
+        t = i / (n - 1)
+        centers[i] = vadd(centers[i], (
+            jitter * math.sin(t * 5.3 + ph1) * math.cos(t * 2.1 + j1 * 6.283),
+            jitter * math.sin(t * 4.1 + ph2) * 0.6,
+            jitter * math.cos(t * 6.2 + ph1 * 0.7) * math.sin(t * 1.7 + j2 * 6.283)))
+    frames = tube_frames(centers, preferred)
+    start = len(verts[mat])
     pts = []
+    for i in range(n):
+        t = i / (n - 1)
+        tangent, b1, b2 = frames[i]
+        rot = twist * (t - 0.5)
+        cr, sr = math.cos(rot), math.sin(rot)
+        rb1 = vadd(vmul(b1, cr), vmul(b2, sr))
+        rb2 = vadd(vmul(b1, -sr), vmul(b2, cr))
+        w = width * _lock_width_profile(t) * (1.0 + 0.05 * math.sin(t * 9.0 + j3 * 6.283))
+        d = w * flat
+        ring = []
+        for s in range(sides):
+            a = 2.0 * math.pi * s / sides
+            gf = 1.0 - groove_depth * (0.5 + 0.5 * math.cos(a * grooves + j1 * 6.283))
+            off = vadd(vmul(rb1, 0.5 * w * gf * math.cos(a)),
+                       vmul(rb2, 0.5 * d * gf * math.sin(a)))
+            ring.append(vadd(centers[i], off))
+        pts.extend(ring)
     fs = []
-    
-    top_pole = (0.0, 1.824, -0.018)
-    pts.append(top_pole)
-    
-    y_levels = [1.816 - i * (1.816 - 1.560) / (cap_rings - 2) for i in range(cap_rings - 1)]
-    
-    for r_idx, y_ring in enumerate(y_levels):
-        rx_skull = interp_val(y_ring, spline_y, spline_rx)
-        rz_b_skull = interp_val(y_ring, spline_y, spline_rz_back)
-        rz_f_skull = interp_val(y_ring, spline_y, spline_rz_front)
-        cz_skull = interp_val(y_ring, spline_y, spline_cz)
-        
-        hair_offset = 0.0065
-        rx_h = rx_skull + hair_offset
-        rz_b_h = rz_b_skull + hair_offset + 0.002
-        rz_f_h = rz_f_skull + hair_offset
-        
+    for r in range(n - 1):
+        for s in range(sides):
+            a = r * sides + s
+            an = r * sides + (s + 1) % sides
+            b = (r + 1) * sides + s
+            bn = (r + 1) * sides + (s + 1) % sides
+            fs.extend(((a, an, b), (an, bn, b)))
+    # root fan (sunk inside the cap, hidden) and pinched tip fan
+    root_c = len(pts)
+    pts.append(vadd(centers[0], vmul(norm(vsub(centers[1], centers[0])), -0.002)))
+    for s in range(sides):
+        fs.append((root_c, (s + 1) % sides, s))
+    tip_c = len(pts)
+    pts.append(vadd(centers[-1], vmul(norm(vsub(centers[-1], centers[-2])), 0.0025)))
+    base = (n - 1) * sides
+    for s in range(sides):
+        fs.append((tip_c, base + s, base + (s + 1) % sides))
+    add_mesh(mat, name, pts, fs)
+    sections.append((name, role, start, len(verts[mat])))
+    return start, len(verts[mat])
+
+
+def generate_gothic_hair():
+    """Adds every hair section directly to the Hair material buffer, recording
+    buffer-absolute vertex ranges in HAIR_SECTIONS as it goes."""
+    def add_mesh_hair(points, faces, name, role):
+        start = len(verts["Hair"])
+        add_mesh("Hair", name, points, faces)
+        HAIR_SECTIONS.append((name, role, start, len(verts["Hair"])))
+
+    # ---------------- Crown cap: padded scalp shell with modelled hairline
+    cap_sides = _segs(46, 14)
+    cap_rows = _segs(24, 12)
+    cap_pts = []
+    cap_fs = []
+    pole = (0.0, HAIR_CROWN_TOP, -0.018)
+    cap_pts.append(pole)
+    y_top, y_bot = 1.827, 1.552
+    for r in range(cap_rows):
+        y_row = y_top - (y_top - y_bot) * r / (cap_rows - 1.0)
         for s in range(cap_sides):
-            lon = 2.0 * math.pi * s / cap_sides
-            cos_lon = math.cos(lon)
-            sin_lon = math.sin(lon)
-            
-            blend_t = 0.5 * (cos_lon + 1.0)
-            rz = rz_b_h * (1.0 - blend_t) + rz_f_h * blend_t
-            
-            px = rx_h * sin_lon
-            pz = cz_skull + rz * cos_lon
-            py = y_ring
-            
-            if cos_lon > 0.0:
-                hairline_y = 1.738 + 0.008 * math.cos(lon * 2.0)
-                if py < hairline_y:
-                    py = hairline_y
-                    
-            pts.append((px, py, pz))
-            
+            lon = -math.pi + 2.0 * math.pi * s / cap_sides
+            hl = hairline_y(lon)
+            yy = max(y_row, hl)
+            lift = _cap_pad(yy, lon) + _part_groove(yy, lon)
+            # flow ripples: subtle horizontal wave ridges down the sides/back
+            # so the cap itself carries hair direction instead of reading as
+            # a smooth shell (fades out on the crown dome)
+            lift += (0.0013 * math.sin(6 * lon + (yy - 1.55) * 36.0 + 0.6)
+                     + 0.0007 * math.sin(11 * lon + 2.2)) \
+                * gauss(lon, math.pi, 1.5) \
+                * (1.0 - smoothstep(1.70, 1.78, yy)) \
+                * smoothstep(1.556, 1.576, yy)
+            # rim tuck: the last few millimetres press against the skin so no
+            # light leaks under the hairline edge
+            rim = yy - hl
+            if rim < 0.006:
+                lift = lerp(-0.0012, lift, smoothstep(0.0, 0.006, rim))
+            cap_pts.append(scalp_point(yy, lon, lift))
+    # winding matches the legacy cap (rows run downward, faces point outward)
     for s in range(cap_sides):
-        p1 = 1 + s
-        p2 = 1 + (s + 1) % cap_sides
-        fs.append((0, p1, p2))
-        
-    for r in range(cap_rings - 2):
+        cap_fs.append((0, 1 + s, 1 + (s + 1) % cap_sides))
+    for r in range(cap_rows - 1):
         for s in range(cap_sides):
             p0 = 1 + r * cap_sides + s
             p1 = 1 + r * cap_sides + (s + 1) % cap_sides
             p2 = 1 + (r + 1) * cap_sides + s
             p3 = 1 + (r + 1) * cap_sides + (s + 1) % cap_sides
-            fs.extend(((p0, p2, p1), (p1, p2, p3)))
-            
-    add_mesh_hair(pts, fs)
+            cap_fs.extend(((p0, p2, p1), (p1, p2, p3)))
+    add_mesh_hair(cap_pts, cap_fs, "Hair/CrownCap", "cap")
 
-    # Swept volume locks
-    def swept_lock(spline, radii, sides=10, twist=0.0):
-        sides = _segs(sides, 6)
-        centers = spline
-        n = len(centers)
-        ring_pts = []
-        ring_fs = []
-        for i, c in enumerate(centers):
-            p_next = centers[min(i+1, n-1)]
-            p_prev = centers[max(0, i-1)]
-            tangent = norm(vsub(p_next, p_prev))
-            if dot(tangent, tangent) < 1e-6: tangent = (0.0, 1.0, 0.0)
-            hint = (1.0, 0.0, 0.0)
-            b1 = norm(vsub(hint, vmul(tangent, dot(hint, tangent))))
-            if dot(b1, b1) < 0.2:
-                hint = (0.0, 0.0, 1.0)
-                b1 = norm(vsub(hint, vmul(tangent, dot(hint, tangent))))
-            b2 = cross(tangent, b1)
-            
-            angle_rot = twist * (i / (n - 1))
-            cr, sr = math.cos(angle_rot), math.sin(angle_rot)
-            rb1 = vadd(vmul(b1, cr), vmul(b2, sr))
-            rb2 = vadd(vmul(b1, -sr), vmul(b2, cr))
-            
-            rx, ry = radii[i] if isinstance(radii[i], (list, tuple)) else (radii[i], radii[i]*0.6)
-            for s in range(sides):
-                a = 2.0 * math.pi * s / sides
-                off = vadd(vmul(rb1, rx * math.cos(a)), vmul(rb2, ry * math.sin(a)))
-                ring_pts.append(vadd(c, off))
-                
-        for r in range(n - 1):
-            for s in range(sides):
-                a = r * sides + s
-                an = r * sides + (s + 1) % sides
-                b = (r + 1) * sides + s
-                bn = (r + 1) * sides + (s + 1) % sides
-                ring_fs.extend(((a, an, b), (an, bn, b)))
-                
-        tc = len(ring_pts); ring_pts.append(centers[0])
-        bc = len(ring_pts); ring_pts.append(centers[-1])
-        for s in range(sides):
-            ring_fs.append((tc, (s+1)%sides, s))
-            base_bot = (n - 1) * sides
-            ring_fs.append((bc, base_bot + s, base_bot + (s+1)%sides))
-            
-        add_mesh_hair(ring_pts, ring_fs)
+    def SP(lon, y, lift=0.0035):
+        # ride above the cap's sculpted padding so locks never sink into it
+        return scalp_point(y, lon, lift + _cap_pad(y, lon))
 
-    locks = [
-        ([(0.025, 1.775, 0.082), (0.005, 1.755, 0.088), (-0.022, 1.730, 0.086), (-0.045, 1.700, 0.078)],
-         [(0.022, 0.014), (0.020, 0.012), (0.015, 0.009), (0.004, 0.003)], 0.2),
-        ([(-0.040, 1.765, 0.072), (-0.068, 1.728, 0.076), (-0.082, 1.675, 0.066), (-0.080, 1.620, 0.048), (-0.068, 1.575, 0.035)],
-         [(0.020, 0.013), (0.018, 0.012), (0.014, 0.010), (0.009, 0.006), (0.003, 0.003)], -0.25),
-        ([(-0.055, 1.760, 0.055), (-0.078, 1.710, 0.050), (-0.085, 1.650, 0.032), (-0.078, 1.595, 0.018)],
-         [(0.018, 0.012), (0.016, 0.010), (0.011, 0.007), (0.003, 0.003)], -0.15),
-        ([(0.038, 1.765, 0.068), (0.065, 1.735, 0.058), (0.082, 1.695, 0.035), (0.084, 1.650, 0.005), (0.078, 1.605, -0.018)],
-         [(0.018, 0.012), (0.016, 0.011), (0.012, 0.008), (0.008, 0.005), (0.003, 0.003)], 0.25),
-        ([(0.000, 1.822, 0.020), (-0.005, 1.832, -0.018), (-0.010, 1.822, -0.060), (-0.008, 1.785, -0.098)],
-         [(0.024, 0.016), (0.026, 0.018), (0.022, 0.014), (0.006, 0.005)], 0.1),
-        ([(0.035, 1.815, 0.010), (0.068, 1.800, -0.015), (0.082, 1.760, -0.045), (0.084, 1.705, -0.070)],
-         [(0.020, 0.014), (0.022, 0.015), (0.016, 0.011), (0.005, 0.004)], 0.15),
-        ([(-0.035, 1.815, 0.010), (-0.068, 1.800, -0.015), (-0.082, 1.760, -0.045), (-0.084, 1.705, -0.070)],
-         [(0.020, 0.014), (0.022, 0.015), (0.016, 0.011), (0.005, 0.004)], -0.15),
-        ([(-0.035, 1.730, -0.095), (-0.038, 1.675, -0.108), (-0.030, 1.620, -0.098), (-0.018, 1.565, -0.082)],
-         [(0.020, 0.014), (0.018, 0.012), (0.012, 0.008), (0.004, 0.003)], -0.1),
-        ([(0.035, 1.730, -0.095), (0.038, 1.675, -0.108), (0.030, 1.620, -0.098), (0.018, 1.565, -0.082)],
-         [(0.020, 0.014), (0.018, 0.012), (0.012, 0.008), (0.004, 0.003)], 0.1),
-        ([(0.000, 1.725, -0.100), (0.000, 1.665, -0.112), (0.000, 1.610, -0.102), (0.000, 1.555, -0.084)],
-         [(0.022, 0.016), (0.020, 0.014), (0.014, 0.010), (0.004, 0.003)], 0.0),
-        ([(0.012, 1.765, 0.084), (-0.004, 1.735, 0.090), (-0.018, 1.705, 0.085)],
-         [(0.012, 0.008), (0.009, 0.006), (0.003, 0.002)], 0.2)
+    seed = 10.0
+
+    # ---------------- Crown sweeps radiating from the part line
+    # right of the part: shorter locks sweeping back over the right temple
+    crown_R = [
+        ("CrownSweep_R1", [(0.42, 1.740), (0.58, 1.748), (0.76, 1.724), (0.94, 1.698), (1.06, 1.680)], 0.0130),
+        ("CrownSweep_R2", [(0.50, 1.760), (0.68, 1.754), (0.90, 1.726), (1.10, 1.698), (1.24, 1.674)], 0.0125),
+        ("CrownSweep_R3", [(0.56, 1.780), (0.76, 1.766), (1.00, 1.736), (1.22, 1.710), (1.38, 1.698)], 0.0130),
+        ("CrownSweep_R4", [(0.60, 1.800), (0.82, 1.786), (1.08, 1.752), (1.32, 1.722), (1.48, 1.704)], 0.0125),
+        ("CrownSweep_R5", [(0.62, 1.818), (0.86, 1.806), (1.14, 1.772), (1.42, 1.736), (1.60, 1.712)], 0.0120),
     ]
-    
-    for spline, radii, twist in locks:
-        swept_lock(spline, radii, sides=10, twist=twist)
-        
-    return hair_verts, hair_polys
+    # left of the part: the deep diagonal sweep across the crown
+    crown_L = [
+        ("CrownSweep_L1", [(0.16, 1.752), (-0.06, 1.752), (-0.34, 1.736), (-0.62, 1.712), (-0.86, 1.684)], 0.0145),
+        ("CrownSweep_L2", [(0.08, 1.774), (-0.16, 1.766), (-0.46, 1.740), (-0.76, 1.704), (-1.02, 1.664)], 0.0140),
+        ("CrownSweep_L3", [(0.00, 1.796), (-0.24, 1.786), (-0.54, 1.754), (-0.86, 1.712), (-1.14, 1.664)], 0.0135),
+        ("CrownSweep_L4", [(-0.08, 1.812), (-0.34, 1.800), (-0.66, 1.764), (-0.98, 1.720), (-1.26, 1.668)], 0.0130),
+        ("CrownSweep_L5", [(-0.16, 1.824), (-0.42, 1.812), (-0.74, 1.776), (-1.06, 1.732), (-1.34, 1.676)], 0.0125),
+    ]
+        # over the crown and down the back, converging into the gather
+        # (mid controls ride ~1.826-1.831 so they clear the padded dome)
+    crown_B = [
+        ("CrownSweep_B1", [(0.22, 1.776), (0.06, 1.824), (-0.30, 1.826), (-0.95, 1.788), (-1.90, 1.726), (-2.66, 1.664), (-3.02, 1.622)], 0.0135),
+        ("CrownSweep_B2", [(0.34, 1.790), (0.14, 1.828), (-0.22, 1.828), (-0.88, 1.796), (-1.84, 1.740), (-2.60, 1.680), (-2.96, 1.638)], 0.0130),
+        ("CrownSweep_B3", [(0.46, 1.800), (0.22, 1.830), (-0.12, 1.828), (-0.78, 1.802), (-1.70, 1.754), (-2.44, 1.696), (-2.84, 1.652)], 0.0130),
+        ("CrownSweep_B4", [(0.58, 1.806), (0.32, 1.830), (0.00, 1.826), (-0.68, 1.806), (-1.52, 1.764), (-2.26, 1.710), (-2.70, 1.664)], 0.0125),
+        ("CrownSweep_B5", [(0.70, 1.808), (0.44, 1.826), (0.12, 1.820), (-0.56, 1.806), (-1.36, 1.770), (-2.10, 1.722), (-2.56, 1.676)], 0.0120),
+        ("CrownSweep_B6", [(0.14, 1.826), (-0.10, 1.824), (-0.46, 1.812), (-1.10, 1.788), (-1.98, 1.746), (-2.72, 1.690), (-3.06, 1.644)], 0.0120),
+        # center-back fillers hugging the cap so no smooth dome shows above the gather
+        ("CrownSweep_B7", [(2.74, 1.814), (2.90, 1.778), (3.05, 1.736), (3.16, 1.688)], 0.0125),
+        ("CrownSweep_B8", [(3.54, 1.814), (3.38, 1.778), (3.23, 1.736), (3.12, 1.688)], 0.0125),
+    ]
+    for li, (name, ctrl2d, w) in enumerate(crown_R + crown_L + crown_B):
+        # alternate ride height so neighbouring bands never merge into a shell
+        lift = 0.0026 + 0.0032 * ((li % 2) == 0) + 0.0020 * ((li % 3) == 0)
+        ctrl = [SP(lon, y, lift + 0.0012 * (1.0 - abs(lon) / 1.9)) for (lon, y) in ctrl2d]
+        _hair_lock("Hair", HAIR_SECTIONS, name, "crown", ctrl, w,
+                   sides=8, stations=15, flat=0.46, twist=0.5, seed=seed, jitter=0.0012)
+        seed += 1.0
 
-hair_pts, hair_polys = generate_gothic_hair()
-add_mesh("Hair", "Hair/WayfarerHairstyle", hair_pts, hair_polys)
+    # ---------------- Crown whorl: two spiral locks wrapping the apex
+    # hair grows from a whorl just off the crown apex; these two S-spirals
+    # wrap the pole so the dome top carries the same swept-solid reading as
+    # the rest of the cut (and the apex fan never shows as a bald dome).
+    apex_pt = (0.0, HAIR_CROWN_TOP - 0.004, -0.018)
+    for wi, (phase, dirn) in enumerate(((0.35, 1.0), (0.35 + math.pi, 1.0))):
+        ctrl = []
+        for k in range(9):
+            t = k / 8.0
+            ang = phase + dirn * (0.9 + 2.1 * t)
+            rr = 0.0135 + 0.0300 * t
+            yy = (HAIR_CROWN_TOP - 0.0015 - 0.015 * t)
+            czf = -0.018 - 0.006 * t
+            ctrl.append((apex_pt[0] + rr * math.sin(ang),
+                         yy,
+                         czf + rr * 0.9 * math.cos(ang)))
+        _hair_lock("Hair", HAIR_SECTIONS, f"CrownWhorl_{wi + 1}", "crown", ctrl, 0.0118,
+                   sides=8, stations=16, flat=0.48, twist=0.6, seed=seed, jitter=0.0008)
+        seed += 1.0
+
+    # ---------------- Dome fans: locks flowing back over the bare dome top
+    # the part line and the B-sweeps bound a smooth region over the crown
+    # dome flanks; these fans comb back across it on both sides.
+    dome_fans = [
+        ("DomeFan_R0", [(0.26, 1.824), (0.58, 1.828), (0.94, 1.820), (1.34, 1.798), (1.74, 1.766), (2.14, 1.726)], 0.0110),
+        ("DomeFan_R1", [(0.38, 1.816), (0.70, 1.820), (1.05, 1.810), (1.45, 1.786), (1.85, 1.754), (2.25, 1.714)], 0.0100),
+        ("DomeFan_R2", [(0.50, 1.806), (0.82, 1.808), (1.18, 1.798), (1.58, 1.776), (1.98, 1.744), (2.35, 1.704)], 0.0095),
+        ("DomeFan_R3", [(0.62, 1.794), (0.94, 1.796), (1.30, 1.786), (1.68, 1.764), (2.06, 1.732), (2.42, 1.692)], 0.0095),
+        ("DomeFan_L0", [(0.02, 1.830), (-0.32, 1.824), (-0.70, 1.812), (-1.10, 1.790), (-1.58, 1.758), (-2.03, 1.716)], 0.0110),
+        ("DomeFan_L1", [(-0.10, 1.820), (-0.44, 1.814), (-0.82, 1.802), (-1.22, 1.780), (-1.68, 1.748), (-2.11, 1.706)], 0.0100),
+        ("DomeFan_L2", [(-0.22, 1.808), (-0.58, 1.802), (-0.96, 1.792), (-1.34, 1.770), (-1.78, 1.738), (-2.19, 1.696)], 0.0095),
+    ]
+    for di, (name, ctrl2d, w) in enumerate(dome_fans):
+        # alternating proud ridge heights -> visible valleys between bands
+        ctrl = [SP(lon, y, 0.0050 + 0.0034 * ((di % 2) == 0) + 0.0018 * ((di % 3) == 0))
+                for (lon, y) in ctrl2d]
+        _hair_lock("Hair", HAIR_SECTIONS, name, "crown", ctrl, w,
+                   sides=8, stations=14, flat=0.42, twist=0.45, seed=seed, jitter=0.0010)
+        seed += 1.0
+
+    # ---------------- Side vault sweeps above the ears
+    side_vault = [
+        ("SideSweep_R1", [(0.92, 1.776), (1.22, 1.762), (1.52, 1.738), (1.78, 1.714)], 0.0125),
+        ("SideSweep_R2", [(1.02, 1.752), (1.32, 1.742), (1.62, 1.722), (1.86, 1.702)], 0.0115),
+        ("SideSweep_L1", [(-0.90, 1.774), (-1.20, 1.758), (-1.50, 1.732), (-1.76, 1.708)], 0.0125),
+        ("SideSweep_L2", [(-1.00, 1.750), (-1.30, 1.738), (-1.60, 1.716), (-1.84, 1.696)], 0.0115),
+    ]
+    for name, ctrl2d, w in side_vault:
+        ctrl = [SP(lon, y, 0.0032) for (lon, y) in ctrl2d]
+        _hair_lock("Hair", HAIR_SECTIONS, name, "side", ctrl, w,
+                   sides=8, stations=13, flat=0.50, twist=0.4, seed=seed, jitter=0.0010)
+        seed += 1.0
+
+    # short rim fills closing the strip between vault sweeps and the ear notch
+    ear_fill = [
+        ("EarFill_R", [(1.50, 1.718), (1.66, 1.710), (1.82, 1.706), (1.96, 1.705)], 0.0110),
+        ("EarFill_L", [(-1.48, 1.716), (-1.64, 1.706), (-1.80, 1.702), (-1.94, 1.701)], 0.0115),
+    ]
+    for name, ctrl2d, w in ear_fill:
+        ctrl = [SP(lon, y, 0.0026) for (lon, y) in ctrl2d]
+        _hair_lock("Hair", HAIR_SECTIONS, name, "side", ctrl, w,
+                   sides=7, stations=11, flat=0.58, twist=0.3, seed=seed, jitter=0.0008)
+        seed += 1.0
+
+    # ---------------- Fringe: asymmetric sweep + short part strands
+    fringe = [
+        ("Fringe_Sweep", [(0.30, 1.738), (0.10, 1.730), (-0.15, 1.727), (-0.42, 1.719), (-0.68, 1.711)], 0.0145, 0.55),
+        ("Fringe_Sweep_R", [(0.56, 1.742), (0.50, 1.726), (0.44, 1.712), (0.38, 1.702)], 0.0095, 0.52),
+        ("Fringe_Sweep_L", [(-0.10, 1.733), (-0.28, 1.724), (-0.48, 1.715), (-0.62, 1.708)], 0.0105, 0.52),
+        ("Fringe_PartShort", [(0.44, 1.742), (0.39, 1.724), (0.35, 1.708)], 0.0095, 0.55),
+        ("Fringe_WidowsPeak", [(0.06, 1.736), (0.01, 1.7225), (-0.03, 1.7165)], 0.0085, 0.55),
+    ]
+    for name, ctrl2d, w, fl in fringe:
+        ctrl = [SP(lon, y, 0.0042) for (lon, y) in ctrl2d]
+        _hair_lock("Hair", HAIR_SECTIONS, name, "fringe", ctrl, w,
+                   sides=7, stations=12, flat=fl, twist=0.25, seed=seed, jitter=0.0007)
+        seed += 1.0
+
+    # ---------------- Temple frames (in front of the ears) + behind-ear tucks
+    # the ear notch keeps the cap rim high over the ears, so frames run in
+    # front of them and tuck locks fold behind towards the nape.
+    temple = [
+        ("Temple_Frame_R", [(0.95, 1.720), (1.08, 1.680), (1.20, 1.644), (1.30, 1.616)], 0.0120),
+        ("Temple_Frame_L", [(-0.95, 1.718), (-1.09, 1.672), (-1.21, 1.634), (-1.32, 1.604)], 0.0125),
+        ("Temple_Tuck_R", [(1.95, 1.704), (2.15, 1.668), (2.35, 1.634), (2.52, 1.606)], 0.0125),
+        ("Temple_Tuck_L", [(-1.93, 1.700), (-2.13, 1.662), (-2.33, 1.626), (-2.50, 1.596)], 0.0130),
+    ]
+    for name, ctrl2d, w in temple:
+        ctrl = [SP(lon, y, 0.0050) for (lon, y) in ctrl2d]
+        _hair_lock("Hair", HAIR_SECTIONS, name, "temple", ctrl, w,
+                   sides=7, stations=12, flat=0.58, twist=0.3, seed=seed)
+        seed += 1.0
+
+    # ---------------- Nape layers draping over the greatcoat collar
+    # roots on the cap rim; explicit 3D control points hug the collar's
+    # outward-sloping back face (z -0.127 @ y1.564 -> bodice -0.136 @ y1.495),
+    # then fan out and rest ON the mantle drape (z ~ -0.173 @ y1.46) so the
+    # hair visibly layers over the coat instead of floating in the gap.
+    nape_root = [(-2.98, 1.598), (-2.86, 1.602), (-2.66, 1.604), (-2.52, 1.606),
+                 (2.52, 1.606), (2.66, 1.602), (2.88, 1.600), (2.98, 1.598)]
+    nape_paths = [
+        [(-0.013, 1.556, -0.1305), (-0.020, 1.514, -0.1280), (-0.030, 1.462, -0.178), (-0.037, 1.416, -0.186)],
+        [(-0.010, 1.560, -0.1315), (-0.017, 1.516, -0.1290), (-0.026, 1.466, -0.180), (-0.032, 1.424, -0.188)],
+        [(-0.002, 1.562, -0.1325), (-0.005, 1.520, -0.1305), (-0.008, 1.472, -0.182), (-0.010, 1.432, -0.190)],
+        [(-0.016, 1.552, -0.1300), (-0.026, 1.508, -0.1270), (-0.038, 1.452, -0.176), (-0.046, 1.408, -0.184)],
+        [(0.017, 1.552, -0.1300), (0.027, 1.508, -0.1270), (0.039, 1.452, -0.176), (0.047, 1.408, -0.184)],
+        [(0.004, 1.560, -0.1315), (0.009, 1.518, -0.1290), (0.015, 1.468, -0.180), (0.019, 1.428, -0.188)],
+        [(0.014, 1.556, -0.1305), (0.024, 1.512, -0.1270), (0.037, 1.462, -0.178), (0.045, 1.418, -0.186)],
+        [(0.014, 1.552, -0.1300), (0.021, 1.514, -0.1280), (0.031, 1.462, -0.178), (0.038, 1.416, -0.186)],
+    ]
+    nape_widths = [0.0165, 0.0170, 0.0160, 0.0160, 0.0160, 0.0155, 0.0165, 0.0160]
+    for k in range(8):
+        rl, ry = nape_root[k]
+        ctrl = [SP(rl, ry, 0.002), SP(rl * 0.96, ry - 0.020, 0.004)]
+        ctrl += [tuple(p) for p in nape_paths[k]]
+        _hair_lock("Hair", HAIR_SECTIONS, f"NapeLayer_{k + 1}", "nape", ctrl, nape_widths[k],
+                   sides=7, stations=14, flat=0.58, twist=0.45, seed=seed,
+                   jitter=0.0010, preferred=(0.0, 0.0, -1.0))
+        seed += 1.0
+
+    # ---------------- Gather bulge where the mass is collected
+    # a small rippled dome bulging off the cap at the back-crown; its rim
+    # sits on the cap surface so it always reads as attached.
+    dome_base = scalp_point(1.630, math.pi, 0.0)
+    dome_n = norm((dome_base[0] * 0.4, 0.16, dome_base[2]))      # cap surface normal
+    dome_side = norm(cross((0.0, 1.0, 0.0), dome_n))
+    dome_up = norm(cross(dome_n, dome_side))
+    rim_c = vadd(dome_base, vmul(dome_n, 0.001))
+    apex = vadd(rim_c, vmul(dome_n, 0.0135))
+    Rp, D = 0.0225, 0.0135
+    gat_rows, gat_sides = _segs(8, 5), _segs(20, 8)
+    gat_pts = [apex]
+    for r in range(1, gat_rows):
+        lat = (math.pi * 0.46) * r / (gat_rows - 1.0)
+        rr = Rp * math.sin(lat) ** 0.75
+        dn = D * math.sin(lat)
+        for s in range(gat_sides):
+            a = 2.0 * math.pi * s / gat_sides
+            wob = 1.0 + 0.09 * math.sin(3.0 * a + 1.2) + 0.05 * math.sin(5.0 * a + 0.4)
+            gat_pts.append(vadd(apex,
+                                vadd(vmul(dome_n, -dn),
+                                     vadd(vmul(dome_side, rr * wob * math.cos(a)),
+                                          vmul(dome_up, rr * wob * math.sin(a) * 0.92)))))
+    gat_fs = []
+    for s in range(gat_sides):
+        gat_fs.append((0, 1 + s, 1 + (s + 1) % gat_sides))
+    for r in range(gat_rows - 2):
+        for s in range(gat_sides):
+            p0 = 1 + r * gat_sides + s
+            p1 = 1 + r * gat_sides + (s + 1) % gat_sides
+            p2 = 1 + (r + 1) * gat_sides + s
+            p3 = 1 + (r + 1) * gat_sides + (s + 1) % gat_sides
+            gat_fs.extend(((p0, p2, p1), (p1, p2, p3)))
+    add_mesh_hair(gat_pts, gat_fs, "Hair/Gather", "gather")
+
+    # ---------------- Bound tail: four twisted rope strands around an axis
+    # strands orbit a curved, tapering axis that leans back and comes to rest
+    # ON the mantle drape, so the bound tail layers over the coat (visible
+    # from the back) instead of hiding in the collar-mantle gap.
+    axis = [(0.002, 1.612, -0.148), (0.000, 1.572, -0.163), (-0.008, 1.524, -0.176),
+            (-0.014, 1.470, -0.184), (-0.018, 1.424, -0.190)]
+    axis_pts = _catmull_sample(axis, 16)
+    ax_frames = tube_frames(axis_pts, (0.0, 1.0, 0.0))
+    rope_plan = [(0.0, 1.00), (1.57, 0.93), (3.14, 0.84), (4.71, 0.68)]
+    for k, (phase, span) in enumerate(rope_plan):
+        turns = 2.1 + 0.35 * _hash1(seed + k)
+        ctrl = []
+        steps = 13
+        for j in range(steps):
+            t = j / (steps - 1.0)
+            ti = min(int(t * (len(axis_pts) - 1)), len(axis_pts) - 2)
+            ft = t * (len(axis_pts) - 1) - ti
+            ap = lerp(axis_pts[ti], axis_pts[ti + 1], ft)
+            _, b1, b2 = ax_frames[ti]
+            orbit = lerp(0.0090, 0.0030, t)
+            ang = phase + turns * 6.283 * t
+            ctrl.append(vadd(ap, vadd(vmul(b1, orbit * math.cos(ang)),
+                                      vmul(b2, orbit * math.sin(ang)))))
+        cut = max(7, int(round(steps * span)))
+        ctrl = ctrl[:cut]
+        ctrl[-1] = vadd(ctrl[-1], vmul(norm(vsub(ctrl[-1], ctrl[-2])), 0.004))
+        _hair_lock("Hair", HAIR_SECTIONS, f"TailRope_{k + 1}", "tail", ctrl, 0.0092,
+                   sides=7, stations=13, flat=0.78, twist=2.4 + 0.4 * k,
+                   grooves=3, groove_depth=0.16, seed=seed + k)
+    seed += 4.0
+
+    # ---------------- Hairline wisps (base LOD only)
+    if DETAIL >= 0.8:
+        wisp_lons = [0.55, 0.24, -0.05, -0.34, -0.62, 1.05, -1.02, 1.30]
+        for k, lon in enumerate(wisp_lons):
+            hl = hairline_y(lon)
+            sgn = 1.0 if lon >= 0 else -1.0
+            ctrl = [SP(lon, hl + 0.003, 0.0008),
+                    SP(lon + sgn * 0.035, hl - 0.005, 0.0004),
+                    SP(lon + sgn * 0.065, hl - 0.012, 0.0)]
+            _hair_lock("Hair", HAIR_SECTIONS, f"HairlineWisp_{k + 1}", "wisp", ctrl,
+                       0.0032 + 0.0010 * _hash1(k * 3.3), sides=5, stations=7,
+                       flat=0.5, twist=0.2, jitter=0.0003, seed=seed + k)
+
+
+def generate_hair_tie():
+    """Bone twine cord bound around the gather: wraps, knot, hanging ends."""
+    dome_base = scalp_point(1.630, math.pi, 0.0)
+    nrm = norm((dome_base[0] * 0.4, 0.16, dome_base[2]))
+    side = norm(cross((0.0, 1.0, 0.0), nrm))
+    upv = norm(cross(side, nrm))
+    cx = vadd(dome_base, vmul(nrm, 0.0075))   # mid-dome, just behind the cap
+    R = 0.0210
+    # 2.25 wraps of cord around the gathered mass
+    for w in range(2):
+        pts = []
+        for k in range(19):
+            a = 2.0 * math.pi * (k / 18.0) + w * 0.5
+            pts.append(vadd(vadd(cx, vmul(side, R * math.cos(a))),
+                            vmul(upv, R * 0.82 * math.sin(a) - 0.006 + 0.009 * w)))
+        start = len(verts["BoneThread"])
+        tube("BoneThread", f"Accessories/HairTieWrap_{w + 1}", pts, [0.0026] * 19, 6, (0.0, 1.0, 0.0))
+        HAIR_TIE_SECTIONS.append((f"Accessories/HairTieWrap_{w + 1}", start, len(verts["BoneThread"])))
+    # small knot: two interlocked loops
+    for k in range(2):
+        c = vadd(cx, vmul(side, -0.006 + 0.012 * k))
+        pts = []
+        for i in range(13):
+            a = 2.0 * math.pi * i / 12.0
+            pts.append(vadd(vadd(c, vmul(side, 0.0055 * math.cos(a))),
+                            vmul(upv, 0.0042 * math.sin(a))))
+        start = len(verts["BoneThread"])
+        tube("BoneThread", f"Accessories/HairTieKnot_{k + 1}", pts, [0.0028] * 13, 6, (0.0, 1.0, 0.0))
+        HAIR_TIE_SECTIONS.append((f"Accessories/HairTieKnot_{k + 1}", start, len(verts["BoneThread"])))
+    # two short curled cord ends hanging from the knot
+    for k, sgn in enumerate((-1.0, 1.0)):
+        p0 = vadd(cx, vmul(side, -0.006 + 0.012 * k))
+        pts = [p0,
+               vadd(p0, (sgn * 0.008, -0.014, -0.004)),
+               vadd(p0, (sgn * 0.013, -0.027, -0.002)),
+               vadd(p0, (sgn * 0.010, -0.037, 0.003))]
+        start = len(verts["BoneThread"])
+        tube("BoneThread", f"Accessories/HairTieEnd_{k + 1}", pts,
+             [0.0026, 0.0023, 0.0019, 0.0014], 6, (0.0, 1.0, 0.0))
+        HAIR_TIE_SECTIONS.append((f"Accessories/HairTieEnd_{k + 1}", start, len(verts["BoneThread"])))
+
+
+generate_gothic_hair()
+generate_hair_tie()
 
 
 # =========================================================================
@@ -3102,4 +3503,69 @@ boot_rig_data = {
 with open(boot_path, "w", encoding="utf-8") as f:
     json.dump(boot_rig_data, f, indent=1)
 
+# --- hair sidecar: "Vigil Sweep" section ranges + design contract ----------
+# Vertex ranges are global OBJ indices, 0-based, end-exclusive. The verify and
+# preview tooling (Tools/verify_hair.py, Tools/render_hair_previews.py) reads
+# this file the same way verify_boots.py reads the bootrig sidecar.
+def _hair_triangles(range_pairs, mat):
+    total = 0
+    for _, _, start, end in range_pairs:
+        total += sum(1 for a, b, c in faces[mat] if start <= a - 1 < end)
+    return total
+
+hair_tri_count = _hair_triangles(HAIR_SECTIONS, "Hair")
+hair_section_records = []
+for (name, role, start, end) in HAIR_SECTIONS:
+    hair_section_records.append({
+        "name": name, "role": role,
+        "mat": "Hair", "start": offsets["Hair"] + start,
+        "end": offsets["Hair"] + end,
+    })
+for (name, start, end) in HAIR_TIE_SECTIONS:
+    hair_section_records.append({
+        "name": name, "role": "tie",
+        "mat": "BoneThread", "start": offsets["BoneThread"] + start, "end": offsets["BoneThread"] + end,
+    })
+
+hair_path = os.path.join(OUT, f"SM_Character_VeilboundWayfarer{SUFFIX}.hairrig.json")
+hair_rig = {
+    "format": "vespershade.hair/1",
+    "mesh": os.path.basename(obj_path),
+    "units": "metres", "up": "Y", "character_faces": "+Z",
+    "style": "Vigil Sweep (original): offset part, deep diagonal sweep, "
+             "gathered bound tail with bone twine tie, layered nape, "
+             "face-framing temple strands",
+    "attachment": "rigid (same transform as the player mesh; no cloth/jiggle "
+                  "simulation - stable under locomotion by construction)",
+    "ranges_note": "start/end are global OBJ vertex indices, 0-based, "
+                   "end-exclusive; every face of a section uses only its range",
+    "design": {
+        "part_line_lon_y": [[lon, y] for (lon, y) in HAIR_PART_2D],
+        "hairline_ctrl_lon_y": [[c[0], c[1]] for c in HAIRLINE_CTRL],
+        "scalp_pad_m": HAIR_PAD,
+        "crown_apex_y": HAIR_CROWN_TOP,
+        "skull_apex_y": 1.815,
+        "gather_center": [round(c, 6) for c in scalp_point(1.630, math.pi, 0.0)],
+        "clearance": {
+            "collar_top_back_y": 1.564,
+            "tail_axis_min_clearance_m": 0.010,
+            "face_zone_rule": "no hair vertex with z > 0.082, y < 1.702, |x| < 0.055",
+        },
+    },
+    "sections": hair_section_records,
+    "budget": {
+        "hair_triangles": hair_tri_count,
+        "hair_vertices": sum(end - start for (_, _, start, end) in HAIR_SECTIONS),
+        "detail_level": round(DETAIL, 3),
+    },
+}
+with open(hair_path, "w", encoding="utf-8") as f:
+    json.dump(hair_rig, f, indent=1)
+
+role_counts = {}
+for (_, role, _, _) in HAIR_SECTIONS:
+    role_counts[role] = role_counts.get(role, 0) + 1
 print(f"Wrote {obj_path}: {sum(map(len, verts.values()))} vertices, {sum(map(len, faces.values()))} triangles, {len(MATERIALS)} material regions")
+print(f"  hair: {hair_tri_count} tris in {len(HAIR_SECTIONS)} sections "
+      f"({', '.join(f'{k}={v}' for k, v in sorted(role_counts.items()))}) + "
+      f"{len(HAIR_TIE_SECTIONS)} tie sections on BoneThread")
