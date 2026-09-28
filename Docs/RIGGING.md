@@ -36,6 +36,7 @@ the mesh, not of the rig.
 | `Tools/boot_rig.py` | Authoritative leg/foot bones, boot weights, ankle/ball IK (pre-existing, unchanged) |
 | `Tools/create_original_protagonist.py` | Generates the mesh and the four sidecars; registers every mesh part with a chain id |
 | `Assets/Models/Characters/*.rig.json` | Exported skeleton + part ranges + humanoid map, one per LOD |
+| `Tools/render_rig_previews.py` | Skins the mesh through the rig and renders `Docs/CharacterPreviews/RIG_<pose>_*` (front, three-quarter, and a joint close-up per pose) |
 
 Regenerate and verify:
 
@@ -46,8 +47,13 @@ WAYFARER_DETAIL=0.34 WAYFARER_SUFFIX=_L2 python3 Tools/create_original_protagoni
 python3 Tools/verify_rig.py --structure   # hierarchy, humanoid, placement, weights, bind (30 s)
 python3 Tools/verify_rig.py --sweeps      # 45 deformation cases + animation states (100 s)
 python3 Tools/verify_rig.py --sweeps --only elbow --debug   # one family, worst edges
-python3 Tools/verify_rig.py --sweeps --report /tmp/rig.json # machine-readable report
+python3 Tools/verify_rig.py --sweeps --report Docs/CharacterPreviews/rig_report.json
+python3 Tools/render_rig_previews.py    # posed previews (bind, walk, attack, dodge)
 ```
+
+The last full report is checked in at
+`Docs/CharacterPreviews/rig_report.json` (per-case metrics, limits, failures,
+warnings).
 
 `verify_rig.py` takes `--obj/--rig` so the LODs are checked with the same
 rules:
